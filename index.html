@@ -297,14 +297,14 @@
   .theme-backdrop { position: fixed; inset: 0; z-index: 150; display: none; background: rgba(0,0,0,0.3); }
   .theme-backdrop.show { display: block; }
   .marquee-box { position: absolute; background: var(--marquee-bg); border: 2px dashed var(--marquee-border); pointer-events: none; z-index: 998; box-shadow: 0 0 0 10000px rgba(59,130,196,0.05); }
-  #toast-container { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 6px; pointer-events: none; max-width: 90vw; }
+  #toast-container { position: fixed; top: 84px; right: 8px; left: auto; transform: none; z-index: 9999; display: flex; flex-direction: column; gap: 6px; pointer-events: none; max-width: 200px; align-items: flex-end; }
   .toast { background: var(--toast-bg); color: var(--toast-text); padding: 10px 14px; border-radius: 8px; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: toastIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
   .toast.success { border-left: 3px solid #10b981; }
   .toast.error { border-left: 3px solid var(--danger); }
   .toast.info { border-left: 3px solid var(--accent); }
   .toast.out { animation: toastOut 0.3s ease-in forwards; }
-  @keyframes toastIn { from { transform: translateY(15px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-  @keyframes toastOut { to { transform: translateY(15px) scale(0.9); opacity: 0; } }
+  @keyframes toastIn { from { transform: translateX(30px) scale(0.9); opacity: 0; } to { transform: translateX(0) scale(1); opacity: 1; } }
+  @keyframes toastOut { to { transform: translateX(30px) scale(0.9); opacity: 0; } }
   #loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 9998; display: none; align-items: center; justify-content: center; }
   #loading-overlay.show { display: flex; }
   .spinner-box { background: var(--panel); padding: 22px 30px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
@@ -432,13 +432,57 @@
   .pdf-range-group input { flex: 1; font-size: 11px; padding: 4px 6px; min-height: 30px; font-family: 'JetBrains Mono', monospace; min-width: 0; }
   .pdf-range-group .btn { min-height: 30px; font-size: 11px; padding: 4px 7px; }
   #pdfPrintModal { z-index: 13000; }
+
+  /* FIX 4: @media print corregido para evitar página extra en blanco */
   @media print {
+    @page { margin: 0; }
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100%;
+      background: #fff !important;
+    }
     body * { visibility: hidden; }
     #printArea, #printArea * { visibility: visible; }
-    #printArea { display: block !important; position: absolute; top: 0; left: 0; width: 100%; margin: 0; padding: 0; }
-    #printArea .print-page { page-break-after: always; margin: 0; padding: 0; }
-    #printArea .print-page:last-child { page-break-after: auto; }
-    #printArea img { display: block; width: 100%; height: auto; }
+    #printArea {
+      display: block !important;
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #printArea .print-page {
+      page-break-after: always;
+      break-after: page;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+    #printArea .print-page:last-child {
+      page-break-after: auto;
+      break-after: auto;
+      height: auto;
+      max-height: 100vh;
+    }
+    #printArea img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border: 0;
+      outline: 0;
+    }
   }
 </style>
 </head>
@@ -460,19 +504,12 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0-6 6v4"/></svg>
       </button>
       <div class="toolbar-divider"></div>
-      <label for="addFiles" class="icon-btn" title="Añadir imagen">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      </label>
-      <input type="file" id="addFiles" accept="image/*" multiple style="display: none;" />
-      <button class="icon-btn" id="cameraBtn" title="Cámara">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      </button>
       <button class="icon-btn" id="openPdfReaderBtn" title="Lector PDF">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       </button>
-      <button class="icon-btn accent" id="openBatchBtn" title="Auto">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8L19 13M17.8 6.2L19 5M12.2 6.2L11 5M12.2 11.8L11 13"/><path d="M3 21l9-9"/></svg>
-      </button>
+      <button class="icon-btn accent" id="openBatchBtn" title="Añadir imágenes">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+</button>
           <div class="toolbar-spacer"></div>
     <button class="icon-btn" id="moreMenuBtn" title="Más opciones">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
@@ -480,7 +517,6 @@
   </div>
 </header>
 
-<!-- MENÚ DESPLEGABLE (fuera del header para que no lo recorte el overflow) -->
 <div class="dropdown-menu" id="moreMenu">
   <button id="addPageBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6M9 15h6"/></svg>Nueva página</button>
   <button id="duplicatePageBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Duplicar página</button>
@@ -858,7 +894,8 @@
         <div><label>Hasta</label><input type="number" id="printTo" value="1" min="1" /></div>
       </div>
       <label>Doble cara (dúplex manual)</label>
-      <div class="toggle"><button id="printDuplexOff" class="active">Solo frente</button><button id="printDuplexOdd">Frente (impares)</button><button id="printDuplexEven">Reverso (pares)</button></div>
+      <!-- FIX 1: "Solo frente" -> "Todas" -->
+      <div class="toggle"><button id="printDuplexOff" class="active">Todas</button><button id="printDuplexOdd">Frente (impares)</button><button id="printDuplexEven">Reverso (pares)</button></div>
       <label>Calidad</label>
       <select id="printQuality"><option value="0.7">Borrador</option><option value="0.92" selected>Normal</option><option value="1.0">Alta</option></select>
       <label>Vista previa</label>
@@ -895,19 +932,14 @@
       <button class="closebtn" id="closePdfPrint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       <h2>Imprimir páginas del PDF</h2>
       <label>Doble cara</label>
-      <div class="toggle"><button id="pdfDuplexOff" class="active">Solo frente</button><button id="pdfDuplexOdd">Frente (impares)</button><button id="pdfDuplexEven">Reverso (pares)</button></div>
+      <!-- FIX 1: "Solo frente" -> "Todas" -->
+      <div class="toggle"><button id="pdfDuplexOff" class="active">Todas</button><button id="pdfDuplexOdd">Frente </button><button id="pdfDuplexEven">Reverso </button></div>
       <label>Calidad</label>
       <select id="pdfPrintQuality"><option value="0.7">Borrador</option><option value="0.92" selected>Normal</option><option value="1.0">Alta</option></select>
       <label>Vista previa</label>
       <div class="print-preview" id="pdfPrintPreview"></div>
       <button class="cta full" id="doPdfPrintBtn" style="margin-top: 12px;">Imprimir ahora</button>
     </div>
-  </div>
-
-  <div class="camera-modal" id="cameraModal">
-    <button class="camera-close-btn" id="cameraCloseBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    <video class="camera-video" id="cameraVideo" autoplay playsinline muted></video>
-    <div class="camera-controls"><button class="camera-btn-capture" id="cameraCaptureBtn"></button></div>
   </div>
 
   <div class="scan-modal" id="scanModal">
@@ -1038,12 +1070,10 @@
   let scanCapturedDataUrl = null;
   const DPR = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
 
-  function showToast(msg, type = 'info', duration = 2500) {
-    const t = document.createElement('div');
-    t.className = `toast ${type}`; t.textContent = msg;
-    $('toast-container').appendChild(t);
-    setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, duration);
-  }
+  function showToast(msg, type = 'info', duration = 1400) {
+  // Desactivado: las notificaciones no se muestran
+  return;
+}
   function showLoading(label = 'Procesando...') { $('loading-label').textContent = label; $('loading-overlay').classList.add('show'); }
   function hideLoading() { $('loading-overlay').classList.remove('show'); }
 
@@ -1210,27 +1240,35 @@
     thumbCache.delete(currentPage().id);
     updateThumbnails();
   }
-  function undo() {
-    if (undoStack.length <= 1) return;
-    sfx.click();
-    isHistoryAction = true;
-    redoStack.push(undoStack.pop());
-    Object.assign(state, JSON.parse(undoStack[undoStack.length - 1]));
-    selectedIds = new Set(); checkMultiSelectState();
-    syncUIWithState(); renderAll();
-    isHistoryAction = false; updateHistoryButtons(); saveToLocalStorage(); updateThumbnails();
-  }
+  const UI_ONLY_FIELDS = ['sidebarOpen', 'thumbsVisible', 'inspectorExpanded', 'inspectorHeight', 'inspectorLocked'];
+
+function undo() {
+  if (undoStack.length <= 1) return;
+  sfx.click();
+  isHistoryAction = true;
+  redoStack.push(undoStack.pop());
+  const currentUI = {};
+  UI_ONLY_FIELDS.forEach(f => { currentUI[f] = state[f]; });
+  Object.assign(state, JSON.parse(undoStack[undoStack.length - 1]));
+  UI_ONLY_FIELDS.forEach(f => { state[f] = currentUI[f]; });
+  selectedIds = new Set(); checkMultiSelectState();
+  syncUIWithState(); renderAll();
+  isHistoryAction = false; updateHistoryButtons(); saveToLocalStorage(); updateThumbnails();
+}
   function redo() {
-    if (redoStack.length === 0) return;
-    sfx.click();
-    isHistoryAction = true;
-    const str = redoStack.pop();
-    undoStack.push(str);
-    Object.assign(state, JSON.parse(str));
-    selectedIds = new Set(); checkMultiSelectState();
-    syncUIWithState(); renderAll();
-    isHistoryAction = false; updateHistoryButtons(); saveToLocalStorage(); updateThumbnails();
-  }
+  if (redoStack.length === 0) return;
+  sfx.click();
+  isHistoryAction = true;
+  const str = redoStack.pop();
+  undoStack.push(str);
+  const currentUI = {};
+  UI_ONLY_FIELDS.forEach(f => { currentUI[f] = state[f]; });
+  Object.assign(state, JSON.parse(str));
+  UI_ONLY_FIELDS.forEach(f => { state[f] = currentUI[f]; });
+  selectedIds = new Set(); checkMultiSelectState();
+  syncUIWithState(); renderAll();
+  isHistoryAction = false; updateHistoryButtons(); saveToLocalStorage(); updateThumbnails();
+}
   function updateHistoryButtons() {
     $("undoBtn").disabled = undoStack.length <= 1;
     $("redoBtn").disabled = redoStack.length === 0;
@@ -1437,7 +1475,6 @@
     return d;
   }
 
-  // CORRECCIÓN BUG 2: shadow div lleva data-shadow-id para actualizarse en tiempo real
   function buildShadowDiv(el) {
     const sd = document.createElement("div");
     sd.className = "el-shadow";
@@ -1611,157 +1648,284 @@
     } catch (e) { return null; }
   }
 
-  // CORRECCIÓN BUG 3: cada thumb guarda su pageId y usa lookup en tap y drag
   function setupThumbEvents(thumb, pageId) {
-    let longPressTimer = null;
-    let startX = 0, startY = 0;
-    let dragActive = false;
-    let ghost = null, insertIndicator = null;
-    let insertIdx = -1, currentPointerId = null, movedDuringGesture = false;
+  let longPressTimer = null;
+  let startX = 0, startY = 0;
+  let dragActive = false;
+  let ghost = null, insertIndicator = null;
+  let insertIdx = -1, currentPointerId = null, movedDuringGesture = false;
+  let isPointerDown = false; // bandera para bloquear pointerdowns duplicados
 
-    const startDrag = (clientX, clientY) => {
-      dragActive = true; thumb.style.touchAction = 'none'; sfx.longpress();
-      ghost = document.createElement('div'); ghost.className = 'thumb-ghost';
-      const img = thumb.querySelector('img');
-      if (img) { const ghostImg = document.createElement('img'); ghostImg.src = img.src; ghost.appendChild(ghostImg); }
-      document.body.appendChild(ghost);
-      insertIndicator = document.createElement('div'); insertIndicator.className = 'thumb-insert-indicator';
-      $('thumbnailsBar').appendChild(insertIndicator);
-      thumb.classList.add('dragging');
-      updateGhostPosition(clientX, clientY);
-    };
-    const updateGhostPosition = (clientX, clientY) => {
-      if (!ghost) return;
-      ghost.style.left = (clientX - 24) + 'px'; ghost.style.top = (clientY - 28) + 'px';
-      const bar = $('thumbnailsBar'); const thumbs = Array.from(bar.querySelectorAll('.thumb'));
-      insertIdx = state.pages.length;
-      for (let i = 0; i < thumbs.length; i++) {
-        const rect = thumbs[i].getBoundingClientRect();
-        if (clientX < rect.left + rect.width / 2) { insertIdx = i; break; }
+  const cleanupDragVisuals = () => {
+    if (ghost) { ghost.remove(); ghost = null; }
+    if (insertIndicator) { insertIndicator.remove(); insertIndicator = null; }
+    thumb.classList.remove('dragging');
+    thumb.style.touchAction = '';
+    dragActive = false;
+  };
+
+  const startDrag = (clientX, clientY) => {
+    if (dragActive) return; // evitar doble drag
+    dragActive = true;
+    thumb.style.touchAction = 'none';
+    sfx.longpress();
+    ghost = document.createElement('div');
+    ghost.className = 'thumb-ghost';
+    const img = thumb.querySelector('img');
+    if (img) {
+      const ghostImg = document.createElement('img');
+      ghostImg.src = img.src;
+      ghost.appendChild(ghostImg);
+    }
+    document.body.appendChild(ghost);
+    insertIndicator = document.createElement('div');
+    insertIndicator.className = 'thumb-insert-indicator';
+    $('thumbnailsBar').appendChild(insertIndicator);
+    thumb.classList.add('dragging');
+    updateGhostPosition(clientX, clientY);
+  };
+
+  const updateGhostPosition = (clientX, clientY) => {
+    if (!ghost) return;
+    ghost.style.left = (clientX - 24) + 'px';
+    ghost.style.top = (clientY - 28) + 'px';
+    const bar = $('thumbnailsBar');
+    const thumbs = Array.from(bar.querySelectorAll('.thumb'));
+    insertIdx = state.pages.length;
+    for (let i = 0; i < thumbs.length; i++) {
+      const rect = thumbs[i].getBoundingClientRect();
+      if (clientX < rect.left + rect.width / 2) { insertIdx = i; break; }
+    }
+    if (insertIndicator) {
+      const barRect = bar.getBoundingClientRect();
+      if (insertIdx < thumbs.length) {
+        const targetRect = thumbs[insertIdx].getBoundingClientRect();
+        insertIndicator.style.left = (targetRect.left - barRect.left + bar.scrollLeft - 2) + 'px';
+      } else {
+        const lastRect = thumbs[thumbs.length - 1].getBoundingClientRect();
+        insertIndicator.style.left = (lastRect.right - barRect.left + bar.scrollLeft - 1) + 'px';
       }
-      if (insertIndicator) {
-        const barRect = bar.getBoundingClientRect();
-        if (insertIdx < thumbs.length) {
-          const targetRect = thumbs[insertIdx].getBoundingClientRect();
-          insertIndicator.style.left = (targetRect.left - barRect.left + bar.scrollLeft - 2) + 'px';
-        } else {
-          const lastRect = thumbs[thumbs.length - 1].getBoundingClientRect();
-          insertIndicator.style.left = (lastRect.right - barRect.left + bar.scrollLeft - 1) + 'px';
+      insertIndicator.style.top = '8px';
+    }
+  };
+
+  const endDrag = () => {
+    if (dragActive && ghost) {
+      const currentIdx = state.pages.findIndex(p => p.id === pageId);
+      if (currentIdx >= 0 && insertIdx !== currentIdx && insertIdx !== currentIdx + 1) {
+        const movedPage = state.pages.splice(currentIdx, 1)[0];
+        let targetIdx = insertIdx;
+        if (targetIdx > currentIdx) targetIdx--;
+        state.pages.splice(targetIdx, 0, movedPage);
+        if (state.currentPageIndex === currentIdx) {
+          state.currentPageIndex = targetIdx;
+        } else if (currentIdx < state.currentPageIndex && targetIdx >= state.currentPageIndex) {
+          state.currentPageIndex--;
+        } else if (currentIdx > state.currentPageIndex && targetIdx <= state.currentPageIndex) {
+          state.currentPageIndex++;
         }
-        insertIndicator.style.top = '8px';
+        saveState(); renderAll(); sfx.success(); showToast('Página reorganizada', 'success');
       }
-    };
-    const endDrag = () => {
-      if (dragActive && ghost) {
-        // Buscar índice actual por pageId para evitar índices obsoletos
-        const currentIdx = state.pages.findIndex(p => p.id === pageId);
-        if (currentIdx >= 0 && insertIdx !== currentIdx && insertIdx !== currentIdx + 1) {
-          const movedPage = state.pages.splice(currentIdx, 1)[0];
-          let targetIdx = insertIdx;
-          if (targetIdx > currentIdx) targetIdx--;
-          state.pages.splice(targetIdx, 0, movedPage);
-          if (state.currentPageIndex === currentIdx) {
-            state.currentPageIndex = targetIdx;
-          } else if (currentIdx < state.currentPageIndex && targetIdx >= state.currentPageIndex) {
-            state.currentPageIndex--;
-          } else if (currentIdx > state.currentPageIndex && targetIdx <= state.currentPageIndex) {
-            state.currentPageIndex++;
-          }
-          saveState(); renderAll(); sfx.success(); showToast('Página reorganizada', 'success');
-        }
-      }
-      if (ghost) { ghost.remove(); ghost = null; }
-      if (insertIndicator) { insertIndicator.remove(); insertIndicator = null; }
-      thumb.classList.remove('dragging'); thumb.style.touchAction = '';
-      dragActive = false; currentPointerId = null;
-    };
-    thumb.addEventListener('pointerdown', (e) => {
-      if (e.button !== 0) return;
-      e.stopPropagation();
-      startX = e.clientX; startY = e.clientY;
-      currentPointerId = e.pointerId; dragActive = false; movedDuringGesture = false;
-      longPressTimer = setTimeout(() => {
-        longPressTimer = null; startDrag(e.clientX, e.clientY);
+    }
+    cleanupDragVisuals();
+  };
+
+  thumb.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+
+    // 🔒 BLOQUEO: si ya hay un pointerdown activo o un drag en curso, ignorar
+    if (isPointerDown || dragActive) return;
+    isPointerDown = true;
+
+    startX = e.clientX;
+    startY = e.clientY;
+    currentPointerId = e.pointerId;
+    movedDuringGesture = false;
+
+    // 🧹 Limpiar cualquier timer previo (evita timers huérfanos)
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+
+    longPressTimer = setTimeout(() => {
+      longPressTimer = null;
+      // Solo arrancar drag si el dedo sigue apoyado
+      if (isPointerDown) {
+        startDrag(e.clientX, e.clientY);
         try { thumb.setPointerCapture(e.pointerId); } catch(_) {}
-      }, 400);
-    });
-    thumb.addEventListener('pointermove', (e) => {
-      if (e.pointerId !== currentPointerId) return;
-      if (dragActive && ghost) { updateGhostPosition(e.clientX, e.clientY); e.preventDefault(); return; }
-      const dx = e.clientX - startX, dy = e.clientY - startY;
-      if (Math.hypot(dx, dy) > 8) { movedDuringGesture = true; if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; } }
-    });
-    thumb.addEventListener('pointerup', (e) => {
-      if (e.pointerId !== currentPointerId) return;
-      if (longPressTimer && !movedDuringGesture) {
-        clearTimeout(longPressTimer); longPressTimer = null; sfx.page();
-        // Lookup por pageId en lugar de usar índice obsoleto
-        const currentIdx = state.pages.findIndex(p => p.id === pageId);
-        if (currentIdx >= 0) {
-          state.currentPageIndex = currentIdx;
-          deselectAll();
-          renderAll();
+      }
+    }, 400);
+  });
+
+  thumb.addEventListener('pointermove', (e) => {
+    if (e.pointerId !== currentPointerId) return;
+    if (dragActive && ghost) {
+      updateGhostPosition(e.clientX, e.clientY);
+      e.preventDefault();
+      return;
+    }
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    if (Math.hypot(dx, dy) > 8) {
+      movedDuringGesture = true;
+      // 🧹 Movimiento = cancelar long press
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+    }
+  });
+
+  thumb.addEventListener('pointerup', (e) => {
+    if (e.pointerId !== currentPointerId) return;
+
+    const wasCleanTap = !dragActive && !movedDuringGesture && longPressTimer !== null;
+
+    // 🧹 Limpiar timer siempre
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+
+    isPointerDown = false;
+    currentPointerId = null;
+
+    if (wasCleanTap) {
+      // Tap corto → cambiar de página
+      sfx.page();
+      const currentIdx = state.pages.findIndex(p => p.id === pageId);
+      if (currentIdx >= 0 && currentIdx !== state.currentPageIndex) {
+        state.currentPageIndex = currentIdx;
+
+        if (selectedIds.size > 0) {
+          selectedIds = new Set();
+          multiSelectMode = false;
+          document.body.classList.remove('multiselect-mode');
         }
-      } else if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        renderAll();
+      }
+      return;
+    }
+
+    // Si era un drag activo, cerrar el drag
+    if (dragActive) {
       endDrag();
-    });
-    thumb.addEventListener('pointercancel', (e) => {
-      if (e.pointerId !== currentPointerId) return;
-      if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-      endDrag();
-    });
-  }
+    } else {
+      // Cualquier otro caso: por seguridad, limpiar restos
+      cleanupDragVisuals();
+    }
+  });
+
+  thumb.addEventListener('pointercancel', (e) => {
+    if (e.pointerId !== currentPointerId) return;
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+    isPointerDown = false;
+    currentPointerId = null;
+    endDrag();
+  });
+}
 
   let thumbUpdateTimer = null;
-  let thumbUpdateToken = 0;
-  function updateThumbnails() {
-    clearTimeout(thumbUpdateTimer);
-    const myToken = ++thumbUpdateToken;
-    thumbUpdateTimer = setTimeout(async () => {
-      if (myToken !== thumbUpdateToken) return;
-      const bar = $('thumbnailsBar'); if (!bar) return;
-      const currentIdx = state.currentPageIndex;
-      bar.innerHTML = '';
-      for (let i = 0; i < state.pages.length; i++) {
-        const pageId = state.pages[i].id;
-        const thumb = document.createElement('div');
-        thumb.className = 'thumb' + (i === currentIdx ? ' active' : '');
-        thumb.dataset.page = i;
-        thumb.dataset.pageId = pageId;
-        const img = document.createElement('img');
-        const cached = thumbCache.get(pageId);
-        img.src = cached || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="42" height="50"><rect width="42" height="50" fill="%23ddd"/></svg>';
-        const num = document.createElement('div'); num.className = 'thumb-num'; num.textContent = i + 1;
-        thumb.appendChild(img); thumb.appendChild(num);
-        setupThumbEvents(thumb, pageId);
-        bar.appendChild(thumb);
-        const shouldRegenerate = !cached || i === currentIdx;
-        if (shouldRegenerate) {
-          const capturedId = pageId;
-          renderThumbnail(i).then(dataUrl => {
-            if (dataUrl) {
-              thumbCache.set(capturedId, dataUrl);
-              const curThumb = bar.querySelector(`.thumb[data-page-id="${capturedId}"]`);
-              if (curThumb && curThumb.firstChild) curThumb.firstChild.src = dataUrl;
-            }
-          });
+let thumbUpdateToken = 0;
+let lastThumbsSignature = ''; // firma para detectar cambios estructurales
+
+function updateThumbnails() {
+  clearTimeout(thumbUpdateTimer);
+  const myToken = ++thumbUpdateToken;
+
+  thumbUpdateTimer = setTimeout(async () => {
+    if (myToken !== thumbUpdateToken) return;
+    const bar = $('thumbnailsBar'); if (!bar) return;
+    const currentIdx = state.currentPageIndex;
+
+    // Firma: ids en orden. Si no cambia, solo actualizamos clases (sin parpadeo)
+    const signature = state.pages.map(p => p.id).join(',');
+    const structureChanged = signature !== lastThumbsSignature;
+
+    // ===== CAMINO RÁPIDO: solo cambió la página activa =====
+    if (!structureChanged && bar.children.length > 0) {
+      // Actualizar clases .active en los thumbs existentes
+      const thumbs = bar.querySelectorAll('.thumb');
+      thumbs.forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === currentIdx);
+      });
+
+      // Regenerar SOLO la miniatura de la página activa (por si cambió su contenido)
+      const activePageId = state.pages[currentIdx]?.id;
+      if (activePageId) {
+        const activeThumb = bar.querySelector(`.thumb[data-page-id="${activePageId}"]`);
+        if (activeThumb) {
+          const dataUrl = await renderThumbnail(currentIdx);
+          if (myToken !== thumbUpdateToken) return;
+          if (dataUrl) {
+            thumbCache.set(activePageId, dataUrl);
+            const img = activeThumb.querySelector('img');
+            if (img) img.src = dataUrl;
+          }
         }
       }
-      const addBtn = document.createElement('div');
-      addBtn.className = 'thumb-add'; addBtn.innerHTML = ICONS.plus; addBtn.title = 'Nueva página';
-      addBtn.addEventListener('click', () => {
-        sfx.success();
-        state.pages.push({ id: ++pageCounter, els: [] });
-        state.currentPageIndex = state.pages.length - 1;
-        saveState(); deselectAll(); showToast('Página agregada', 'success');
-      });
-      bar.appendChild(addBtn);
-      setTimeout(() => {
-        const active = bar.querySelector('.thumb.active');
-        if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      }, 50);
-    }, 150);
-  }
+
+      // Scroll al activo (suave, sin saltos bruscos)
+      const active = bar.querySelector('.thumb.active');
+      if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      return;
+    }
+
+    // ===== CAMINO LENTO: cambió la estructura → reconstruir todo =====
+    lastThumbsSignature = signature;
+    bar.innerHTML = '';
+
+    for (let i = 0; i < state.pages.length; i++) {
+      if (myToken !== thumbUpdateToken) return;
+
+      const pageId = state.pages[i].id;
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb' + (i === currentIdx ? ' active' : '');
+      thumb.dataset.page = i;
+      thumb.dataset.pageId = pageId;
+      const img = document.createElement('img');
+      const cached = thumbCache.get(pageId);
+      img.src = cached || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="42" height="50"><rect width="42" height="50" fill="%23ddd"/></svg>';
+      const num = document.createElement('div'); num.className = 'thumb-num'; num.textContent = i + 1;
+      thumb.appendChild(img); thumb.appendChild(num);
+      setupThumbEvents(thumb, pageId);
+      bar.appendChild(thumb);
+
+      if (!cached || i === currentIdx) {
+        const capturedId = pageId;
+        renderThumbnail(i).then(dataUrl => {
+          if (myToken !== thumbUpdateToken) return;
+          if (dataUrl) {
+            thumbCache.set(capturedId, dataUrl);
+            const curThumb = bar.querySelector(`.thumb[data-page-id="${capturedId}"]`);
+            if (curThumb && curThumb.firstChild) curThumb.firstChild.src = dataUrl;
+          }
+        });
+      }
+    }
+
+    if (myToken !== thumbUpdateToken) return;
+
+    const addBtn = document.createElement('div');
+    addBtn.className = 'thumb-add'; addBtn.innerHTML = ICONS.plus; addBtn.title = 'Nueva página';
+    addBtn.addEventListener('click', () => {
+      sfx.success();
+      state.pages.push({ id: ++pageCounter, els: [] });
+      state.currentPageIndex = state.pages.length - 1;
+      saveState(); deselectAll(); showToast('Página agregada', 'success');
+    });
+    bar.appendChild(addBtn);
+
+    setTimeout(() => {
+      const active = bar.querySelector('.thumb.active');
+      if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }, 50);
+  }, 80);
+}
 
   function applyTheme(themeName) {
     document.body.className = document.body.className.replace(/theme-\w+/g, '');
@@ -1890,7 +2054,7 @@
     addCtxDivider(menu);
     addCtxItem(menu, ICONS.group, 'Plantillas collage', openCollageModal);
     addCtxItem(menu, ICONS.replace, 'Detectar líneas', () => openLineDetectModal(null));
-    addCtxItem(menu, ICONS.plus, 'Añadir imagen', () => $('addFiles').click());
+    addCtxItem(menu, ICONS.plus, 'Añadir imágenes', () => $('openBatchBtn').click());
     positionContextMenu(menu, x, y);
   }
   function showPageContextMenu(x, y, pageIdx) {
@@ -2747,7 +2911,6 @@
         el.hCm = Math.max(0.5, snap(gesture.resize.startH + dyPx / PX_PER_CM));
         const elDiv = stage.querySelector(`.el[data-id="${gesture.resize.elId}"]`);
         if (elDiv) { elDiv.style.width = el.wCm * PX_PER_CM + "px"; elDiv.style.height = el.hCm * PX_PER_CM + "px"; }
-        // CORRECCIÓN BUG 2: actualizar sombra en tiempo real
         const shadowEl = stage.querySelector(`.el-shadow[data-shadow-id="${gesture.resize.elId}"]`);
         if (shadowEl) {
           shadowEl.style.width = el.wCm * PX_PER_CM + "px";
@@ -2772,7 +2935,6 @@
             e2.xCm = sPos.xCm + deltaX; e2.yCm = sPos.yCm + deltaY;
             const domEl = stage.querySelector(`.el[data-id="${id}"]`);
             if (domEl) { domEl.style.left = e2.xCm * PX_PER_CM + "px"; domEl.style.top = e2.yCm * PX_PER_CM + "px"; }
-            // CORRECCIÓN BUG 2: actualizar sombra en tiempo real
             const shadowEl = stage.querySelector(`.el-shadow[data-shadow-id="${id}"]`);
             if (shadowEl) {
               shadowEl.style.left = e2.xCm * PX_PER_CM + "px";
@@ -2932,34 +3094,6 @@
   setZoomAtPoint(val, rect.width / 2, rect.height / 2);
 }
 
-  let cameraStream = null;
-  async function openCamera() {
-    try {
-      cameraStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 1920 } }, audio: false
-      });
-      $('cameraVideo').srcObject = cameraStream;
-      $('cameraModal').classList.add('show');
-    } catch (err) { sfx.error(); showToast('No se pudo abrir la cámara', 'error'); }
-  }
-  function closeCamera() {
-    if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
-    $('cameraVideo').srcObject = null;
-    $('cameraModal').classList.remove('show');
-  }
-  async function capturePhoto() {
-    const video = $('cameraVideo'); if (!video.videoWidth) return;
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    canvas.toBlob(async (blob) => {
-      try {
-        const file = new File([blob], `photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
-        const result = await processImageFile(file);
-        closeCamera(); sfx.success(); openScanCorrection(result.src);
-      } catch (err) { sfx.error(); showToast('Error al procesar foto', 'error'); }
-    }, 'image/jpeg', 0.92);
-  }
 
   async function renderPageToCanvas(pageIndex, targetDpi = 300, pageNum = null, totalPages = null, forcePxWidth = null) {
     const paper = getPaperCm();
@@ -3143,6 +3277,8 @@ ctx.restore();
 
   let printScope = 'all';
   let printDuplex = 'off';
+
+  // FIX 2: Frente/Reverso ahora se calcula por POSICIÓN en la selección, no por nº de página
   function getPrintPages() {
     const total = state.pages.length;
     let pages;
@@ -3154,8 +3290,9 @@ ctx.restore();
       if (from > to) [from, to] = [to, from];
       pages = Array.from({ length: to - from + 1 }, (_, i) => from - 1 + i);
     }
-    if (printDuplex === 'odd') pages = pages.filter(p => (p + 1) % 2 === 1);
-    else if (printDuplex === 'even') pages = pages.filter(p => (p + 1) % 2 === 0);
+    // Frente/Reverso por POSICIÓN (1,2,3,4...) en la lista de páginas a imprimir
+    if (printDuplex === 'odd') pages = pages.filter((_, idx) => idx % 2 === 0);
+    else if (printDuplex === 'even') pages = pages.filter((_, idx) => idx % 2 === 1);
     return pages;
   }
   function updatePrintPreview() {
@@ -3550,11 +3687,14 @@ ctx.restore();
   }
 
   let pdfPrintDuplex = 'off';
+
+  // FIX 2: Frente/Reverso ahora se calcula por POSICIÓN en la selección, no por nº de página
   function getPdfPrintPages() {
     let pages = Array.from(pdfReaderState.selectedPages).sort((a,b)=>a-b);
     if (pages.length === 0) pages = [pdfReaderState.currentPage];
-    if (pdfPrintDuplex === 'odd') pages = pages.filter(p => p % 2 === 1);
-    else if (pdfPrintDuplex === 'even') pages = pages.filter(p => p % 2 === 0);
+    // Frente/Reverso por POSICIÓN (1,2,3,4...) en la lista de páginas marcadas
+    if (pdfPrintDuplex === 'odd') pages = pages.filter((_, idx) => idx % 2 === 0);
+    else if (pdfPrintDuplex === 'even') pages = pages.filter((_, idx) => idx % 2 === 1);
     return pages;
   }
   function setPdfPrintDuplex(mode) {
@@ -3564,8 +3704,12 @@ ctx.restore();
     $('pdfDuplexEven').classList.toggle('active', mode === 'even');
     updatePdfPrintPreview();
   }
+
+  // FIX 3: Token anti-carrera para evitar duplicados en la vista previa
+  let pdfPrintPreviewToken = 0;
   async function updatePdfPrintPreview() {
     const preview = $('pdfPrintPreview'); if (!preview) return;
+    const myToken = ++pdfPrintPreviewToken;
     preview.innerHTML = '';
     const pdf = pdfReaderState.pdfDoc;
     if (!pdf) { preview.innerHTML = '<div class="pp-empty">Abre un PDF primero</div>'; return; }
@@ -3573,18 +3717,22 @@ ctx.restore();
     if (pages.length === 0) { preview.innerHTML = '<div class="pp-empty">Sin páginas</div>'; return; }
     const previewPages = pages.slice(0, 12);
     for (const pNum of previewPages) {
+      if (myToken !== pdfPrintPreviewToken) return;
       const item = document.createElement('div'); item.className = 'pp-item';
       const canvas = document.createElement('canvas');
       const page = await pdf.getPage(pNum);
+      if (myToken !== pdfPrintPreviewToken) return;
       const vp = page.getViewport({ scale: 0.25 });
       canvas.width = vp.width; canvas.height = vp.height;
       const ctx = canvas.getContext('2d');
       await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      if (myToken !== pdfPrintPreviewToken) return;
       const img = document.createElement('img');
       img.src = canvas.toDataURL('image/jpeg', 0.8);
       const label = document.createElement('span'); label.textContent = `Pág. ${pNum}`;
       item.appendChild(img); item.appendChild(label); preview.appendChild(item);
     }
+    if (myToken !== pdfPrintPreviewToken) return;
     if (pages.length > previewPages.length) {
       const more = document.createElement('div');
       more.className = 'pp-empty'; more.style.fontSize = '10px'; more.style.padding = '8px 0';
@@ -3592,10 +3740,15 @@ ctx.restore();
       preview.appendChild(more);
     }
   }
+
+  // FIX 3: openPdfPrintModal ya NO llama a setPdfPrintDuplex (evita doble llamada)
   function openPdfPrintModal() {
     if (!pdfReaderState.pdfDoc) { showToast('Abre un PDF primero', 'info'); return; }
     $('pdfPrintQuality').value = String(state.exportQuality || 0.92);
-    setPdfPrintDuplex('off');
+    pdfPrintDuplex = 'off';
+    $('pdfDuplexOff').classList.add('active');
+    $('pdfDuplexOdd').classList.remove('active');
+    $('pdfDuplexEven').classList.remove('active');
     const m = $('pdfPrintModal'); m.classList.add('show'); setTimeout(() => m.classList.add('visible'), 10);
     updatePdfPrintPreview();
   }
@@ -3688,9 +3841,6 @@ ctx.restore();
       if (header) header.addEventListener('click', () => { sfx.tap(); sg.classList.toggle('collapsed'); });
     });
 
-    // ============ CORRECCIÓN BUG 1: menú "⋯" ============
-    // Usamos pointerdown en fase de captura para cerrar, y click para togglear.
-    // Antes el stopPropagation + listener de click en document se peleaban.
     $('moreMenuBtn').addEventListener('click', (e) => {
   e.stopPropagation();
   sfx.click();
@@ -3698,7 +3848,6 @@ ctx.restore();
   const willOpen = !menu.classList.contains('show');
   document.querySelectorAll('.dropdown-menu.show').forEach(m => { if (m !== menu) m.classList.remove('show'); });
   if (willOpen) {
-    // Posicionamos el menú justo debajo del botón (que es fixed)
     const btnRect = e.currentTarget.getBoundingClientRect();
     menu.style.top = (btnRect.bottom + 6) + 'px';
     menu.style.right = Math.max(8, window.innerWidth - btnRect.right) + 'px';
@@ -3707,7 +3856,6 @@ ctx.restore();
     menu.classList.remove('show');
   }
 });
-// Cierre al tocar fuera
 document.addEventListener('pointerdown', (e) => {
   if (!e.target.closest('#moreMenu') && !e.target.closest('#moreMenuBtn')) {
     $('moreMenu').classList.remove('show');
@@ -3718,9 +3866,6 @@ document.addEventListener('pointerdown', (e) => {
     $('redoBtn').addEventListener('click', redo);
 
     $('resetAllBtn').addEventListener('click', () => { sfx.click(); $('moreMenu').classList.remove('show'); resetAll(); });
-    $('cameraBtn').addEventListener('click', () => { sfx.click(); openCamera(); });
-    $('cameraCloseBtn').addEventListener('click', closeCamera);
-    $('cameraCaptureBtn').addEventListener('click', () => { sfx.click(); capturePhoto(); });
     $('scanSkipBtn').addEventListener('click', () => {
       sfx.click();
       if (scanCapturedDataUrl) addScannedPageImage(scanCapturedDataUrl);
@@ -4114,31 +4259,6 @@ document.addEventListener('pointerdown', (e) => {
       state.inspectorExpanded = !state.inspectorExpanded;
       updateInspectorState(); saveToLocalStorage(); sfx.tap();
     });
-
-    $('addFiles').addEventListener('change', async (e) => {
-      const files = Array.from(e.target.files);
-      if (files.length === 0) return;
-      showLoading('Procesando...');
-      let count = 0;
-      for (const file of files) {
-        try {
-          const result = await processImageFile(file);
-          currentPage().els.push({
-            id: ++elCounter, src: result.src,
-            xCm: 1.0 + count * 0.3, yCm: 1.0 + count * 0.3,
-            wCm: 8.0, hCm: 8.0,
-            mode: "fit", imgZoom: 100, imgPosX: 0, imgPosY: 0,
-            imgRotate: 0, showOverflow: false
-          });
-          count++;
-        } catch (err) {}
-      }
-      hideLoading(); thumbCache.delete(currentPage().id);
-      sfx.success(); showToast(`${count} imagen(es) agregada(s)`, 'success');
-      saveState(); renderAll();
-      e.target.value = '';
-    });
-
     $('pdfBtn').addEventListener('click', () => { sfx.click(); generatePdf(); });
     $('shareBtn').addEventListener('click', async () => {
       sfx.click();
