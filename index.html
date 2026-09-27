@@ -433,57 +433,102 @@
   .pdf-range-group .btn { min-height: 30px; font-size: 11px; padding: 4px 7px; }
   #pdfPrintModal { z-index: 13000; }
 
-  /* FIX 4: @media print corregido para evitar página extra en blanco */
-  @media print {
-    @page { margin: 0; }
-    html, body {
-      margin: 0 !important;
-      padding: 0 !important;
-      width: 100%;
-      background: #fff !important;
-    }
-    body * { visibility: hidden; }
-    #printArea, #printArea * { visibility: visible; }
-    #printArea {
-      display: block !important;
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-    }
-    #printArea .print-page {
-      page-break-after: always;
-      break-after: page;
-      page-break-inside: avoid;
-      break-inside: avoid;
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-    #printArea .print-page:last-child {
-      page-break-after: auto;
-      break-after: auto;
-      height: auto;
-      max-height: 100vh;
-    }
-    #printArea img {
-      display: block;
-      max-width: 100%;
-      max-height: 100%;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-      border: 0;
-      outline: 0;
-    }
+  /* ============================================================
+   @media print — reescrito para evitar:
+   - hojas blancas extra
+   - imágenes tapadas
+   - páginas duplicadas
+   - desbordes en Mopria / Chrome Android
+   ============================================================ */
+@media print {
+  @page { margin: 0; }
+
+  /* 1) Reset completo de html/body para anular
+        el layout de la app (flex + 100vh + overflow hidden) */
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: block !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    touch-action: auto !important;
+    /* Fuerza a imprimir fondos/imágenes en algunos motores */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
+
+  /* 2) En lugar de visibility:hidden (que reserva espacio),
+        ocultamos con display:none a TODO excepto #printArea.
+        Así el documento impreso SOLO contiene las páginas. */
+  body > *:not(#printArea) {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* 3) #printArea fluye de forma normal (static), sin
+        posicionamiento absoluto que lo desplace */
+  #printArea {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    overflow: visible !important;
+  }
+
+  /* 4) Cada página ocupa el ancho de la hoja y su alto lo
+        determina la imagen. Sin 100vh, sin flex centrado. */
+  #printArea .print-page {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: hidden !important;
+    background: #ffffff !important;
+    line-height: 0 !important;
+    font-size: 0 !important;
+    /* Salto de página después de cada imagen */
+    page-break-after: always;
+    break-after: page;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* 5) La ÚLTIMA página no debe forzar salto,
+        para evitar una hoja blanca al final */
+  #printArea .print-page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  /* 6) La imagen llena el ancho, la altura se calcula sola
+        respetando su proporción (que ya coincide con el papel).
+        Sin max-height:100% (que dependía de 100vh). */
+  #printArea .print-page img {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    object-fit: contain;
+    border: 0 !important;
+    outline: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+}
 </style>
 </head>
 
@@ -3366,7 +3411,9 @@ ctx.restore();
       const imgs = Array.from(printArea.querySelectorAll('img'));
       await Promise.all(imgs.map(img => { if (img.complete) return Promise.resolve(); return new Promise(res => { img.onload = res; img.onerror = res; }); }));
       hideLoading(); closePrintModal();
-      setTimeout(() => window.print(), 200);
+      // Damos un poco más de tiempo para que el motor de impresión móvil
+      // procese todas las imágenes antes de abrir el diálogo.
+      setTimeout(() => window.print(), 450);
     } catch (err) { hideLoading(); sfx.error(); showToast('Error al imprimir', 'error'); }
   }
 
