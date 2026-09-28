@@ -484,42 +484,38 @@
     overflow: visible !important;
   }
 
-  /* 4) Cada página ocupa el ancho de la hoja y su alto lo
-        determina la imagen. Sin 100vh, sin flex centrado. */
+  /* 4) Cada página tiene tamaño EXACTO (variables --pw / --ph en pt,
+        puestas por JS). Si no hay variables (editor), se usa 100% x auto. */
   #printArea .print-page {
     display: block !important;
     margin: 0 !important;
     padding: 0 !important;
-    width: 100% !important;
-    height: auto !important;
-    max-height: none !important;
+    width: var(--pw, 100%) !important;
+    height: var(--ph, auto) !important;
+    max-height: var(--ph, none) !important;
     overflow: hidden !important;
     background: #ffffff !important;
     line-height: 0 !important;
     font-size: 0 !important;
-    /* Salto de página después de cada imagen */
-    page-break-after: always;
-    break-after: page;
-    page-break-inside: avoid;
     break-inside: avoid;
+    page-break-inside: avoid;
   }
 
-  /* 5) La ÚLTIMA página no debe forzar salto,
-        para evitar una hoja blanca al final */
-  #printArea .print-page:last-child {
-    page-break-after: auto;
-    break-after: auto;
+  /* 5) El salto se pone ANTES de cada página excepto la primera.
+        Así nunca se genera una hoja en blanco al final ni entre páginas. */
+  #printArea .print-page + .print-page {
+    page-break-before: always;
+    break-before: page;
   }
 
-  /* 6) La imagen llena el ancho, la altura se calcula sola
-        respetando su proporción (que ya coincide con el papel).
-        Sin max-height:100% (que dependía de 100vh). */
+  /* 6) La imagen llena la caja. Con alto fijo usa 100% (contain);
+        con alto auto se comporta como antes. */
   #printArea .print-page img {
     display: block !important;
     width: 100% !important;
-    height: auto !important;
+    height: 100% !important;
     max-width: 100% !important;
-    max-height: none !important;
+    max-height: 100% !important;
     object-fit: contain;
     border: 0 !important;
     outline: 0 !important;
@@ -3390,6 +3386,7 @@ ctx.restore();
     try {
       const paper = getPaperCm();
       const printArea = $('printArea'); printArea.innerHTML = '';
+      printArea.style.removeProperty('--pw'); printArea.style.removeProperty('--ph');
       let styleTag = document.getElementById('dynamicPageSize');
       if (!styleTag) { styleTag = document.createElement('style'); styleTag.id = 'dynamicPageSize'; document.head.appendChild(styleTag); }
       const inchW = (paper.w / 2.54).toFixed(2), inchH = (paper.h / 2.54).toFixed(2);
@@ -3815,8 +3812,12 @@ ctx.restore();
       if (!styleTag) { styleTag = document.createElement('style'); styleTag.id = 'dynamicPageSize'; document.head.appendChild(styleTag); }
       const firstPage = await pdf.getPage(pages[0]);
       const vp1 = firstPage.getViewport({ scale: 1 });
-      const inchW = (vp1.width / 72).toFixed(2), inchH = (vp1.height / 72).toFixed(2);
-      styleTag.textContent = `@media print { @page { size: ${inchW}in ${inchH}in; margin: 0; } }`;
+      // Tamaño exacto en puntos (sin redondeo a 2 decimales en pulgadas)
+      const ptW = vp1.width.toFixed(2), ptH = vp1.height.toFixed(2);
+      styleTag.textContent = `@media print { @page { size: ${ptW}pt ${ptH}pt; margin: 0; } }`;
+      // La caja de cada página mide 1pt menos de alto para que jamás se desborde a otra hoja
+      printArea.style.setProperty('--pw', `${ptW}pt`);
+      printArea.style.setProperty('--ph', `${(vp1.height - 1).toFixed(2)}pt`);
       const q = parseFloat($('pdfPrintQuality').value) || 0.92;
       for (const pNum of pages) {
         const page = await pdf.getPage(pNum);
