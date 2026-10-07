@@ -2,10 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content" />
 <title>Editor de Imágenes Pro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Bebas+Neue&family=Pacifico&family=Caveat:wght@400;700&family=Oswald:wght@400;700&family=Lobster&family=Roboto+Slab:wght@400;700&family=Montserrat:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -525,6 +525,45 @@
     break-inside: avoid;
   }
 }
+  #kbMini { position: fixed; left: 8px; right: 8px; z-index: 20000; display: none; align-items: center; gap: 8px; padding: 6px 8px 6px 10px; background: var(--panel); border: 1px solid var(--accent); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.35); font-size: 13px; color: var(--text); touch-action: auto; }
+  #kbMini.show { display: flex; }
+  #kbMini .km-l { font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; flex-shrink: 0; max-width: 32%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #kbMini .km-v { flex: 1; max-height: 3.9em; overflow-y: auto; white-space: pre-wrap; word-break: break-word; line-height: 1.3; user-select: none; -webkit-user-select: none; }
+  #kbMini button.km-h { background: var(--btn-bg); color: var(--btn-text); border: 1px solid var(--btn-border); }
+  #kbMini button { flex-shrink: 0; background: var(--accent); color: var(--cta-color); border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; min-height: 30px; }
+  #inlineEd { position: fixed; z-index: 60; margin: 0; border: 2px solid var(--accent); border-radius: 2px; outline: none; resize: none; overflow: auto; box-sizing: border-box; touch-action: auto; user-select: text; -webkit-user-select: text; }
+  .sl { display: flex; align-items: center; gap: 4px; }
+  .sl-t { flex: 1; min-width: 0; touch-action: pan-y; padding: 8px 0; }
+  .sl-t input { pointer-events: none; width: 100%; margin: 0; display: block; }
+  .sl-b { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--btn-text); font-size: 15px; line-height: 1; padding: 0; flex-shrink: 0; touch-action: manipulation; }
+  .sl-b:active { transform: scale(0.9); }
+  .inspector.locked .sl { pointer-events: none; opacity: 0.75; }
+  #qa { position: fixed; left: 6px; right: 6px; z-index: 45; display: none; gap: 4px; overflow-x: auto; padding: 4px; background: var(--header-bg); border: 1px solid var(--line); border-radius: 10px; backdrop-filter: blur(8px); touch-action: pan-x; scrollbar-width: none; align-items: center; }
+  #qa::-webkit-scrollbar { display: none; }
+  #qa.show { display: flex; }
+  #qa button { flex-shrink: 0; min-width: 32px; height: 30px; padding: 0 9px; border-radius: 7px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--btn-text); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  #qa button.on { border-color: var(--accent); color: var(--accent); background: var(--toggle-active-bg); }
+  #qa button:active { transform: scale(0.94); }
+  #qa input[type=color] { width: 30px; height: 30px; min-width: 30px; padding: 1px; border-radius: 50%; flex-shrink: 0; border: 1px solid var(--line); background: none; }
+  #qa .sep { width: 1px; align-self: stretch; background: var(--line); flex-shrink: 0; margin: 3px 1px; }
+  #edDone { position: fixed; z-index: 61; display: none; background: var(--accent); color: var(--cta-color); border: none; border-radius: 14px; padding: 5px 12px; font-size: 12px; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+  #inlineEd.ov { background: transparent !important; color: transparent !important; -webkit-text-fill-color: transparent; caret-color: var(--accent); border: 1px dashed var(--accent); border-radius: 0; margin: 0; }
+  #inlineEd.ov::selection { background: rgba(59,130,196,0.35); }
+  #inlineEd.dk { background: var(--panel); color: var(--text); -webkit-text-fill-color: var(--text); font: 16px/1.35 Inter, sans-serif; padding: 8px 10px; border: 2px solid var(--accent); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.35); }
+  #edBar { position: fixed; left: 6px; right: 6px; z-index: 20001; display: none; gap: 4px; overflow-x: auto; padding: 4px; background: var(--panel); border: 1px solid var(--accent); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.35); scrollbar-width: none; align-items: center; touch-action: pan-x; }
+  #edBar.show { display: flex; }
+  #edBar button { flex-shrink: 0; min-width: 34px; height: 32px; padding: 0 10px; border-radius: 7px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--btn-text); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  #edBar button.on { border-color: var(--accent); color: var(--accent); background: var(--toggle-active-bg); }
+  #edBar button[data-e=done] { background: var(--accent); color: var(--cta-color); border-color: var(--accent); }
+  #edBar input[type=color] { width: 32px; height: 32px; min-width: 32px; padding: 1px; border-radius: 50%; flex-shrink: 0; }
+  .el[data-flow="1"] { pointer-events: none !important; }
+  #docModal .modalbox { max-height: 88vh; overflow-y: auto; }
+  #docModal .row { gap: 6px; margin-top: 4px; }
+  #docModal .toggle { margin-top: 6px; }
+  #docModal .row .btn.full { width: auto; flex: 1; min-width: 0; }
+  #docModal .row > div { flex: 1; min-width: 0; }
+  #docModal input[type=number], #docModal select { width: 100%; box-sizing: border-box; }
 </style>
 </head>
 
@@ -548,6 +587,7 @@
       <button class="icon-btn" id="openPdfReaderBtn" title="Lector PDF">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       </button>
+      <button class="icon-btn accent" id="insertBtn" title="Insertar texto y formas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></button>
       <button class="icon-btn accent" id="openBatchBtn" title="Añadir imágenes">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
 </button>
@@ -845,6 +885,24 @@
     </div>
   </div>
 
+  <div class="modal" id="docModal"><div class="modalbox">
+    <button class="closebtn" id="closeDoc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <h2>Hoja y documento</h2>
+    <div class="toggle"><button id="dcAll" class="active">Todas las hojas</button><button id="dcOne">Solo esta hoja</button></div>
+    <div class="row"><button class="btn full cyan" id="dcEdit">Escribir en la hoja</button><button class="btn full" id="dcPaste">Pegar texto</button></div>
+    <label style="margin-top:8px">Márgenes (cm)</label>
+    <div class="row"><div><label>Todos</label><input type="number" data-dm="all" step="0.1" min="0"></div><div><label>Arriba</label><input type="number" data-dm="t" step="0.1" min="0"></div><div><label>Abajo</label><input type="number" data-dm="b" step="0.1" min="0"></div></div>
+    <div class="row"><div><label>Izquierda</label><input type="number" data-dm="l" step="0.1" min="0"></div><div><label>Derecha</label><input type="number" data-dm="r" step="0.1" min="0"></div></div>
+    <label style="margin-top:8px">Texto</label>
+    <select data-dt="font"><option value="Inter">Inter</option><option value="Montserrat">Montserrat</option><option value="Oswald">Oswald</option><option value="Bebas Neue">Bebas Neue</option><option value="Roboto Slab">Roboto Slab</option><option value="Playfair Display">Playfair Display</option><option value="Lobster">Lobster</option><option value="Pacifico">Pacifico</option><option value="Caveat">Caveat</option><option value="Georgia">Georgia</option><option value="Courier New">Courier New</option></select>
+    <div class="row"><div><label>Tamaño (pt)</label><input type="number" data-dt="size" min="4" max="200" step="1"></div><div><label>Interlineado</label><input type="number" data-dt="lh" min="0.8" max="3" step="0.05"></div><div><label>Color</label><input type="color" data-dt="color"></div></div>
+    <div class="toggle"><button data-db="bold"><b>N</b></button><button data-db="italic"><i>K</i></button><button data-db="underline"><u>S</u></button><button data-db="strike"><s>T</s></button></div>
+    <div class="toggle"><button data-da="left">Izq</button><button data-da="center">Centro</button><button data-da="right">Der</button><button data-da="justify">Justif.</button></div>
+    <label style="margin-top:8px">Fondo de la hoja</label>
+    <div class="row"><div><label>Color</label><input type="color" data-dg="c1" value="#ffffff"></div><div><label>Color 2</label><input type="color" data-dg="c2" value="#dbeafe"></div><div><label>Ángulo °</label><input type="number" data-dg="ang" value="180" step="15"></div></div>
+    <div class="row" style="align-items:center"><label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" data-dg="on"> Degradado</label><button class="btn full" id="dgNone">Quitar fondo</button></div>
+    <button class="btn full danger" id="dcRemove" style="margin-top:10px">Quitar documento (el texto en hojas)</button>
+  </div></div>
   <div class="context-menu" id="contextMenu"></div>
 
   <div class="modal" id="batchModal">
@@ -1216,6 +1274,7 @@
   }
 
   function sanitizeEl(el) {
+    sanitizeGen(el);
     el.mode = el.mode || "fit";
     if (el.imgZoom === undefined) el.imgZoom = 100;
     if (el.imgPosX === undefined) el.imgPosX = 0;
@@ -1251,7 +1310,7 @@
       if (!raw) return false;
       const data = JSON.parse(raw);
       state.pages = data.pages || state.pages;
-      state.groups = data.groups || {};
+      state.groups = data.groups || {}; state.doc = data.doc || null;
       state.currentPageIndex = data.currentPageIndex || 0;
       state.orientation = data.orientation || "vertical";
       state.paperType = data.paperType || "carta";
@@ -1457,12 +1516,13 @@ function undo() {
   function buildElementDiv(el) {
     const d = document.createElement("div");
     d.className = "el" + (isSelected(el.id) ? " selected" : "") + (el.showOverflow ? " show-overflow" : "") + (el.groupId ? " grouped" : "");
-    d.dataset.id = el.id;
+    d.dataset.id = el.id; if (el.flow && isDocPage(currentPage())) d.dataset.flow = '1';
     d.style.left = el.xCm * PX_PER_CM + "px";
     d.style.top = el.yCm * PX_PER_CM + "px";
     d.style.width = el.wCm * PX_PER_CM + "px";
     d.style.height = el.hCm * PX_PER_CM + "px";
     d.style.opacity = (el.opacity !== undefined ? el.opacity : 100) / 100;
+    d.style.transform = elCss(el);
     const contentDiv = document.createElement("div");
     contentDiv.className = "el-content";
     if (el.borderWidth && parseFloat(el.borderWidth) > 0) {
@@ -1483,7 +1543,7 @@ function undo() {
       d.style.boxShadow = `${offXpx}px ${offYpx}px ${blurPx}px rgba(${r},${g},${b},${alpha})`;
     } else { d.style.boxShadow = "none"; }
     const img = document.createElement("img");
-    img.src = el.src;
+    img.src = isGen(el) ? genURL(el) : el.src;
     img.style.imageRendering = "auto";
     const f = el.filters || {};
     img.style.filter = cssFilterString({
@@ -1506,6 +1566,7 @@ function undo() {
       img.style.objectFit = "contain";
       img.style.transform = `translate(${posX}%, ${posY}%) scale(${zoom}) rotate(${rot}deg)`;
     }
+    if (isGen(el)) { img.style.objectFit = "fill"; img.style.transform = "none"; img.style.filter = "none"; }
     contentDiv.appendChild(img);
     d.appendChild(contentDiv);
     if (selectedIds.size === 1 && isSelected(el.id)) {
@@ -1560,7 +1621,7 @@ function undo() {
     pageDiv.className = pageClass;
     pageDiv.style.width = paper.w * PX_PER_CM + "px";
     pageDiv.style.height = paper.h * PX_PER_CM + "px";
-    pageDiv.style.backgroundColor = "#ffffff";
+    pageDiv.style.background = pageBgCss(cp.bg);
 
     const shadowLayer = document.createElement("div");
     shadowLayer.className = "shadow-layer";
@@ -1611,7 +1672,7 @@ function undo() {
 
   function syncInspector() {
     const els = getSelectedEls();
-    const count = els.length;
+    const count = els.length; updateQA(els);
     const insp = $("inspector");
     if (count === 0) {
       insp.classList.remove('visible');
@@ -1635,8 +1696,8 @@ function undo() {
       dupBtn.textContent = "Duplicar";
     }
     const first = els[0]; sanitizeEl(first);
-    $("elW").value = first.wCm.toFixed(1);
-    $("elH").value = first.hCm.toFixed(1);
+    if (document.activeElement !== $("elW")) $("elW").value = first.wCm.toFixed(1);
+    if (document.activeElement !== $("elH")) $("elH").value = first.hCm.toFixed(1);
     $("modeFit").classList.toggle("active", first.mode === "fit");
     $("modeFill").classList.toggle("active", first.mode === "fill");
     $("modeStretch").classList.toggle("active", first.mode === "stretch");
@@ -1673,6 +1734,7 @@ function undo() {
     const goVal = gid && state.groups[gid] ? (state.groups[gid].opacity ?? 100) : 100;
     $("groupOpacity").value = goVal;
     $("groupOpacityVal").textContent = goVal + "%";
+    syncGenPanels(first);
   }
 
   async function renderThumbnail(pageIdx) {
@@ -1912,7 +1974,7 @@ function updateThumbnails() {
 
       // Scroll al activo (suave, sin saltos bruscos)
       const active = bar.querySelector('.thumb.active');
-      if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      if (active) centerThumb(active);
       return;
     }
 
@@ -1963,7 +2025,7 @@ function updateThumbnails() {
 
     setTimeout(() => {
       const active = bar.querySelector('.thumb.active');
-      if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      if (active) centerThumb(active);
     }, 50);
   }, 80);
 }
@@ -2059,6 +2121,7 @@ function updateThumbnails() {
       addCtxDivider(menu);
       addCtxItem(menu, ICONS.trash, `Eliminar (${selectedIds.size})`, doDelete, true);
     } else {
+      if (findEl(elId) && findEl(elId).type === 'text') addCtxItem(menu, ICONS.values, 'Editar texto', openTextEditor);
       addCtxItem(menu, ICONS.copy, 'Copiar', doCopy);
       addCtxItem(menu, ICONS.cut, 'Cortar', doCut);
       addCtxItem(menu, ICONS.duplicate, 'Duplicar', doDuplicate);
@@ -2248,7 +2311,7 @@ function updateThumbnails() {
   async function resetAll() {
     const ok = await confirmAction('¿Reiniciar todo?', 'Se eliminarán todas las páginas y elementos.');
     if (!ok) return;
-    state.pages = [{ id: 1, els: [] }];
+    state.pages = [{ id: 1, els: [] }]; state.doc = null;
     state.groups = {};
     state.currentPageIndex = 0;
     elCounter = 1; pageCounter = 1;
@@ -2683,7 +2746,8 @@ function updateThumbnails() {
     saveState(); renderAll();
   }
 
-  function getLineDetectTargets() {
+  function getLineDetectTargets() { return getLineDetectTargets0().filter(e => !e.type); }
+  function getLineDetectTargets0() {
     const sel = getSelectedEls();
     if (sel.length > 0) return sel;
     return currentPage().els.slice();
@@ -2950,8 +3014,9 @@ function updateThumbnails() {
         const dxPx = pos.x - gesture.resize.startX, dyPx = pos.y - gesture.resize.startY;
         el.wCm = Math.max(0.5, snap(gesture.resize.startW + dxPx / PX_PER_CM));
         el.hCm = Math.max(0.5, snap(gesture.resize.startH + dyPx / PX_PER_CM));
+        if (isGen(el)) sanitizeGen(el);
         const elDiv = stage.querySelector(`.el[data-id="${gesture.resize.elId}"]`);
-        if (elDiv) { elDiv.style.width = el.wCm * PX_PER_CM + "px"; elDiv.style.height = el.hCm * PX_PER_CM + "px"; }
+        if (elDiv) { elDiv.style.width = el.wCm * PX_PER_CM + "px"; elDiv.style.height = el.hCm * PX_PER_CM + "px"; if (isGen(el)) { const im = elDiv.querySelector("img"); if (im) im.src = genURL(el); } }
         const shadowEl = stage.querySelector(`.el-shadow[data-shadow-id="${gesture.resize.elId}"]`);
         if (shadowEl) {
           shadowEl.style.width = el.wCm * PX_PER_CM + "px";
@@ -3073,6 +3138,9 @@ function updateThumbnails() {
       const elId = gesture.tap.elId;
       if (target === 'handle') return;
       if (target === 'element' && elId !== null) {
+        if (gesture.tap.lastTapElId === elId && now - gesture.tap.lastTapTime < 350 && findEl(elId) && findEl(elId).type === 'text') {
+          gesture.tap.lastTapTime = 0; gesture.tap.lastTapElId = null; startInlineEdit(elId, false); return;
+        }
         if (gesture.tap.lastTapElId === elId && now - gesture.tap.lastTapTime < 350) {
           const el = findEl(elId);
           if (el) {
@@ -3147,10 +3215,10 @@ function updateThumbnails() {
     const ctx = canvas.getContext("2d", { alpha: false });
     ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
     const p = state.pages[pageIndex];
-    ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    pageFill(ctx, p && p.bg, canvas.width, canvas.height);
     if (!p) return canvas;
     ctx.save();
-ctx.globalCompositeOperation = 'darken';
+ctx.globalCompositeOperation = p.bg ? 'source-over' : 'darken';
 for (const el of p.els) {
   sanitizeEl(el);
   if (el.shadow && el.shadow.opacity > 0 && el.shadowBelow) {
@@ -3178,11 +3246,12 @@ ctx.restore();
     for (const el of p.els) {
       sanitizeEl(el);
       try {
-        const img = await getLoadedImage(el.src);
+        const img = isGen(el) ? (await fontsReady(el), genCanvas(el, pxPerCm)) : await getLoadedImage(el.src);
         const xPx = el.xCm * pxPerCm, yPx = el.yCm * pxPerCm, wPx = el.wCm * pxPerCm, hPx = el.hCm * pxPerCm;
         if (wPx <= 0 || hPx <= 0) continue;
         ctx.save();
         ctx.globalAlpha = (el.opacity !== undefined ? el.opacity : 100) / 100;
+        applyElXform(ctx, el, xPx, yPx, wPx, hPx);
         const f = el.filters || {};
         ctx.filter = cssFilterString({
           brightness: f.brightness ?? 100, contrast: f.contrast ?? 100,
@@ -3209,10 +3278,10 @@ ctx.restore();
         const radPx = ((el.borderRadius||0)/10) * pxPerCm;
         drawRoundRect(ctx, xPx, yPx, wPx, hPx, radPx);
         ctx.clip();
-        const zoom = (Number(el.imgZoom) || 100) / 100;
+        const zoom = isGen(el) ? 1 : (Number(el.imgZoom) || 100) / 100;
         const posX = Number(el.imgPosX) || 0, posY = Number(el.imgPosY) || 0;
-        const rot = (Number(el.imgRotate) || 0) * (Math.PI / 180);
-        const mode = el.mode || "fit";
+        const rot = isGen(el) ? 0 : (Number(el.imgRotate) || 0) * (Math.PI / 180);
+        const mode = isGen(el) ? "stretch" : (el.mode || "fit");
         const imgAspect = img.width / img.height;
         const frameAspect = wPx / hPx;
         const centerX = xPx + wPx / 2, centerY = yPx + hPx / 2;
@@ -3258,7 +3327,7 @@ ctx.restore();
         if (el.borderWidth && parseFloat(el.borderWidth) > 0) {
           const borderPx = (parseFloat(el.borderWidth) / 10) * pxPerCm;
           ctx.save();
-          ctx.strokeStyle = el.borderColor || "#000000"; ctx.lineWidth = borderPx;
+          applyElXform(ctx, el, xPx, yPx, wPx, hPx); ctx.strokeStyle = el.borderColor || "#000000"; ctx.lineWidth = borderPx;
           if (el.borderStyle === 'dashed') ctx.setLineDash([borderPx*2, borderPx*1.5]);
           else if (el.borderStyle === 'dotted') ctx.setLineDash([borderPx*0.1, borderPx*1.5]);
           const half = borderPx / 2;
@@ -3838,6 +3907,597 @@ ctx.restore();
     } catch (err) { hideLoading(); sfx.error(); showToast('Error al imprimir', 'error'); }
   }
 
+  
+  /* ====== TEXTO, FORMAS Y TRANSFORMACIONES ====== */
+  const isGen = (el) => el.type === 'text' || el.type === 'shape';
+  const TXD = { font:'Inter', size:28, color:'#111111', bold:false, italic:false, underline:false, strike:false, caps:false, align:'center', valign:'middle', lh:1.2, ls:0, pad:2, strokeColor:'#ffffff', strokeW:0, shColor:'#000000', shOp:0, shBlur:1, shDist:1, bg:'#ffffff', bgOp:0, fit:'none', list:'none', indent:0, parGap:0 };
+  const SHD = { kind:'rect', fill:'#3b82c4', fillOp:100, stroke:'#1e3a8a', strokeW:0.5 };
+  const FONTS = ['Inter','Montserrat','Oswald','Bebas Neue','Roboto Slab','Playfair Display','Lobster','Pacifico','Caveat','Georgia','Courier New'];
+  const gcache = new Map(), fontTried = new Set();
+  function sanitizeGen(el) {
+    if (el.rot === undefined) el.rot = 0;
+    if (el.type === 'text') { if (el.text == null) el.text = ''; el.tx = el.tx || {}; for (const k in TXD) if (el.tx[k] === undefined) el.tx[k] = TXD[k]; if (el.tx.fit === 'grow') fitText(el); }
+    if (el.type === 'shape') { el.sh = el.sh || {}; for (const k in SHD) if (el.sh[k] === undefined) el.sh[k] = SHD[k]; }
+  }
+  const elCss = (el) => (el.rot || el.flipX || el.flipY) ? `rotate(${el.rot || 0}deg) scale(${el.flipX ? -1 : 1},${el.flipY ? -1 : 1})` : '';
+  function applyElXform(ctx, el, x, y, w, h) {
+    if (!(el.rot || el.flipX || el.flipY)) return;
+    ctx.translate(x + w / 2, y + h / 2); ctx.rotate((el.rot || 0) * Math.PI / 180); ctx.scale(el.flipX ? -1 : 1, el.flipY ? -1 : 1); ctx.translate(-(x + w / 2), -(y + h / 2));
+  }
+  const fontSpec = (t, px) => `${t.italic ? 'italic ' : ''}${t.bold ? 700 : 400} ${px}px "${t.font}", sans-serif`;
+  const fontsReady = (el) => el.type === 'text' ? document.fonts.load(fontSpec(el.tx, 20), 'Aa').catch(() => {}) : Promise.resolve();
+  function ensureFont(el) {
+    const k = fontSpec(el.tx, 20);
+    if (document.fonts.check(k) || fontTried.has(k)) return;
+    fontTried.add(k); document.fonts.load(k, 'Aa').then(() => { gcache.clear(); if (state.doc) reflowDoc(0); renderAll(); }).catch(() => {});
+  }
+  const hexA = (h, a) => `rgba(${parseInt(h.slice(1,3),16)},${parseInt(h.slice(3,5),16)},${parseInt(h.slice(5,7),16)},${a})`;
+  function txCore(x, el, ppc, size) {
+    const t = el.tx, fs = size * 0.035278 * ppc, pad = t.pad / 10 * ppc, maxW = Math.max(1, el.wCm * ppc - 2 * pad);
+    const ind = t.indent / 10 * ppc, hang = t.list !== 'none' ? fs * 1.4 : 0, ps = t.parGap * 0.035278 * ppc;
+    x.font = fontSpec(t, fs); if ('letterSpacing' in x) x.letterSpacing = (t.ls / 100 * fs) + 'px';
+    const txt = t.caps ? el.text.toUpperCase() : el.text, lines = [];
+    const pars = txt.split('\n'); pars.forEach((par, pi) => {
+      let cur = '', first = !(el.cont && pi === 0), wp = 0, co = 0;
+      const mkr = t.list === 'bullet' ? '•' : t.list === 'number' ? (pi + 1 + (el.parOff || 0)) + '.' : '';
+      const av = () => maxW - hang - (first ? ind : 0);
+      const push = (s2, last) => { lines.push({ s: s2, first, last, o: co, pi, gap: first && pi > 0 ? ps : 0, mk: first ? mkr : '' }); first = false; };
+      par.split(' ').forEach(w => {
+        const ws = wp; wp += w.length + 1;
+        const test = cur ? cur + ' ' + w : w;
+        if (!cur) { cur = w; co = ws; } else if (x.measureText(test).width <= av()) cur = test; else { push(cur, false); cur = w; co = ws; }
+        while (cur.length > 1 && x.measureText(cur).width > av()) { let i = cur.length - 1; while (i > 1 && x.measureText(cur.slice(0, i)).width > av()) i--; push(cur.slice(0, i), false); cur = cur.slice(i); co += i; }
+      });
+      push(cur, !(el.contNext && pi === pars.length - 1));
+    });
+    const lh = fs * t.lh;
+    return { lines, fs, pad, lh, ind, hang, maxW, th: lines.reduce((n, l) => n + lh + l.gap, 0), size };
+  }
+  const SCR = document.createElement('canvas').getContext('2d');
+  function txLayout(x, el, ppc) {
+    const t = el.tx, R = 100, k = ppc / R; let L;
+    if (t.fit !== 'shrink') L = txCore(SCR, el, R, t.size);
+    else {
+      let lo = 4, hi = t.size, best = 4; const room = el.hCm * R - 2 * t.pad / 10 * R;
+      if (txCore(SCR, el, R, hi).th <= room) L = txCore(SCR, el, R, hi);
+      else { for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (txCore(SCR, el, R, m).th <= room) { best = m; lo = m; } else hi = m; } L = txCore(SCR, el, R, best); }
+    }
+    x.font = fontSpec(t, L.fs * k); if ('letterSpacing' in x) x.letterSpacing = (t.ls / 100 * L.fs * k) + 'px';
+    return Object.assign({}, L, { lines: L.lines.map(l => Object.assign({}, l, { gap: l.gap * k })), fs: L.fs * k, pad: L.pad * k, lh: L.lh * k, ind: L.ind * k, hang: L.hang * k, maxW: L.maxW * k, th: L.th * k });
+  }
+  function drawText(x, el, ppc, w, h) {
+    const t = el.tx, L = txLayout(x, el, ppc);
+    if (t.bgOp > 0) { x.fillStyle = hexA(t.bg, t.bgOp / 100); x.fillRect(0, 0, w, h); }
+    x.textBaseline = 'middle'; x.lineJoin = 'round';
+    let y = t.valign === 'top' ? L.pad : t.valign === 'bottom' ? h - L.pad - L.th : (h - L.th) / 2;
+    const sw = t.strokeW / 10 * ppc * 2;
+    const sh = () => { if (t.shOp > 0) { x.shadowColor = hexA(t.shColor, t.shOp / 100); x.shadowBlur = t.shBlur / 10 * ppc; x.shadowOffsetX = x.shadowOffsetY = t.shDist / 10 * ppc * 0.7071; } };
+    const clr = () => { x.shadowColor = 'transparent'; x.shadowBlur = 0; x.shadowOffsetX = x.shadowOffsetY = 0; };
+    const put = (str, xx, yy, al) => {
+      x.textAlign = al;
+      if (sw > 0) { sh(); x.lineWidth = sw; x.strokeStyle = t.strokeColor; x.strokeText(str, xx, yy); clr(); x.fillStyle = t.color; x.fillText(str, xx, yy); }
+      else { sh(); x.fillStyle = t.color; x.fillText(str, xx, yy); clr(); }
+    };
+    L.lines.forEach(l => {
+      y += l.gap; const cy = y + L.lh / 2; y += L.lh;
+      const left = L.pad + L.hang + (l.first ? L.ind : 0), cw = w - 2 * L.pad - L.hang - (l.first ? L.ind : 0);
+      if (l.mk) put(l.mk, L.pad + (l.first ? L.ind : 0), cy, 'left');
+      const words = l.s.split(' '), lw0 = x.measureText(l.s).width;
+      let sx = left, lw = lw0;
+      if (t.align === 'justify' && !l.last && words.length > 1) {
+        const sp = x.measureText(' ').width, extra = (cw - lw0) / (words.length - 1); let cx = left;
+        words.forEach(wd => { put(wd, cx, cy, 'left'); cx += x.measureText(wd).width + sp + extra; });
+        lw = cw;
+      } else {
+        const al = t.align === 'justify' ? 'left' : t.align;
+        const ax = al === 'left' ? left : al === 'right' ? left + cw : left + cw / 2;
+        put(l.s, ax, cy, al); sx = al === 'left' ? left : al === 'right' ? left + cw - lw0 : left + cw / 2 - lw0 / 2;
+      }
+      if (t.underline || t.strike) {
+        const th2 = Math.max(1, L.fs / 14); x.fillStyle = t.color;
+        if (t.underline) x.fillRect(sx, cy + L.fs * 0.4, lw, th2);
+        if (t.strike) x.fillRect(sx, cy - th2 / 2, lw, th2);
+      }
+    });
+  }
+  function drawShape(x, s, ppc, w, h) {
+    const sw = s.strokeW / 10 * ppc, i = sw / 2 + 0.5, k = s.kind;
+    x.lineWidth = sw; x.lineJoin = 'round'; x.lineCap = 'round'; x.fillStyle = hexA(s.fill, s.fillOp / 100); x.strokeStyle = s.stroke; x.beginPath();
+    if (k === 'rect') x.rect(i, i, w - 2 * i, h - 2 * i);
+    else if (k === 'ellipse') x.ellipse(w / 2, h / 2, w / 2 - i, h / 2 - i, 0, 0, 7);
+    else if (k === 'triangle') { x.moveTo(w / 2, i); x.lineTo(w - i, h - i); x.lineTo(i, h - i); x.closePath(); }
+    else if (k === 'star') { for (let n = 0; n < 10; n++) { const r = n % 2 ? 0.42 : 1, a = -Math.PI / 2 + n * Math.PI / 5, px = w / 2 + Math.cos(a) * (w / 2 - i) * r, py = h / 2 + Math.sin(a) * (h / 2 - i) * r; n ? x.lineTo(px, py) : x.moveTo(px, py); } x.closePath(); }
+    else if (k === 'line') { x.moveTo(i, h / 2); x.lineTo(w - i, h / 2); }
+    else { const hh = Math.min(h / 2 - i, w * 0.3); x.moveTo(i, h / 2); x.lineTo(w - i, h / 2); x.moveTo(w - i - hh, h / 2 - hh); x.lineTo(w - i, h / 2); x.lineTo(w - i - hh, h / 2 + hh); }
+    if (k !== 'line' && k !== 'arrow') x.fill();
+    if (sw > 0) x.stroke();
+  }
+  function genCanvas(el, ppc) {
+    sanitizeGen(el);
+    const key = JSON.stringify([el.type, el.text, el.tx, el.sh, el.wCm, el.hCm, ppc, el.cont, el.parOff, el.contNext]);
+    let c = gcache.get(key); if (c) return c;
+    const w = Math.max(1, Math.round(el.wCm * ppc)), h = Math.max(1, Math.round(el.hCm * ppc));
+    c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d');
+    el.type === 'text' ? drawText(x, el, ppc, w, h) : drawShape(x, el.sh, ppc, w, h);
+    if (gcache.size > 80) gcache.delete(gcache.keys().next().value);
+    gcache.set(key, c); return c;
+  }
+  function genURL(el) { if (el.type === 'text') ensureFont(el); const c = genCanvas(el, PX_PER_CM * DPR * 1.5); return c._u || (c._u = c.toDataURL()); }
+  function fitText(el) { const L = txCore(document.createElement('canvas').getContext('2d'), el, 100, el.tx.size); el.hCm = Math.max(0.5, (L.th + 2 * L.pad) / 100); }
+
+  const mk = (h) => { const d = document.createElement('div'); d.innerHTML = h.trim(); return d.firstChild; };
+  const CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+  const grp = (id, title, body) => mk(`<div class="subgroup collapsed" data-subgroup id="${id}"><div class="subgroup-header"><span>${title}</span>${CHEV}</div><div class="subgroup-body">${body}</div></div>`);
+  const R = (g, k, l, min, max, step, suf = '') => `<label>${l} (<span id="v_${g}_${k}"></span>${suf})</label><input type="range" data-g="${g}" data-k="${k}" min="${min}" max="${max}" step="${step}">`;
+  const C = (g, k, l) => `<div style="flex:1"><label>${l}</label><input type="color" data-g="${g}" data-k="${k}"></div>`;
+  const TG = (g, k, items, bool) => `<div class="toggle">${items.map(([v, l]) => `<button data-g="${g}" data-k="${k}" ${bool ? 'data-b="1"' : `data-v="${v}"`}>${l}</button>`).join('')}</div>`;
+  const SEL = (g, k, l, opts) => `<label>${l}</label><select data-g="${g}" data-k="${k}">${opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select>`;
+  const TA = 'width:100%;font:14px Inter,sans-serif;padding:8px;background:var(--input-bg);color:var(--text);border:1px solid var(--input-border);border-radius:5px;resize:vertical;';
+  const textBody = `<textarea id="txtContent" style="display:none"></textarea><button class="btn full cyan" id="txtEdit" style="margin-top:0">Editar texto en el lienzo</button>
+    <button class="btn full" id="txtFit">Ajustar alto al texto</button>
+    <label>Estilos rápidos</label><div class="toggle">${[['title','Título'],['sub','Subtítulo'],['body','Cuerpo'],['small','Nota']].map(([k, l]) => `<button data-preset="${k}">${l}</button>`).join('')}</div>
+    <label>Autoajuste de la caja</label>${TG('tx','fit',[['none','Fijo'],['grow','Crece'],['shrink','Reduce']])}
+    ${SEL('tx','font','Fuente',FONTS.map(f => [f, f]))}
+    ${R('tx','size','Tamaño',4,200,1,' pt')}
+    ${TG('tx','bold',[[0,'<b>N</b>']],1).replace('<div class="toggle">','<div class="toggle" style="margin-top:6px">').replace('</div>','')}${TG('tx','italic',[[0,'<i>K</i>']],1).replace(/<div class="toggle">|<\/div>/g,'')}${TG('tx','underline',[[0,'<u>S</u>']],1).replace(/<div class="toggle">|<\/div>/g,'')}${TG('tx','strike',[[0,'<s>T</s>']],1).replace(/<div class="toggle">|<\/div>/g,'')}${TG('tx','caps',[[0,'AA']],1).replace(/<div class="toggle">|<\/div>/g,'')}</div>
+    <label>Alineación</label>${TG('tx','align',[['left','Izq'],['center','Centro'],['right','Der'],['justify','Justif.']])}
+    <label>Lista</label>${TG('tx','list',[['none','Ninguna'],['bullet','Viñetas'],['number','Números']])}
+    <label>Posición vertical</label>${TG('tx','valign',[['top','Arriba'],['middle','Medio'],['bottom','Abajo']])}
+    <div class="row">${C('tx','color','Color')}${C('tx','bg','Fondo')}</div>
+    ${R('tx','bgOp','Opacidad del fondo',0,100,1,'%')}
+    ${R('tx','lh','Interlineado',0.8,2.5,0.05)}${R('tx','ls','Espaciado de letras',-5,40,1)}${R('tx','pad','Margen interno',0,30,1,' mm')}${R('tx','indent','Sangría de 1ª línea',0,30,1,' mm')}${R('tx','parGap','Espacio entre párrafos',0,40,1,' pt')}
+    <div class="row">${C('tx','strokeColor','Contorno')}${C('tx','shColor','Sombra')}</div>
+    ${R('tx','strokeW','Grosor del contorno',0,5,0.1,' mm')}${R('tx','shOp','Opacidad de sombra',0,100,1,'%')}${R('tx','shBlur','Difuminado de sombra',0,10,0.1,' mm')}${R('tx','shDist','Distancia de sombra',0,10,0.1,' mm')}`;
+  const shapeBody = `${SEL('sh','kind','Forma',[['rect','Rectángulo'],['ellipse','Elipse'],['triangle','Triángulo'],['star','Estrella'],['line','Línea'],['arrow','Flecha']])}
+    <div class="row">${C('sh','fill','Relleno')}${C('sh','stroke','Trazo')}</div>
+    ${R('sh','fillOp','Opacidad del relleno',0,100,1,'%')}${R('sh','strokeW','Grosor del trazo',0,10,0.1,' mm')}`;
+  const AL = [['l','Izq'],['c','Centro'],['r','Der'],['t','Arriba'],['m','Medio'],['b','Abajo']];
+  const xformBody = `${R('el','rot','Rotación',-180,180,1,'°')}
+    <div class="toggle" style="margin-top:6px"><button data-g="el" data-k="rot" data-v="0">0°</button><button data-g="el" data-k="rot" data-v="90">90°</button><button data-g="el" data-k="rot" data-v="-90">-90°</button><button data-g="el" data-k="rot" data-v="180">180°</button></div>
+    <label>Voltear</label>${TG('el','flipX',[[0,'Horizontal']],1).replace('</div>','')}${TG('el','flipY',[[0,'Vertical']],1).replace(/<div class="toggle">|<\/div>/g,'')}</div>
+    <label>Alinear (a la página o a la selección)</label>
+    <div class="toggle">${AL.slice(0,3).map(([m,l]) => `<button data-al="${m}">${l}</button>`).join('')}</div>
+    <div class="toggle">${AL.slice(3).map(([m,l]) => `<button data-al="${m}">${l}</button>`).join('')}</div>
+    <label>Distribuir (3 o más elementos)</label>
+    <div class="toggle"><button data-al="dh">Horizontal</button><button data-al="dv">Vertical</button></div>`;
+  const SIC = $('singleInspectorControls');
+  const firstSG = SIC.querySelector('.subgroup');
+  [grp('grpText', 'Texto', textBody), grp('grpShape', 'Forma', shapeBody), grp('grpXform', 'Transformar y alinear', xformBody)].forEach(g => SIC.insertBefore(g, firstSG));
+  $('grpText').style.display = $('grpShape').style.display = 'none';
+
+  function syncGenPanels(f) {
+    const T = f.type === 'text', S = f.type === 'shape';
+    $('grpText').style.display = T ? '' : 'none'; $('grpShape').style.display = S ? '' : 'none';
+    SIC.querySelectorAll(':scope > .subgroup').forEach(g => { const n = g.querySelector('.subgroup-header span').textContent; if (n === 'Filtros' || n === 'Encuadre' || n === 'Sombra') g.style.display = ((n === 'Sombra') ? T : (T || S)) ? 'none' : '';
+      if (n === 'Reemplazar' || n === 'Duplicar') g.querySelector('.subgroup-header span').textContent = (T || S) ? 'Duplicar' : 'Reemplazar'; });
+    const mt = $('modeFit').parentElement; mt.style.display = (T || S) ? 'none' : ''; if (mt.previousElementSibling) mt.previousElementSibling.style.display = (T || S) ? 'none' : '';
+    $('replaceImageBtn').style.display = (T || S) ? 'none' : '';
+    const ta = $('txtContent'); if (T && document.activeElement !== ta) ta.value = f.text;
+    SIC.querySelectorAll('[data-g]').forEach(c => {
+      const o = c.dataset.g === 'el' ? f : f[c.dataset.g]; if (!o) return;
+      const v = o[c.dataset.k];
+      if (c.tagName === 'BUTTON') c.classList.toggle('active', c.dataset.b ? !!v : String(v) === c.dataset.v);
+      else { if (document.activeElement !== c) c.value = v; const sp = document.getElementById(`v_${c.dataset.g}_${c.dataset.k}`); if (sp) sp.textContent = v; }
+    });
+  }
+  const gTargets = (g) => getSelectedEls().filter(e => g === 'el' || (g === 'tx' ? e.type === 'text' : e.type === 'shape'));
+  SIC.addEventListener('input', (e) => {
+    const c = e.target;
+    if (c.id === 'txtContent') { gTargets('tx').forEach(el => el.text = c.value); renderAll(); return; }
+    if (!c.dataset.g || c.tagName === 'BUTTON') return;
+    const v = c.type === 'range' ? parseFloat(c.value) : c.value;
+    gTargets(c.dataset.g).forEach(el => { (c.dataset.g === 'el' ? el : el[c.dataset.g])[c.dataset.k] = v; });
+    renderAll();
+  });
+  SIC.addEventListener('change', (e) => { if (e.target.dataset.g || e.target.id === 'txtContent') saveState(); });
+  SIC.addEventListener('click', (e) => {
+    const al = e.target.closest('button[data-al]'); if (al) { alignSel(al.dataset.al); return; }
+    if (e.target.closest('#txtFit')) { gTargets('tx').forEach(fitText); saveState(); renderAll(); sfx.success(); return; }
+    const b = e.target.closest('button[data-g]'); if (!b) return;
+    sfx.tap();
+    gTargets(b.dataset.g).forEach(el => { const o = b.dataset.g === 'el' ? el : el[b.dataset.g]; o[b.dataset.k] = b.dataset.b ? !o[b.dataset.k] : (b.dataset.k === 'rot' ? parseFloat(b.dataset.v) : b.dataset.v); });
+    saveState(); renderAll();
+  });
+  function alignSel(m) {
+    const els = getSelectedEls(); if (!els.length) return;
+    const P = getPaperCm(), mu = els.length > 1;
+    const x0 = mu ? Math.min(...els.map(e => e.xCm)) : 0, x1 = mu ? Math.max(...els.map(e => e.xCm + e.wCm)) : P.w;
+    const y0 = mu ? Math.min(...els.map(e => e.yCm)) : 0, y1 = mu ? Math.max(...els.map(e => e.yCm + e.hCm)) : P.h;
+    if (m === 'dh' || m === 'dv') {
+      if (els.length < 3) { showToast('Selecciona 3 o más', 'info'); return; }
+      const h = m === 'dh', k = h ? 'xCm' : 'yCm', sz = h ? 'wCm' : 'hCm';
+      const a = [...els].sort((p, q) => p[k] - q[k]), gap = ((h ? x1 - x0 : y1 - y0) - a.reduce((n, e) => n + e[sz], 0)) / (a.length - 1);
+      let cur = h ? x0 : y0; a.forEach(e => { e[k] = cur; cur += e[sz] + gap; });
+    } else els.forEach(e => {
+      if (m === 'l') e.xCm = x0; if (m === 'r') e.xCm = x1 - e.wCm; if (m === 'c') e.xCm = (x0 + x1) / 2 - e.wCm / 2;
+      if (m === 't') e.yCm = y0; if (m === 'b') e.yCm = y1 - e.hCm; if (m === 'm') e.yCm = (y0 + y1) / 2 - e.hCm / 2;
+    });
+    saveState(); renderAll(); sfx.success();
+  }
+  function openTextEditor() { const e = getSelectedEls().find(x => x.type === 'text'); if (e) startInlineEdit(e.id, false); }
+  function addGen(kind) {
+    const P = getPaperCm();
+    const el = { id: ++elCounter, xCm: 0, yCm: 0, wCm: 6, hCm: 6, mode: 'stretch' };
+    if (kind === 'text') { el.type = 'text'; el.text = 'Texto'; el.wCm = Math.min(P.w * 0.7, 12); }
+    else { el.type = 'shape'; el.sh = { kind }; if (kind === 'line' || kind === 'arrow') { el.wCm = 8; el.hCm = 1.5; el.sh.stroke = '#111111'; el.sh.strokeW = 1.5; } }
+    sanitizeEl(el);
+    if (kind === 'text') fitText(el);
+    el.xCm = (P.w - el.wCm) / 2; el.yCm = (P.h - el.hCm) / 2;
+    currentPage().els.push(el);
+    selectedIds = new Set([el.id]); multiSelectMode = false;
+    saveState(); renderAll(); sfx.success();
+    if (kind === 'text') startInlineEdit(el.id, true); else { state.inspectorExpanded = true; updateInspectorState(); setTimeout(() => $('grpShape').classList.remove('collapsed'), 100); }
+  }
+  const insMenu = document.createElement('div');
+  insMenu.className = 'dropdown-menu'; insMenu.id = 'insertMenu';
+  insMenu.innerHTML = [['text','Texto'],['rect','Rectángulo'],['ellipse','Elipse'],['triangle','Triángulo'],['star','Estrella'],['line','Línea'],['arrow','Flecha'],['doc','Texto en la hoja (documento)'],['pg','Hoja: márgenes, estilo y fondo']].map(([k, l]) => `<button data-k="${k}">${l}</button>`).join('');
+  document.body.appendChild(insMenu);
+  $('insertBtn').addEventListener('click', (e) => {
+    e.stopPropagation(); sfx.click();
+    const open = !insMenu.classList.contains('show'); $('moreMenu').classList.remove('show');
+    if (open) { const r = e.currentTarget.getBoundingClientRect(); insMenu.style.top = (r.bottom + 6) + 'px'; insMenu.style.left = Math.max(8, r.left) + 'px'; insMenu.style.right = 'auto'; }
+    insMenu.classList.toggle('show', open);
+  });
+  insMenu.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; insMenu.classList.remove('show'); b.dataset.k === 'doc' ? docEdit(state.doc && state.doc.pids.includes(currentPage().id) ? state.doc.pids.indexOf(currentPage().id) : 0) : b.dataset.k === 'pg' ? docOpen() : addGen(b.dataset.k); });
+  document.addEventListener('pointerdown', (e) => { if (!e.target.closest('#insertMenu') && !e.target.closest('#insertBtn')) insMenu.classList.remove('show'); }, true);
+
+  
+  /* ====== EDICIÓN EN EL LIENZO + MINI PANEL SOBRE EL TECLADO ====== */
+  let editingTextId = null, edTA = null, edOrig = '', edPanelHidden = false, edPanY0 = null, miniDismissed = null;
+  function centerThumb(a) { const b = $('thumbnailsBar'); b.scrollTo({ left: a.offsetLeft - b.clientWidth / 2 + a.clientWidth / 2, behavior: 'smooth' }); }
+  function isTypeField(f) { return !!(f && f.matches && f.matches('textarea, input:not([type=range]):not([type=color]):not([type=checkbox]):not([type=radio]):not([type=file]):not([type=button])')); }
+  const vk = navigator.virtualKeyboard; if (vk) { try { vk.overlaysContent = true; } catch (e) {} }
+  function kbTop() {
+    if (vk && vk.boundingRect && vk.boundingRect.height > 0) return vk.boundingRect.top;
+    const v = window.visualViewport;
+    if (v && window.innerHeight - v.height - v.offsetTop > 100) return v.offsetTop + v.height;
+    return null;
+  }
+  const mini = mk('<div id="kbMini"><span class="km-l"></span><div class="km-v"></div><button type="button" class="km-h">Ocultar</button><button type="button" class="km-ok">Listo</button></div>');
+  document.body.appendChild(mini);
+  mini.querySelectorAll('button').forEach(b => b.addEventListener('pointerdown', (e) => e.preventDefault()));
+  mini.querySelector('.km-ok').addEventListener('click', () => { if (edTA) endInlineEdit(); else { const f = document.activeElement; if (f && f.blur) f.blur(); } mini.classList.remove('show'); });
+  mini.querySelector('.km-h').addEventListener('click', () => { miniDismissed = document.activeElement; mini.classList.remove('show'); });
+  function fieldLabel(f) {
+    if (f === edTA) return 'Texto';
+    const l = f.closest('div') && f.closest('div').querySelector('label');
+    return (l ? l.textContent : (f.placeholder || 'Valor')).replace(/\s*\(.*?\)/g, '').trim();
+  }
+  const edDone = mk('<button id="edDone" type="button">Listo</button>'); document.body.appendChild(edDone);
+  edDone.addEventListener('pointerdown', (e) => e.preventDefault());
+  edDone.addEventListener('click', () => endInlineEdit());
+  const coarse = window.matchMedia && matchMedia('(pointer:coarse)').matches;
+  function syncDone() {
+    if (!edTA) { edDone.style.display = 'none'; return; }
+    const r = edTA.getBoundingClientRect();
+    edDone.style.display = 'none';
+    edDone.style.left = Math.max(4, Math.min(window.innerWidth - 64, r.right - 60)) + 'px';
+    edDone.style.top = (r.top > 40 ? r.top - 32 : r.bottom + 6) + 'px';
+  }
+  function updateKb() { updateKb0(); syncDone(); if (edTA) placeEd(); }
+  function updateKb0() {
+    const f = document.activeElement; let kt = kbTop();
+    if (f === edTA) { mini.classList.remove('show'); return; }
+    if (!isTypeField(f) || kt == null || miniDismissed === f) { mini.classList.remove('show'); return; }
+    const r = f.getBoundingClientRect();
+    if (r.top < kt - 2) { mini.classList.remove('show'); return; }
+    mini.querySelector('.km-l').textContent = fieldLabel(f);
+    const v = mini.querySelector('.km-v'); v.textContent = f.value || ' ';
+    mini.classList.add('show'); v.scrollTop = v.scrollHeight;
+    mini.style.top = (kt - mini.offsetHeight - 8) + 'px';
+  }
+  const kbSoon = () => [0, 120, 300, 550].forEach(ms => setTimeout(updateKb, ms));
+  document.addEventListener('focusin', (e) => {
+    const f = e.target; if (!isTypeField(f)) return;
+    if (miniDismissed && miniDismissed !== f) miniDismissed = null;
+    const saved = [];
+    for (let n = f.parentElement; n; n = n.parentElement) if (n.scrollTop || n.scrollLeft || n.scrollHeight > n.clientHeight) saved.push([n, n.scrollTop, n.scrollLeft]);
+    if (f !== edTA) [0, 60, 160, 320, 520].forEach(ms => setTimeout(() => { saved.forEach(([n, t, l]) => { n.scrollTop = t; n.scrollLeft = l; }); if (window.scrollX || window.scrollY) window.scrollTo(0, 0); }, ms));
+    if (f.tagName === 'INPUT') { f.setAttribute('enterkeyhint', 'done'); setTimeout(() => { try { f.select(); } catch (_) {} }, 30); }
+    kbSoon();
+  });
+  document.addEventListener('focusout', () => setTimeout(updateKb, 50));
+  document.addEventListener('input', (e) => { if (isTypeField(e.target)) updateKb(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName === 'INPUT') e.target.blur(); });
+  if (window.visualViewport) { visualViewport.addEventListener('resize', kbSoon); visualViewport.addEventListener('scroll', updateKb); }
+  if (vk) vk.addEventListener('geometrychange', kbSoon);
+  window.addEventListener('scroll', () => { if (window.scrollX || window.scrollY) window.scrollTo(0, 0); }, { passive: true });
+
+  document.addEventListener('pointerdown', (e) => { if (edTA && !e.target.closest('#inlineEd, #kbMini, #edDone, #edBar')) endInlineEdit(); }, true);
+  function revealEd(el, limit) {
+    const d = $('stage').querySelector(`.el[data-id="${el.id}"]`), wr = $('stage-wrapper'); if (!d || !wr) return;
+    if (edPanY0 == null) edPanY0 = panY;
+    const r = d.getBoundingClientRect(), wt = wr.getBoundingClientRect().top;
+    let dy = 0;
+    if (r.bottom > limit) dy = limit - r.bottom - 8;
+    if (r.top + dy < wt + 4) dy = Math.min(0, wt + 4 - r.top);
+    if (dy) { panY += dy; applyStageTransform(); }
+  }
+  function placeEd() {
+    const el = findEl(editingTextId), d = $('stage').querySelector(`.el[data-id="${editingTextId}"]`);
+    if (!el || !d || !edTA) return;
+    const t = el.tx, z = PX_PER_CM * zoomScale;
+    let kt = kbTop();
+    const bh = edBar.offsetHeight || 42, limit = kt == null ? null : kt - bh - 10;
+    if (limit != null && edPanelHidden) { revealEd(el, limit); }
+    let r = d.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const w = el.wCm * z, h = el.hCm * z;
+    const covered = limit != null && !edPanelHidden && (cy - h / 2) >= limit - 2;
+    if (covered) {
+      edTA.className = 'dk'; edTA.style.cssText = `left:8px;right:8px;width:auto;top:${Math.max(70, limit - 92)}px;height:84px;`;
+    } else {
+      const L = txLayout(SCR, el, z), pad = L.pad, pt = (t.valign === 'top' || el.flow) ? pad : t.valign === 'bottom' ? Math.max(pad, h - pad - L.th) : Math.max(pad, (h - L.th) / 2);
+      edTA.className = 'ov';
+      edTA.style.cssText = `left:${cx - w / 2}px;top:${cy - h / 2}px;width:${w}px;height:${h}px;font-family:"${t.font}",sans-serif;font-size:${L.fs}px;font-weight:${t.bold ? 700 : 400};font-style:${t.italic ? 'italic' : 'normal'};letter-spacing:${t.ls / 100 * L.fs}px;line-height:${L.lh}px;text-align:${t.align === 'justify' ? 'left' : t.align};padding:${pt}px ${pad}px 0 ${pad + L.hang}px;text-indent:${el.cont ? 0 : L.ind}px;text-transform:${t.caps ? 'uppercase' : 'none'};transform:${elCss(el)};`;
+    }
+    edTA.dataset.covered = covered ? '1' : '';
+    placeBar(el, kt, covered); syncDone();
+  }
+  function startInlineEdit(id, selectAll) {
+    const el = findEl(id); if (!el || el.type !== 'text') return;
+    endInlineEdit();
+    selectedIds = new Set([id]); multiSelectMode = false; editingTextId = id; renderAll();
+    const ta = document.createElement('textarea'); ta.id = 'inlineEd'; ta.value = el.text;
+    document.body.appendChild(ta); edTA = ta; edPanelHidden = false; edPanY0 = null; placeEd();
+    ta.addEventListener('input', () => { const e2 = findEl(editingTextId); if (!e2) return; if (e2.flow) { docInput(ta, e2); return; } e2.text = ta.value; sanitizeGen(e2); renderAll(); placeEd(); });
+    edOrig = el.text;
+    edTA.addEventListener('input', syncDone);
+    ta.focus({ preventScroll: true });
+    if (selectAll) ta.select(); else ta.setSelectionRange(ta.value.length, ta.value.length);
+    kbSoon();
+  }
+  function endInlineEdit() {
+    if (!edTA) return;
+    const ta = edTA, id = editingTextId; edTA = null; editingTextId = null; ta.remove();
+    if (edPanY0 != null) { panY = edPanY0; edPanY0 = null; applyStageTransform(); } edPanelHidden = false; mini.classList.remove('show'); edBar.classList.remove('show');
+    const el = findEl(id);
+    if (el && !el.flow && !el.text.trim()) { el.text = edOrig && edOrig.trim() ? edOrig : 'Texto'; sanitizeGen(el); }
+    edDone.style.display = 'none';
+    saveState(); renderAll();
+  }
+  SIC.addEventListener('click', (e) => { if (e.target.closest('#txtEdit')) openTextEditor(); });
+
+  /* ====== BARRA DE FORMATO SOBRE EL TECLADO + DOCUMENTO (TEXTO EN LA HOJA) ====== */
+  const edBar = mk('<div id="edBar"><button data-e="bold"><b>N</b></button><button data-e="italic"><i>K</i></button><button data-e="underline"><u>S</u></button><button data-e="sdn">A−</button><button data-e="sup">A+</button><input type="color" data-e="color"><button data-e="align">Izq</button><button data-e="pg">Hoja</button><button data-e="panel">Ocultar panel</button><button data-e="done">Listo</button></div>');
+  document.body.appendChild(edBar);
+  function placeBar(el, kt, covered) {
+    edBar.classList.add('show'); const h = edBar.offsetHeight || 42; edBar.style.top = ((kt == null ? window.innerHeight : kt) - h - 6) + 'px';
+    const t = el.tx;
+    edBar.querySelectorAll('[data-e]').forEach(b => { const k = b.dataset.e; if (k === 'bold' || k === 'italic' || k === 'underline') b.classList.toggle('on', !!t[k]); if (k === 'align') b.textContent = { left: 'Izq', center: 'Centro', right: 'Der', justify: 'Justif.' }[t.align]; if (k === 'pg') b.style.display = el.flow ? '' : 'none'; if (k === 'panel') { b.style.display = (covered || edPanelHidden) ? '' : 'none'; b.textContent = edPanelHidden ? 'Mostrar panel' : 'Ocultar panel'; } });
+    const c = edBar.querySelector('input'); if (document.activeElement !== c) c.value = t.color;
+  }
+  edBar.addEventListener('pointerdown', (e) => { if (e.target.tagName !== 'INPUT') e.preventDefault(); });
+  edBar.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-e]'); if (!b || !edTA) return; sfx.tap();
+    const k = b.dataset.e, el = findEl(editingTextId); if (!el) return;
+    if (k === 'done') endInlineEdit();
+    else if (k === 'pg') { endInlineEdit(); docOpen(); }
+    else if (k === 'panel') { edPanelHidden = !edPanelHidden; if (!edPanelHidden && edPanY0 != null) { panY = edPanY0; edPanY0 = null; applyStageTransform(); } placeEd(); }
+    else if (k === 'bold' || k === 'italic' || k === 'underline') fmtEd(k, v => !v);
+    else if (k === 'sdn' || k === 'sup') fmtEd('size', v => Math.max(4, Math.min(200, v + (k === 'sup' ? 1 : -1) * (el.flow ? 1 : 2))));
+    else if (k === 'align') { const o = ['left', 'center', 'right', 'justify']; fmtEd('align', v => o[(o.indexOf(v) + 1) % 4]); }
+  });
+  edBar.addEventListener('input', (e) => { if (e.target.tagName === 'INPUT') fmtEd('color', () => e.target.value); });
+  edBar.addEventListener('change', () => { if (edTA) edTA.focus({ preventScroll: true }); });
+  function fmtEd(key, fn) {
+    const el = findEl(editingTextId); if (!el) return;
+    if (el.flow) {
+      const d = state.doc, pg = state.pages.find(p => p.els.includes(el)), r = d.recs[d.pids.indexOf(pg.id)], caret = r.s + edTA.selectionStart;
+      d.tx[key] = fn(el.tx[key]); state.pages.forEach(p => { if (p.fo) delete p.fo[key]; });
+      reflowDoc(0); docRelocate(edTA, caret);
+    } else { el.tx[key] = fn(el.tx[key]); renderAll(); placeEd(); }
+  }
+
+  const pageBgCss = (bg) => !bg ? '#ffffff' : bg.c2 ? `linear-gradient(${bg.ang || 0}deg, ${bg.c1}, ${bg.c2})` : bg.c1;
+  function pageFill(ctx, bg, W, H) {
+    if (bg && bg.c2) { const a = ((bg.ang || 0) - 90) * Math.PI / 180, cx = W / 2, cy = H / 2, r = Math.abs(Math.cos(a)) * W / 2 + Math.abs(Math.sin(a)) * H / 2;
+      const g = ctx.createLinearGradient(cx - Math.cos(a) * r, cy - Math.sin(a) * r, cx + Math.cos(a) * r, cy + Math.sin(a) * r); g.addColorStop(0, bg.c1); g.addColorStop(1, bg.c2); ctx.fillStyle = g; }
+    else ctx.fillStyle = bg ? bg.c1 : '#FFFFFF';
+    ctx.fillRect(0, 0, W, H);
+  }
+  const DOC_TX = { font: 'Inter', size: 12, color: '#111111', bold: false, italic: false, underline: false, strike: false, align: 'left', lh: 1.4, ls: 0, parGap: 0, list: 'none', indent: 0 };
+  function docPage(id) { return state.pages.find(p => p.id === id); }
+  function isDocPage(p) { return !!(state.doc && p && state.doc.pids.includes(p.id)); }
+  function ensureDoc() { if (!state.doc) state.doc = { text: '', tx: Object.assign({}, DOC_TX), m: { t: 2, b: 2, l: 2, r: 2 }, pids: [currentPage().id], recs: [] }; return state.doc; }
+  function docEff(pg) {
+    const d = state.doc || { tx: DOC_TX, m: { t: 2, b: 2, l: 2, r: 2 } };
+    return { tx: Object.assign({}, TXD, d.tx, pg.fo || {}, { pad: 0, valign: 'top', fit: 'none', bgOp: 0, caps: false, strokeW: 0, shOp: 0 }), m: Object.assign({}, d.m, pg.mo || {}) };
+  }
+  function ensureFontTx(tx) { const k = fontSpec(tx, 20); if (!document.fonts.check(k) && !fontTried.has(k)) { fontTried.add(k); document.fonts.load(k, 'Aa').then(() => { gcache.clear(); reflowDoc(0); renderAll(); }).catch(() => {}); } }
+  function reflowDoc(from = 0) {
+    const d = state.doc; if (!d) return; const P = getPaperCm(), T = d.text;
+    let pos = 0, cont = false, po = 0, k = from;
+    d.recs = (d.recs || []).slice(0, from);
+    if (from > 0 && d.recs[from - 1]) { const r = d.recs[from - 1]; pos = r.next; cont = r.cn; po = r.pn; } else { k = 0; d.recs = []; }
+    for (let guard = 0; guard < 600; guard++, k++) {
+      let pg = docPage(d.pids[k]);
+      if (!pg) { pg = { id: ++pageCounter, els: [] }; state.pages.push(pg); d.pids[k] = pg.id; }
+      const E = docEff(pg), w = Math.max(1, P.w - E.m.l - E.m.r), h = Math.max(1, P.h - E.m.t - E.m.b);
+      const sz = E.tx.size * 0.035278, cap = Math.max(300, Math.ceil(w * h / (0.3 * E.tx.lh * sz * sz)) + 80);
+      const rest = T.slice(pos, pos + cap); ensureFontTx(E.tx);
+      const Lc = txCore(SCR, { text: rest, tx: E.tx, wCm: w, hCm: h, cont, parOff: po }, 100, E.tx.size), room = h * 100;
+      let acc = 0, n = 0; for (const l of Lc.lines) { const hh = Lc.lh + l.gap; if (acc + hh > room && n > 0) break; acc += hh; n++; }
+      const all = n >= Lc.lines.length && pos + cap >= T.length;
+      let endL = rest.length, nextL = rest.length, cn = false;
+      if (!all) {
+        const l = Lc.lines[n - 1], ps = [0]; for (let i = 0; i < rest.length; i++) if (rest[i] === '\n') ps.push(i + 1);
+        endL = ps[l.pi] + l.o + l.s.length; nextL = endL;
+        if (rest[nextL] === '\n') nextL++; else { cn = true; if (rest[nextL] === ' ') nextL++; }
+      }
+      let el = pg.els.find(e => e.flow);
+      if (!el) { el = { id: ++elCounter, type: 'text', flow: true, mode: 'stretch', rot: 0, xCm: 0, yCm: 0, wCm: w, hCm: h }; pg.els.unshift(el); }
+      Object.assign(el, { xCm: E.m.l, yCm: E.m.t, wCm: w, hCm: h, text: rest.slice(0, endL), tx: E.tx, cont, contNext: !all && cn, parOff: po });
+      sanitizeEl(el); thumbCache.delete(pg.id);
+      d.recs[k] = { pid: pg.id, s: pos, e: pos + endL, next: pos + nextL, cn, pn: po + (rest.slice(0, nextL).split('\n').length - 1) };
+      if (all) { k++; break; }
+      pos += nextL; cont = cn; po = d.recs[k].pn;
+    }
+    while (d.pids.length > k) { const pg = docPage(d.pids.pop()); if (!pg) continue; pg.els = pg.els.filter(e => !e.flow); thumbCache.delete(pg.id); if (!pg.els.length && state.pages.length > 1) state.pages.splice(state.pages.indexOf(pg), 1); }
+    if (state.currentPageIndex >= state.pages.length) state.currentPageIndex = state.pages.length - 1;
+  }
+  function docRelocate(ta, caret) {
+    const d = state.doc; let j = d.recs.findIndex(q => caret <= q.e); if (j < 0) j = d.recs.length - 1;
+    const q = d.recs[j], pg2 = docPage(q.pid), el2 = pg2.els.find(e => e.flow), loc = Math.max(0, Math.min(q.e - q.s, caret - q.s));
+    state.currentPageIndex = state.pages.indexOf(pg2); editingTextId = el2.id; selectedIds = new Set([el2.id]);
+    if (ta.value !== el2.text) ta.value = el2.text; ta.setSelectionRange(loc, loc);
+    renderAll(); placeEd();
+  }
+  function docInput(ta, el) {
+    const d = state.doc, pg = state.pages.find(p => p.els.includes(el)), k = d.pids.indexOf(pg.id), r = d.recs[k]; if (!r) return;
+    const caret = r.s + ta.selectionStart; d.text = d.text.slice(0, r.s) + ta.value + d.text.slice(r.e);
+    reflowDoc(Math.max(0, k - 1)); docRelocate(ta, caret);
+  }
+  function docEdit(k = 0) {
+    const d = ensureDoc(); if (!d.recs.length) reflowDoc(0);
+    const pg = docPage(d.pids[Math.min(k, d.pids.length - 1)]); state.currentPageIndex = state.pages.indexOf(pg); renderAll();
+    const el = pg.els.find(e => e.flow); if (el) startInlineEdit(el.id, false); saveState();
+  }
+  async function docPaste() {
+    let t = ''; try { t = await navigator.clipboard.readText(); } catch (e) {}
+    if (!t) t = prompt('Pega aquí el texto:') || ''; if (!t) return;
+    const d = ensureDoc(); d.text += (d.text && !d.text.endsWith('\n') ? '\n' : '') + t;
+    reflowDoc(0); saveState(); renderAll(); syncDoc(); showToast('Texto agregado a la hoja', 'success');
+  }
+  let dcScope = 'all'; const dm = $('docModal');
+  function docOpen() { syncDoc(); dm.classList.add('show'); void dm.offsetWidth; setTimeout(() => dm.classList.add('visible'), 10); }
+  function docClose() { dm.classList.remove('visible'); setTimeout(() => { if (!dm.classList.contains('visible')) dm.classList.remove('show'); }, 260); }
+  function syncDoc() {
+    const E = docEff(currentPage()), bg = currentPage().bg;
+    dm.querySelectorAll('[data-dt]').forEach(c => { if (document.activeElement !== c) c.value = E.tx[c.dataset.dt]; });
+    dm.querySelectorAll('[data-dm]').forEach(c => { if (document.activeElement !== c) c.value = c.dataset.dm === 'all' ? '' : E.m[c.dataset.dm]; });
+    dm.querySelectorAll('[data-db]').forEach(b => b.classList.toggle('active', !!E.tx[b.dataset.db]));
+    dm.querySelectorAll('[data-da]').forEach(b => b.classList.toggle('active', E.tx.align === b.dataset.da));
+    if (bg) { dm.querySelector('[data-dg=c1]').value = bg.c1; if (bg.c2) dm.querySelector('[data-dg=c2]').value = bg.c2; dm.querySelector('[data-dg=ang]').value = bg.ang || 0; }
+    dm.querySelector('[data-dg=on]').checked = !!(bg && bg.c2);
+    $('dcAll').classList.toggle('active', dcScope === 'all'); $('dcOne').classList.toggle('active', dcScope === 'one');
+  }
+  function setDoc(kind, key, val) {
+    const d = ensureDoc(), all = dcScope === 'all', pg = currentPage(), P = getPaperCm();
+    if (kind === 'tx') { if (all) { d.tx[key] = val; state.pages.forEach(p => { if (p.fo) delete p.fo[key]; }); } else { pg.fo = pg.fo || {}; pg.fo[key] = val; } }
+    else (key === 'all' ? ['t', 'b', 'l', 'r'] : [key]).forEach(k => {
+      const v = Math.max(0, Math.min(val, (k === 't' || k === 'b' ? P.h : P.w) / 2 - 1));
+      if (all) { d.m[k] = v; state.pages.forEach(p => { if (p.mo) delete p.mo[k]; }); } else { pg.mo = pg.mo || {}; pg.mo[k] = v; }
+    });
+    reflowDoc(0); renderAll();
+  }
+  function setBg(none) {
+    const g = (k) => dm.querySelector(`[data-dg=${k}]`), tg = dcScope === 'all' ? state.pages : [currentPage()];
+    const v = none ? null : { c1: g('c1').value, c2: g('on').checked ? g('c2').value : null, ang: parseFloat(g('ang').value) || 0 };
+    tg.forEach(p => { p.bg = v ? Object.assign({}, v) : null; thumbCache.delete(p.id); }); renderAll(); updateThumbnails();
+  }
+  dm.addEventListener('input', (e) => {
+    const c = e.target, q = c.dataset;
+    if (q.dt) { const v = c.type === 'number' ? parseFloat(c.value) : c.value; if (c.type === 'number' && !(v > 0)) return; setDoc('tx', q.dt, v); }
+    else if (q.dm) { const v = parseFloat(c.value); if (v >= 0) setDoc('m', q.dm, v); }
+    else if (q.dg) setBg(false);
+  });
+  dm.addEventListener('change', () => { saveState(); syncDoc(); });
+  dm.addEventListener('click', (e) => {
+    if (e.target === dm) { docClose(); return; }
+    const b = e.target.closest('button'); if (!b) return; sfx.tap();
+    if (b.id === 'closeDoc' || b.closest('#closeDoc')) docClose();
+    else if (b.id === 'dcAll' || b.id === 'dcOne') { dcScope = b.id === 'dcAll' ? 'all' : 'one'; syncDoc(); }
+    else if (b.id === 'dcEdit') { docClose(); docEdit(state.doc && state.doc.pids.includes(currentPage().id) ? state.doc.pids.indexOf(currentPage().id) : 0); }
+    else if (b.id === 'dcPaste') docPaste();
+    else if (b.id === 'dgNone') { setBg(true); saveState(); }
+    else if (b.id === 'dcRemove') { if (state.doc) { state.doc.pids.forEach(id => { const pg = docPage(id); if (pg) pg.els = pg.els.filter(x => !x.flow); }); state.doc = null; saveState(); renderAll(); updateThumbnails(); syncDoc(); } }
+    else if (b.dataset.db) { setDoc('tx', b.dataset.db, !docEff(currentPage()).tx[b.dataset.db]); saveState(); syncDoc(); }
+    else if (b.dataset.da) { setDoc('tx', 'align', b.dataset.da); saveState(); syncDoc(); }
+  });
+  let tapT = 0, tapX = 0, tapY = 0; const swp = $('stage-wrapper');
+  swp.addEventListener('pointerdown', (e) => { tapX = e.clientX; tapY = e.clientY; });
+  swp.addEventListener('pointerup', (e) => {
+    if (!e.isPrimary || edTA || !isDocPage(currentPage()) || Math.hypot(e.clientX - tapX, e.clientY - tapY) > 10) return;
+    const n = Date.now(); if (n - tapT < 320) { tapT = 0; docEdit(state.doc.pids.indexOf(currentPage().id)); } else tapT = n;
+  });
+
+
+  /* ====== SLIDERS SEGUROS (arrastre relativo + botones − / +) ====== */
+  function wrapSliders() {
+    document.querySelectorAll('input[type=range]').forEach(r => {
+      if (r.parentElement.classList.contains('sl-t')) return;
+      const w = mk('<div class="sl"><button type="button" class="sl-b" data-d="-1">−</button><div class="sl-t"></div><button type="button" class="sl-b" data-d="1">+</button></div>');
+      r.parentNode.insertBefore(w, r); const t = w.querySelector('.sl-t'); t.appendChild(r);
+      const step = parseFloat(r.step) || 1, mn = parseFloat(r.min), mx = parseFloat(r.max), dec = (String(step).split('.')[1] || '').length;
+      const fire = (n) => r.dispatchEvent(new Event(n, { bubbles: true }));
+      const setV = (v) => { v = +Math.max(mn, Math.min(mx, Math.round(v / step) * step)).toFixed(dec); if (v !== parseFloat(r.value)) { r.value = v; fire('input'); } };
+      let sx = 0, sy = 0, sv = 0, drag = false, pid = null;
+      t.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; sv = parseFloat(r.value); drag = false; pid = e.pointerId; });
+      t.addEventListener('pointermove', (e) => {
+        if (e.pointerId !== pid) return;
+        const dx = e.clientX - sx, dy = e.clientY - sy;
+        if (!drag) { if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.5) { drag = true; try { t.setPointerCapture(pid); } catch (_) {} } else return; }
+        setV(sv + dx / Math.max(1, t.clientWidth) * (mx - mn));
+      });
+      const end = (e) => { if (e.pointerId !== pid) return; pid = null; if (drag) { drag = false; fire('change'); } };
+      t.addEventListener('pointerup', end); t.addEventListener('pointercancel', end);
+      w.querySelectorAll('.sl-b').forEach(b => {
+        let tm = null, iv = null, on = false; const d = +b.dataset.d;
+        const once = () => setV(parseFloat(r.value) + d * step);
+        const stop = () => { clearTimeout(tm); clearInterval(iv); if (on) { on = false; fire('change'); } };
+        b.addEventListener('pointerdown', (e) => { e.preventDefault(); on = true; once(); tm = setTimeout(() => { iv = setInterval(once, 70); }, 380); });
+        ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => b.addEventListener(ev, stop));
+      });
+    });
+  }
+  wrapSliders();
+
+  /* ====== ESTILOS RÁPIDOS DE TEXTO ====== */
+  const PRESETS = { title: { size: 40, bold: true, font: 'Montserrat', lh: 1.1 }, sub: { size: 26, bold: true, font: 'Inter', lh: 1.2 }, body: { size: 14, bold: false, italic: false, font: 'Inter', lh: 1.4, align: 'left' }, small: { size: 10, bold: false, font: 'Inter', color: '#666666', lh: 1.3 } };
+  SIC.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-preset]'); if (!b) return;
+    sfx.tap(); gTargets('tx').forEach(el => Object.assign(el.tx, PRESETS[b.dataset.preset])); saveState(); renderAll();
+  });
+
+  /* ====== ACCESOS DIRECTOS (barra contextual) ====== */
+  const qa = document.createElement('div'); qa.id = 'qa'; document.body.appendChild(qa);
+  let qaSig = '';
+  const qaB = (a, l, on) => `<button data-a="${a}"${on ? ' class="on"' : ''}>${l}</button>`, qaSep = '<div class="sep"></div>';
+  function updateQA(els) {
+    if (!els.length || (editingTextId && edTA)) { qa.classList.remove('show'); qaSig = ''; return; }
+    const f = els[0], multi = els.length > 1, t = f.tx, sh = f.sh;
+    const sig = JSON.stringify([f.type, els.length, t && [t.bold, t.italic, t.underline, t.align, t.fit], !!f.groupId, !!f.flipX]);
+    qa.style.top = ($('stage-wrapper').getBoundingClientRect().top + 6) + 'px';
+    if (sig !== qaSig) {
+      qaSig = sig; let h = '';
+      if (f.type === 'text') h += qaB('edit', 'Editar') + qaSep + qaB('bold', '<b>N</b>', t.bold) + qaB('italic', '<i>K</i>', t.italic) + qaB('underline', '<u>S</u>', t.underline) + qaSep + qaB('sdn', 'A−') + qaB('sup', 'A+') + '<input type="color" data-qc="tx.color">' + qaB('align', { left: 'Izq', center: 'Centro', right: 'Der', justify: 'Justif.' }[t.align]) + qaB('fit', { none: 'Fijo', grow: 'Crece', shrink: 'Reduce' }[t.fit]) + qaSep;
+      else if (f.type === 'shape') h += '<input type="color" data-qc="sh.fill"><input type="color" data-qc="sh.stroke">' + qaSep;
+      else if (!multi) h += qaB('replace', 'Cambiar') + qaSep;
+      if (multi) h += qaB('group', 'Agrupar') + qaB('ungroup', 'Desagrupar') + qaB('al:l', 'Izq') + qaB('al:c', 'Centro') + qaB('al:r', 'Der') + qaSep;
+      h += qaB('rot', 'Girar') + qaB('flipX', 'Voltear', f.flipX) + qaB('dup', 'Duplicar') + qaB('front', 'Frente') + qaB('back', 'Fondo') + qaB('del', 'Eliminar');
+      qa.innerHTML = h;
+    }
+    qa.querySelectorAll('[data-qc]').forEach(c => { const [g, k] = c.dataset.qc.split('.'); const o = f[g]; if (o && document.activeElement !== c) c.value = o[k]; });
+    qa.classList.add('show');
+  }
+  qa.addEventListener('click', (e) => {
+    const bt = e.target.closest('button[data-a]'); if (!bt) return;
+    const a = bt.dataset.a, els = getSelectedEls(), f = els[0]; if (!f) return;
+    sfx.tap(); const tx = els.filter(x => x.type === 'text'), commit = () => { saveState(); renderAll(); };
+    if (a === 'edit') startInlineEdit(f.id, false);
+    else if (a === 'bold' || a === 'italic' || a === 'underline') { const v = !f.tx[a]; tx.forEach(x => x.tx[a] = v); commit(); }
+    else if (a === 'sdn' || a === 'sup') { tx.forEach(x => x.tx.size = Math.max(4, Math.min(200, x.tx.size + (a === 'sup' ? 2 : -2)))); commit(); }
+    else if (a === 'align') { const o = ['left', 'center', 'right', 'justify'], n = o[(o.indexOf(f.tx.align) + 1) % 4]; tx.forEach(x => x.tx.align = n); commit(); }
+    else if (a === 'fit') { const o = ['none', 'grow', 'shrink'], n = o[(o.indexOf(f.tx.fit) + 1) % 3]; tx.forEach(x => x.tx.fit = n); commit(); }
+    else if (a === 'rot') { els.forEach(x => { let n = ((x.rot || 0) + 90) % 360; if (n > 180) n -= 360; x.rot = n; }); commit(); }
+    else if (a === 'flipX') { const v = !f.flipX; els.forEach(x => x.flipX = v); commit(); }
+    else if (a === 'replace') { const i = $('replaceImageInput'); i.dataset.targetId = f.id; i.click(); }
+    else if (a === 'dup') els.length > 1 ? doDuplicateAll() : doDuplicate();
+    else if (a === 'front') els.length > 1 ? bringToFrontAll() : bringToFront(f.id);
+    else if (a === 'back') els.length > 1 ? sendToBackAll() : sendToBack(f.id);
+    else if (a === 'del') doDelete();
+    else if (a === 'group') doGroupSelected();
+    else if (a === 'ungroup') doUngroupSelected();
+    else if (a.startsWith('al:')) alignSel(a.slice(3));
+  });
+  qa.addEventListener('input', (e) => {
+    const c = e.target; if (!c.dataset.qc) return;
+    const [g, k] = c.dataset.qc.split('.'); getSelectedEls().filter(x => g === 'tx' ? x.type === 'text' : x.type === 'shape').forEach(x => x[g][k] = c.value); renderAll();
+  });
+  qa.addEventListener('change', (e) => { if (e.target.dataset.qc) saveState(); });
+  window.addEventListener('resize', () => { if (qa.classList.contains('show')) qa.style.top = ($('stage-wrapper').getBoundingClientRect().top + 6) + 'px'; });
+
   document.addEventListener('DOMContentLoaded', () => {
     loadTheme();
     $('themeToggleBtn').addEventListener('click', () => {
@@ -3867,7 +4527,7 @@ ctx.restore();
     let resizeTimer = null;
     const onResize = () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
+      resizeTimer = setTimeout(() => { if (isTypeField(document.activeElement)) return;
         recomputeScale(); recenterStage(); renderAll(); syncUIWithState();
         if ($('pdfReader').classList.contains('show') && pdfReaderState.pdfDoc) {
           pdfReaderState.scale = 1.0; pdfReaderState.pendingResetScroll = true; renderPdfCurrentPage();
