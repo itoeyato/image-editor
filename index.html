@@ -241,6 +241,20 @@
   @keyframes handleAppear { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   .handle::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; border-right: 2px solid white; border-bottom: 2px solid white; }
   .el.selected .handle { display: block; }
+  .rotate-handle {
+    position: absolute; left: 50%; top: -42px; transform: translateX(-50%);
+    width: 34px; height: 34px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; z-index: 12;
+    background: var(--handle-bg); color: #fff; border: 2px solid var(--handle-border);
+    box-shadow: 0 2px 7px rgba(0,0,0,.3); cursor: grab; touch-action: none;
+    pointer-events: auto; user-select: none; -webkit-user-select: none;
+  }
+  .rotate-handle:active { cursor: grabbing; }
+  .rotate-handle svg { width: 19px; height: 19px; fill: none; stroke: currentColor;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+  .el.selected .rotate-handle { display: flex; }
+  .rotate-handle::before { content: ''; position: absolute; width: 2px; height: 9px;
+    background: var(--handle-bg); bottom: -10px; left: 50%; transform: translateX(-50%); }
   .inspector { position: fixed; background: var(--inspector-bg); z-index: 50; box-shadow: var(--inspector-shadow); left: 6px; right: 6px; bottom: 6px; border-radius: 12px; max-height: 56px; touch-action: auto; display: none; flex-direction: column; border: 1px solid var(--line); overflow: hidden; transform: translateY(100%); opacity: 0; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease, max-height 0.3s ease, height 0.3s ease; }
   .inspector.show { display: flex; }
   .inspector.visible { transform: translateY(0); opacity: 1; }
@@ -564,6 +578,43 @@
   #docModal .row .btn.full { width: auto; flex: 1; min-width: 0; }
   #docModal .row > div { flex: 1; min-width: 0; }
   #docModal input[type=number], #docModal select { width: 100%; box-sizing: border-box; }
+
+  #snapStep { width: 54px; min-height: 24px; padding: 2px 4px; font-size: 12px; text-align: center; }
+  .grid-layer, .guide-layer { position: absolute; inset: 0; pointer-events: none; }
+  .grid-layer { z-index: 2; } .guide-layer { z-index: 4; overflow: hidden; }
+  .ug-line { position: absolute; pointer-events: none; z-index: 3; }
+  .guide-layer .gl { position: absolute; pointer-events: none; }
+  .guide-layer .gt { position: absolute; transform: translate(-50%, -50%); color: #fff; font-family: 'JetBrains Mono', monospace; white-space: nowrap; line-height: 1; pointer-events: none; }
+  #gridModal { background: rgba(0,0,0,0.12); backdrop-filter: none; align-items: flex-end; padding: 0; z-index: 120; }
+  #gridModal .modalbox { max-width: 520px; max-height: 58vh; overflow-y: auto; margin: 0 auto; border-radius: 14px 14px 0 0; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+  #gridModal label, #posterModal label { display: block; }
+  #cpk { position: fixed; inset: 0; z-index: 30000; display: none; align-items: flex-end; justify-content: center; background: rgba(0,0,0,0.35); touch-action: none; }
+  #cpk.show { display: flex; }
+  .cpk-sheet { width: 100%; max-width: 380px; background: var(--panel); border: 1px solid var(--line); border-radius: 18px 18px 0 0; padding: 14px 14px calc(14px + env(safe-area-inset-bottom)); box-shadow: 0 -8px 30px rgba(0,0,0,0.3); }
+  .cpk-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .cpk-sw { display: flex; width: 74px; height: 36px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); flex-shrink: 0; }
+  .cpk-sw i { flex: 1; display: block; }
+  #cpkHex { flex: 1; text-transform: lowercase; font-family: 'JetBrains Mono', monospace; text-align: center; min-width: 0; }
+  #cpkEye, .cpk-act button { border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--btn-text); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-weight: 600; min-height: 38px; }
+  .cpk-wheel { display: flex; justify-content: center; margin: 6px 0 10px; }
+  #cpkCv { touch-action: none; border-radius: 50%; }
+  .cpk-pal { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; justify-content: center; }
+  .cpk-pal button { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); padding: 0; }
+  .cpk-act { display: flex; gap: 8px; margin-top: 4px; } .cpk-act button { flex: 1; }
+  #cpkOk { background: var(--accent); color: var(--cta-color); border-color: var(--accent); }
+  input[type="color"] { border-radius: 50%; width: 36px; height: 36px; padding: 2px; }
+  .ps-prev { position: sticky; top: -16px; z-index: 3; background: var(--modalbox-bg); padding: 6px 0 8px; text-align: center; }
+  #psCanvas { touch-action: none; border: 1px solid var(--line); border-radius: 6px; background: #9aa4b2; max-width: 100%; }
+  .ps-info { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 4px; } .ps-info.warn { color: var(--danger); }
+  .ps-tab { display: none; margin-top: 6px; } .ps-tab.on { display: block; }
+  .ps-hint { font-size: 11px; color: var(--muted); margin: 6px 0 0; line-height: 1.35; }
+  #posterModal { z-index: 110; position: fixed; inset: 0; height: 100dvh; box-sizing: border-box; overflow: hidden; align-items: flex-start; padding: 8px; }
+  #posterModal .modalbox { max-height: calc(100dvh - 16px); overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; margin: 0 auto; }
+  #posterModal .ps-prev { top: 0; }
+  #posterModal .ps-axis { margin: 8px 0 10px; }
+  #posterModal .ps-axis label { display:flex; justify-content:space-between; gap:8px; align-items:center; font-size:12px; }
+  #posterModal .ps-axis input[type=range] { width:100%; min-height:32px; margin:3px 0 0; touch-action:pan-x; }
+  #posterModal input, #posterModal select, #posterModal button { scroll-margin-block: 12px; }
 </style>
 </head>
 
@@ -623,11 +674,8 @@
         <label class="switch"><input type="checkbox" id="showGrid" /><span class="switch-slider"></span></label>
         <span class="compact-label">Snap</span>
         <label class="switch"><input type="checkbox" id="snapGrid" /><span class="switch-slider"></span></label>
-        <select id="snapStep" style="width:42px;">
-          <option value="0.1">.1</option>
-          <option value="0.5" selected>.5</option>
-          <option value="1.0">1</option>
-        </select>
+        <input type="number" id="snapStep" value="0.5" min="0.05" max="50" step="0.05" inputmode="decimal" title="Paso de malla y snap (cm)" />
+        <button class="icon-btn xs" id="gridCfgBtn" title="Malla y guías"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></button>
       </div>
       <div class="group">
         <button class="icon-btn xs" id="zoomResetQuickBtn" title="Zoom 1:1">
@@ -655,6 +703,7 @@
           <option value="carta">Carta (21.6 × 27.9)</option>
           <option value="oficio">Oficio (21.6 × 34)</option>
           <option value="legal">Legal (21.6 × 35.6)</option>
+          <option value="a4">A4 (21 × 29.7)</option><option value="a3">A3 (29.7 × 42)</option><option value="a2">A2 (42 × 59.4)</option><option value="tabloide">Tabloide (27.9 × 43.2)</option><option value="10x15">10 × 15</option>
           <option value="custom">Personalizado</option>
         </select>
         <div class="row" id="customPaperRow" style="display: none; margin-top: 6px">
@@ -1064,7 +1113,7 @@
 <script>
 (function () {
   const $ = (id) => document.getElementById(id);
-  const PAPERS = { carta: [21.6, 27.9], oficio: [21.6, 34], legal: [21.6, 35.6] };
+  const PAPERS = { carta: [21.6, 27.9], oficio: [21.6, 34], legal: [21.6, 35.6], a4: [21, 29.7], a3: [29.7, 42], a2: [42, 59.4], tabloide: [27.9, 43.2], "10x15": [10, 15] };
   if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   }
@@ -1457,8 +1506,8 @@ function undo() {
   function findEl(id) { for (const p of state.pages) for (const e of p.els) if (e.id === id) return e; return null; }
   function snap(val) {
     if (!$("snapGrid").checked) return val;
-    const step = parseFloat($("snapStep").value) || 0.5;
-    return Math.round(val / step) * step;
+    const step = stepCm();
+    return Math.round(Math.round(val / step) * step * 10000) / 10000;
   }
   function isSelected(id) { return selectedIds.has(id); }
   function getSelectedEls() { return [...selectedIds].map(findEl).filter(Boolean); }
@@ -1572,7 +1621,52 @@ function undo() {
     if (selectedIds.size === 1 && isSelected(el.id)) {
       const handle = document.createElement("div");
       handle.className = "handle";
+      handle.title = "Arrastrar para cambiar tamaño";
       d.appendChild(handle);
+
+      // Handle de rotación independiente del control de escala.
+      const rotateHandle = document.createElement("div");
+      rotateHandle.className = "rotate-handle";
+      rotateHandle.title = "Arrastrar para rotar";
+      rotateHandle.setAttribute("aria-label", "Rotar elemento");
+      rotateHandle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4.5 16a8 8 0 0 0 13.2 2.1A8 8 0 0 0 18 6.5 8 8 0 0 0 5 8"/><path d="M4 4v5h5"/></svg>';
+      let rotating = false, startAngle = 0, startRotation = 0, centerX = 0, centerY = 0;
+      const finishRotation = (ev) => {
+        if (!rotating) return;
+        rotating = false;
+        try { rotateHandle.releasePointerCapture(ev.pointerId); } catch (_) {}
+        el.rot = ((Number(el.rot) || 0) % 360 + 360) % 360;
+        saveState();
+        renderAll();
+      };
+      rotateHandle.addEventListener("pointerdown", (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (ev.button !== undefined && ev.button !== 0) return;
+        rotating = true;
+        const rect = d.getBoundingClientRect();
+        centerX = rect.left + rect.width / 2;
+        centerY = rect.top + rect.height / 2;
+        startAngle = Math.atan2(ev.clientY - centerY, ev.clientX - centerX) * 180 / Math.PI;
+        startRotation = Number(el.rot) || 0;
+        try { rotateHandle.setPointerCapture(ev.pointerId); } catch (_) {}
+      });
+      rotateHandle.addEventListener("pointermove", (ev) => {
+        if (!rotating) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        const angle = Math.atan2(ev.clientY - centerY, ev.clientX - centerX) * 180 / Math.PI;
+        let next = startRotation + angle - startAngle;
+        next = ((next % 360) + 360) % 360;
+        el.rot = next;
+        d.style.transform = elCss(el);
+      });
+      rotateHandle.addEventListener("pointerup", finishRotation);
+      rotateHandle.addEventListener("pointercancel", finishRotation);
+      rotateHandle.addEventListener("lostpointercapture", () => {
+        if (rotating) { rotating = false; el.rot = ((Number(el.rot) || 0) % 360 + 360) % 360; saveState(); renderAll(); }
+      });
+      d.appendChild(rotateHandle);
     }
     return d;
   }
@@ -1611,14 +1705,7 @@ function undo() {
     $("quickZoomVal").textContent = Math.round(zoomScale * 100) + "%";
     const cp = currentPage();
     const pageDiv = document.createElement("div");
-    let pageClass = "page";
-    if ($("showGrid").checked) {
-      pageClass += " grid-bg";
-      const stepCm = parseFloat($("snapStep").value) || 0.5;
-      const gridSizePx = stepCm * PX_PER_CM;
-      pageDiv.style.setProperty('--grid-size', gridSizePx + 'px');
-    }
-    pageDiv.className = pageClass;
+    pageDiv.className = "page";
     pageDiv.style.width = paper.w * PX_PER_CM + "px";
     pageDiv.style.height = paper.h * PX_PER_CM + "px";
     pageDiv.style.background = pageBgCss(cp.bg);
@@ -1629,6 +1716,7 @@ function undo() {
     const contentLayer = document.createElement("div");
     contentLayer.className = "content-layer";
     pageDiv.appendChild(contentLayer);
+    addGridAndGuides(pageDiv, paper, cp);
 
     cp.els.forEach(el => {
       sanitizeEl(el);
@@ -2150,10 +2238,10 @@ function updateThumbnails() {
     if (state.pages.length > 1) addCtxItem(menu, ICONS.trash, 'Eliminar página', doDeletePage, true);
     addCtxDivider(menu);
     addCtxItem(menu, ICONS.fit, `Malla ${$('showGrid').checked ? 'ON' : 'OFF'}`, () => {
-      $('showGrid').checked = !$('showGrid').checked; renderAll();
+      $('showGrid').checked = !$('showGrid').checked; readMainToGC(); renderAll();
     });
     addCtxItem(menu, ICONS.fit, `Snap ${$('snapGrid').checked ? 'ON' : 'OFF'}`, () => {
-      $('snapGrid').checked = !$('snapGrid').checked; renderAll();
+      $('snapGrid').checked = !$('snapGrid').checked; readMainToGC(); renderAll();
     });
     addCtxDivider(menu);
     addCtxItem(menu, ICONS.group, 'Plantillas collage', openCollageModal);
@@ -2264,7 +2352,7 @@ function updateThumbnails() {
   function doAddPage() {
     state.pages.push({ id: ++pageCounter, els: [] });
     state.currentPageIndex = state.pages.length - 1;
-    saveState(); deselectAll(); sfx.success(); showToast('Página agregada', 'success');
+    saveState(); deselectAll(); renderAll(); sfx.success(); showToast('Página agregada', 'success');
   }
   function doDuplicatePage() {
     const srcPage = currentPage();
@@ -2274,7 +2362,7 @@ function updateThumbnails() {
     };
     state.pages.splice(state.currentPageIndex + 1, 0, newPage);
     state.currentPageIndex++;
-    saveState(); deselectAll(); sfx.success(); showToast('Página duplicada', 'success');
+    saveState(); deselectAll(); renderAll(); sfx.success(); showToast('Página duplicada', 'success');
   }
   async function doDeletePage() {
     if (state.pages.length <= 1) { showToast('Debe haber al menos una página', 'info'); return; }
@@ -2285,7 +2373,7 @@ function updateThumbnails() {
     state.pages.splice(state.currentPageIndex, 1);
     thumbCache.delete(removedId);
     if (state.currentPageIndex >= state.pages.length) state.currentPageIndex = state.pages.length - 1;
-    saveState(); deselectAll(); sfx.success(); showToast('Página eliminada', 'success'); checkMultiSelectState();
+    deselectAll(); saveState(); renderAll(); sfx.success(); showToast('Página eliminada', 'success'); checkMultiSelectState();
   }
 
   function doGroupSelected() {
@@ -3012,8 +3100,9 @@ function updateThumbnails() {
         const el = findEl(gesture.resize.elId); if (!el) return;
         const pos = getStageCoords(e.clientX, e.clientY);
         const dxPx = pos.x - gesture.resize.startX, dyPx = pos.y - gesture.resize.startY;
-        el.wCm = Math.max(0.5, snap(gesture.resize.startW + dxPx / PX_PER_CM));
-        el.hCm = Math.max(0.5, snap(gesture.resize.startH + dyPx / PX_PER_CM));
+        const gr = guideResize(el, gesture.resize.startW + dxPx / PX_PER_CM, gesture.resize.startH + dyPx / PX_PER_CM);
+        el.wCm = Math.max(0.5, gr.sw ? gr.w : snap(gr.w));
+        el.hCm = Math.max(0.5, gr.sh ? gr.h : snap(gr.h));
         if (isGen(el)) sanitizeGen(el);
         const elDiv = stage.querySelector(`.el[data-id="${gesture.resize.elId}"]`);
         if (elDiv) { elDiv.style.width = el.wCm * PX_PER_CM + "px"; elDiv.style.height = el.hCm * PX_PER_CM + "px"; if (isGen(el)) { const im = elDiv.querySelector("img"); if (im) im.src = genURL(el); } }
@@ -3034,7 +3123,7 @@ function updateThumbnails() {
           const startPos = gesture.drag.startPositions.get(firstEl.id);
           let newX = startPos.xCm + dxPx / PX_PER_CM;
           let newY = startPos.yCm + dyPx / PX_PER_CM;
-          if ($("snapGrid").checked) { newX = snap(newX); newY = snap(newY); }
+          { const gg = guideDrag(newX, newY); newX = gg.x; newY = gg.y; }
           const deltaX = newX - startPos.xCm, deltaY = newY - startPos.yCm;
           gesture.drag.startPositions.forEach((sPos, id) => {
             const e2 = findEl(id); if (!e2) return;
@@ -4144,7 +4233,7 @@ ctx.restore();
 
   
   /* ====== EDICIÓN EN EL LIENZO + MINI PANEL SOBRE EL TECLADO ====== */
-  let editingTextId = null, edTA = null, edOrig = '', edPanelHidden = false, edPanY0 = null, miniDismissed = null;
+  let editingTextId = null, edTA = null, edOrig = '', edPanelHidden = false, edPanY0 = null, miniDismissed = null, edDock = false;
   function centerThumb(a) { const b = $('thumbnailsBar'); b.scrollTo({ left: a.offsetLeft - b.clientWidth / 2 + a.clientWidth / 2, behavior: 'smooth' }); }
   function isTypeField(f) { return !!(f && f.matches && f.matches('textarea, input:not([type=range]):not([type=color]):not([type=checkbox]):not([type=radio]):not([type=file]):not([type=button])')); }
   const vk = navigator.virtualKeyboard; if (vk) { try { vk.overlaysContent = true; } catch (e) {} }
@@ -4154,11 +4243,19 @@ ctx.restore();
     if (v && window.innerHeight - v.height - v.offsetTop > 100) return v.offsetTop + v.height;
     return null;
   }
-  const mini = mk('<div id="kbMini"><span class="km-l"></span><div class="km-v"></div><button type="button" class="km-h">Ocultar</button><button type="button" class="km-ok">Listo</button></div>');
+  const mini = mk('<div id="kbMini"><span class="km-l"></span><textarea class="km-v" rows="2" spellcheck="false" autocomplete="off"></textarea><button type="button" class="km-h">Ocultar</button><button type="button" class="km-ok">Listo</button></div>');
   document.body.appendChild(mini);
+  const mv = mini.querySelector('.km-v'); let miniTarget = null, miniDirty = false;
+  mv.addEventListener('input', () => {
+    if (!miniTarget) return; let v = mv.value, fin = false;
+    if (miniTarget.tagName === 'INPUT' && /\n/.test(v)) { v = v.replace(/\n/g, ''); mv.value = v; fin = true; }
+    miniTarget.value = v; miniDirty = true; miniTarget.dispatchEvent(new Event('input', { bubbles: true }));
+    if (fin) { mv.blur(); }
+  });
+  mv.addEventListener('blur', () => { if (miniDirty && miniTarget) { miniDirty = false; miniTarget.dispatchEvent(new Event('change', { bubbles: true })); } });
   mini.querySelectorAll('button').forEach(b => b.addEventListener('pointerdown', (e) => e.preventDefault()));
-  mini.querySelector('.km-ok').addEventListener('click', () => { if (edTA) endInlineEdit(); else { const f = document.activeElement; if (f && f.blur) f.blur(); } mini.classList.remove('show'); });
-  mini.querySelector('.km-h').addEventListener('click', () => { miniDismissed = document.activeElement; mini.classList.remove('show'); });
+  mini.querySelector('.km-ok').addEventListener('click', () => { if (edTA) endInlineEdit(); else { const f = document.activeElement; if (f && f.blur) f.blur(); if (miniTarget && miniTarget.blur) miniTarget.blur(); } mini.classList.remove('show'); });
+  mini.querySelector('.km-h').addEventListener('click', () => { miniDismissed = miniTarget || document.activeElement; mini.classList.remove('show'); if (miniTarget) { try { miniTarget.focus({ preventScroll: true }); } catch (_) {} } });
   function fieldLabel(f) {
     if (f === edTA) return 'Texto';
     const l = f.closest('div') && f.closest('div').querySelector('label');
@@ -4178,18 +4275,21 @@ ctx.restore();
   function updateKb() { updateKb0(); syncDone(); if (edTA) placeEd(); }
   function updateKb0() {
     const f = document.activeElement; let kt = kbTop();
+    if (f && f.closest && f.closest('#posterModal')) { mini.classList.remove('show'); return; }
     if (f === edTA) { mini.classList.remove('show'); return; }
+    if (f === mv) { if (kt == null) { mini.classList.remove('show'); return; } mini.classList.add('show'); mini.style.top = (kt - mini.offsetHeight - 8) + 'px'; return; }
     if (!isTypeField(f) || kt == null || miniDismissed === f) { mini.classList.remove('show'); return; }
     const r = f.getBoundingClientRect();
     if (r.top < kt - 2) { mini.classList.remove('show'); return; }
     mini.querySelector('.km-l').textContent = fieldLabel(f);
-    const v = mini.querySelector('.km-v'); v.textContent = f.value || ' ';
-    mini.classList.add('show'); v.scrollTop = v.scrollHeight;
+    miniTarget = f; if (mv.value !== f.value) mv.value = f.value; mv.inputMode = f.type === 'number' ? 'decimal' : (f.inputMode || 'text');
+    mini.classList.add('show'); mv.scrollTop = mv.scrollHeight;
     mini.style.top = (kt - mini.offsetHeight - 8) + 'px';
   }
   const kbSoon = () => [0, 120, 300, 550].forEach(ms => setTimeout(updateKb, ms));
   document.addEventListener('focusin', (e) => {
-    const f = e.target; if (!isTypeField(f)) return;
+    const f = e.target; if (!isTypeField(f) || f === mv) return;
+    if (f.closest && f.closest('#posterModal')) { if (f.tagName === 'INPUT') f.setAttribute('enterkeyhint', 'done'); mini.classList.remove('show'); return; }
     if (miniDismissed && miniDismissed !== f) miniDismissed = null;
     const saved = [];
     for (let n = f.parentElement; n; n = n.parentElement) if (n.scrollTop || n.scrollLeft || n.scrollHeight > n.clientHeight) saved.push([n, n.scrollTop, n.scrollLeft]);
@@ -4204,7 +4304,7 @@ ctx.restore();
   if (vk) vk.addEventListener('geometrychange', kbSoon);
   window.addEventListener('scroll', () => { if (window.scrollX || window.scrollY) window.scrollTo(0, 0); }, { passive: true });
 
-  document.addEventListener('pointerdown', (e) => { if (edTA && !e.target.closest('#inlineEd, #kbMini, #edDone, #edBar')) endInlineEdit(); }, true);
+  document.addEventListener('pointerdown', (e) => { if (edTA && !e.target.closest('#inlineEd, #kbMini, #edDone, #edBar, #cpk')) endInlineEdit(); }, true);
   function revealEd(el, limit) {
     const d = $('stage').querySelector(`.el[data-id="${el.id}"]`), wr = $('stage-wrapper'); if (!d || !wr) return;
     if (edPanY0 == null) edPanY0 = panY;
@@ -4220,10 +4320,11 @@ ctx.restore();
     const t = el.tx, z = PX_PER_CM * zoomScale;
     let kt = kbTop();
     const bh = edBar.offsetHeight || 42, limit = kt == null ? null : kt - bh - 10;
-    if (limit != null && edPanelHidden) { revealEd(el, limit); }
     let r = d.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
     const w = el.wCm * z, h = el.hCm * z;
-    const covered = limit != null && !edPanelHidden && (cy - h / 2) >= limit - 2;
+    if (limit == null || edPanelHidden) edDock = false; else if ((cy - h / 2) >= limit - 2) edDock = true;
+    if (limit != null) { revealEd(el, edDock ? Math.max(120, limit - 100) : limit); r = d.getBoundingClientRect(); cx = r.left + r.width / 2; cy = r.top + r.height / 2; }
+    const covered = edDock;
     if (covered) {
       edTA.className = 'dk'; edTA.style.cssText = `left:8px;right:8px;width:auto;top:${Math.max(70, limit - 92)}px;height:84px;`;
     } else {
@@ -4239,7 +4340,7 @@ ctx.restore();
     endInlineEdit();
     selectedIds = new Set([id]); multiSelectMode = false; editingTextId = id; renderAll();
     const ta = document.createElement('textarea'); ta.id = 'inlineEd'; ta.value = el.text;
-    document.body.appendChild(ta); edTA = ta; edPanelHidden = false; edPanY0 = null; placeEd();
+    document.body.appendChild(ta); edTA = ta; edPanelHidden = false; edPanY0 = null; edDock = false; placeEd();
     ta.addEventListener('input', () => { const e2 = findEl(editingTextId); if (!e2) return; if (e2.flow) { docInput(ta, e2); return; } e2.text = ta.value; sanitizeGen(e2); renderAll(); placeEd(); });
     edOrig = el.text;
     edTA.addEventListener('input', syncDone);
@@ -4250,7 +4351,7 @@ ctx.restore();
   function endInlineEdit() {
     if (!edTA) return;
     const ta = edTA, id = editingTextId; edTA = null; editingTextId = null; ta.remove();
-    if (edPanY0 != null) { panY = edPanY0; edPanY0 = null; applyStageTransform(); } edPanelHidden = false; mini.classList.remove('show'); edBar.classList.remove('show');
+    if (edPanY0 != null) { panY = edPanY0; edPanY0 = null; applyStageTransform(); } edPanelHidden = false; edDock = false; mini.classList.remove('show'); edBar.classList.remove('show');
     const el = findEl(id);
     if (el && !el.flow && !el.text.trim()) { el.text = edOrig && edOrig.trim() ? edOrig : 'Texto'; sanitizeGen(el); }
     edDone.style.display = 'none';
@@ -5062,7 +5163,692 @@ document.addEventListener('pointerdown', (e) => {
     recomputeScale(); recenterStage(); renderAll(); updateThumbnails();
     updateInspectorState();
   });
+
+  /* ====== MALLA, SNAP Y GUÍAS INTELIGENTES ====== */
+  const GC_KEY = 'image-editor-grid-v1';
+  const GC = Object.assign({ show: false, snap: false, step: 0.5, color: '#3b82c4', width: 1, opacity: 0.4, major: 0,
+    guides: true, gEl: true, gPage: true, gMargin: false, margin: 1, gUser: true, gGap: true, gSize: true, labels: true, tol: 8,
+    gColor: '#ff2d7a', ugColor: '#00b5d8' }, (() => { try { return JSON.parse(localStorage.getItem(GC_KEY)) || {}; } catch (e) { return {}; } })());
+  const saveGC = () => { try { localStorage.setItem(GC_KEY, JSON.stringify(GC)); } catch (e) {} };
+  $('showGrid').checked = !!GC.show; $('snapGrid').checked = !!GC.snap; $('snapStep').value = GC.step;
+  function readMainToGC() {
+    GC.show = $('showGrid').checked; GC.snap = $('snapGrid').checked;
+    const v = parseFloat($('snapStep').value); if (v > 0) GC.step = v; saveGC();
+  }
+  ['showGrid', 'snapGrid'].forEach(id => $(id).addEventListener('change', readMainToGC));
+  $('snapStep').addEventListener('input', () => { readMainToGC(); renderAll(); });
+  $('snapStep').addEventListener('change', () => { const v = parseFloat($('snapStep').value); if (!(v > 0)) $('snapStep').value = GC.step; readMainToGC(); renderAll(); });
+  function stepCm() { const v = parseFloat($('snapStep').value); return v > 0 ? v : 0.5; }
+  const gcRgba = (hex, a) => { const m = /^#?([0-9a-f]{6})$/i.exec(hex || ''); const n = parseInt(m ? m[1] : '000000', 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+  const gFmt = (v) => String(Math.round(v * 100) / 100);
+
+  function addGridAndGuides(pageDiv, paper, cp) {
+    if ($('showGrid').checked) {
+      const sp = stepCm() * PX_PER_CM; let k = 1;
+      while (sp * k * zoomScale < 6 && k < 1000) k++;
+      const s = sp * k, t = Math.max(0.3, GC.width / zoomScale);
+      const lay = (col, th) => [`linear-gradient(to right, ${col} 0, ${col} ${th}px, transparent ${th}px)`, `linear-gradient(to bottom, ${col} 0, ${col} ${th}px, transparent ${th}px)`];
+      let imgs = [], sizes = [];
+      const N = Math.round(GC.major);
+      if (N > 1) { imgs.push(...lay(gcRgba(GC.color, Math.min(1, GC.opacity * 1.8)), t * 1.8)); sizes.push(`${s * N}px ${s * N}px`, `${s * N}px ${s * N}px`); }
+      imgs.push(...lay(gcRgba(GC.color, GC.opacity), t)); sizes.push(`${s}px ${s}px`, `${s}px ${s}px`);
+      const g = document.createElement('div'); g.className = 'grid-layer';
+      g.style.backgroundImage = imgs.join(','); g.style.backgroundSize = sizes.join(',');
+      pageDiv.appendChild(g);
+    }
+    (cp.guides || []).forEach(gd => {
+      const l = document.createElement('div'); l.className = 'ug-line'; const th = 1.5 / zoomScale;
+      if (gd.o === 'v') l.style.cssText = `left:${gd.p * PX_PER_CM}px;top:0;bottom:0;border-left:${th}px dashed ${GC.ugColor}`;
+      else l.style.cssText = `top:${gd.p * PX_PER_CM}px;left:0;right:0;border-top:${th}px dashed ${GC.ugColor}`;
+      pageDiv.appendChild(l);
+    });
+    const gl = document.createElement('div'); gl.id = 'guideLayer'; gl.className = 'guide-layer'; pageDiv.appendChild(gl);
+  }
+  function clearGuides() { const g = $('guideLayer'); if (g) g.innerHTML = ''; }
+  ['pointerup', 'pointercancel'].forEach(ev => window.addEventListener(ev, clearGuides, true));
+
+  const gBB = (e) => ({ x: e.xCm, y: e.yCm, w: e.wCm, h: e.hCm });
+  const guideTol = () => GC.tol / (PX_PER_CM * zoomScale);
+  function smTargets(excl) {
+    const cp = currentPage(), p = getPaperCm(), xs = [], ys = [], others = [];
+    if (GC.gPage) { [0, p.w / 2, p.w].forEach(v => xs.push({ v, t: 'p' })); [0, p.h / 2, p.h].forEach(v => ys.push({ v, t: 'p' })); }
+    if (GC.gMargin && GC.margin > 0) { const m = GC.margin; xs.push({ v: m, t: 'm' }, { v: p.w - m, t: 'm' }); ys.push({ v: m, t: 'm' }, { v: p.h - m, t: 'm' }); }
+    if (GC.gUser) (cp.guides || []).forEach(g => (g.o === 'v' ? xs : ys).push({ v: g.p, t: 'u' }));
+    cp.els.forEach(e => {
+      if (excl.has(e.id)) return; const b = gBB(e); others.push(b);
+      if (GC.gEl) { [b.x, b.x + b.w / 2, b.x + b.w].forEach(v => xs.push({ v, t: 'e', b })); [b.y, b.y + b.h / 2, b.y + b.h].forEach(v => ys.push({ v, t: 'e', b })); }
+    });
+    return { xs, ys, others };
+  }
+  function bestD(cands, targets, tol) {
+    let best = null;
+    for (const c of cands) for (const t of targets) { const d = t.v - c; if (Math.abs(d) <= tol && (best === null || Math.abs(d) < Math.abs(best) - 1e-9)) best = d; }
+    return best;
+  }
+  function gMatches(box, T) {
+    const L = [], eps = 0.015, P = getPaperCm();
+    [box.x, box.x + box.w / 2, box.x + box.w].forEach(c => T.xs.forEach(t => {
+      if (Math.abs(t.v - c) >= eps) return; let a = box.y, b = box.y + box.h;
+      if (t.b) { a = Math.min(a, t.b.y); b = Math.max(b, t.b.y + t.b.h); } else { a = 0; b = P.h; }
+      L.push({ o: 'v', p: t.v, a, b });
+    }));
+    [box.y, box.y + box.h / 2, box.y + box.h].forEach(c => T.ys.forEach(t => {
+      if (Math.abs(t.v - c) >= eps) return; let a = box.x, b = box.x + box.w;
+      if (t.b) { a = Math.min(a, t.b.x); b = Math.max(b, t.b.x + t.b.w); } else { a = 0; b = P.w; }
+      L.push({ o: 'h', p: t.v, a, b });
+    }));
+    return L;
+  }
+  const gOv = (a0, a1, b0, b1) => Math.min(a1, b1) - Math.max(a0, b0) > 0.001;
+  function gNeighbors(box, T) {
+    const P = getPaperCm(); let Lb = null, Rb = null, Tb = null, Bb = null;
+    T.others.forEach(o => {
+      if (gOv(box.y, box.y + box.h, o.y, o.y + o.h)) {
+        if (o.x + o.w <= box.x + 0.001) { if (!Lb || o.x + o.w > Lb.x + Lb.w) Lb = o; }
+        else if (o.x >= box.x + box.w - 0.001) { if (!Rb || o.x < Rb.x) Rb = o; }
+      }
+      if (gOv(box.x, box.x + box.w, o.x, o.x + o.w)) {
+        if (o.y + o.h <= box.y + 0.001) { if (!Tb || o.y + o.h > Tb.y + Tb.h) Tb = o; }
+        else if (o.y >= box.y + box.h - 0.001) { if (!Bb || o.y < Bb.y) Bb = o; }
+      }
+    });
+    return { L: Lb, R: Rb, T: Tb, B: Bb, P };
+  }
+  function gDistSegs(box, N, eq) {
+    const segs = [], mx = box.x + box.w / 2, my = box.y + box.h / 2, P = N.P;
+    const l0 = N.L ? N.L.x + N.L.w : 0, r1 = N.R ? N.R.x : P.w, t0 = N.T ? N.T.y + N.T.h : 0, b1 = N.B ? N.B.y : P.h;
+    if (box.x - l0 > 0.005) segs.push({ o: 'h', pos: my, a: l0, b: box.x, eq: eq.x && N.L && N.R });
+    if (r1 - (box.x + box.w) > 0.005) segs.push({ o: 'h', pos: my, a: box.x + box.w, b: r1, eq: eq.x && N.L && N.R });
+    if (box.y - t0 > 0.005) segs.push({ o: 'v', pos: mx, a: t0, b: box.y, eq: eq.y && N.T && N.B });
+    if (b1 - (box.y + box.h) > 0.005) segs.push({ o: 'v', pos: mx, a: box.y + box.h, b: b1, eq: eq.y && N.T && N.B });
+    return segs;
+  }
+  function drawGuides(lines, segs, tags) {
+    const g = $('guideLayer'); if (!g) return;
+    const z = 1 / zoomScale, P = PX_PER_CM, c = GC.gColor; let h = '';
+    const tag = (x, y, txt, col) => `<div class="gt" style="left:${x * P}px;top:${y * P}px;font-size:${10 * z}px;padding:${3 * z}px ${5 * z}px;border-radius:${4 * z}px;background:${col || c}">${txt}</div>`;
+    lines.forEach(l => {
+      if (l.o === 'v') h += `<div class="gl" style="left:${l.p * P}px;top:${l.a * P}px;height:${(l.b - l.a) * P}px;width:${z * 1.3}px;background:${c}"></div>`;
+      else h += `<div class="gl" style="top:${l.p * P}px;left:${l.a * P}px;width:${(l.b - l.a) * P}px;height:${z * 1.3}px;background:${c}"></div>`;
+    });
+    segs.forEach(s => {
+      const col = s.eq ? '#10b981' : c, len = s.b - s.a;
+      if (s.o === 'h') {
+        h += `<div class="gl" style="top:${s.pos * P}px;left:${s.a * P}px;width:${len * P}px;height:${z * 1.3}px;background:${col}"></div>`;
+        h += `<div class="gl" style="top:${s.pos * P - 4 * z}px;left:${s.a * P}px;width:${z * 1.3}px;height:${8 * z}px;background:${col}"></div><div class="gl" style="top:${s.pos * P - 4 * z}px;left:${s.b * P}px;width:${z * 1.3}px;height:${8 * z}px;background:${col}"></div>`;
+        if (GC.labels) h += tag((s.a + s.b) / 2, s.pos - 10 * z / P, gFmt(len), col);
+      } else {
+        h += `<div class="gl" style="left:${s.pos * P}px;top:${s.a * P}px;height:${len * P}px;width:${z * 1.3}px;background:${col}"></div>`;
+        h += `<div class="gl" style="left:${s.pos * P - 4 * z}px;top:${s.a * P}px;height:${z * 1.3}px;width:${8 * z}px;background:${col}"></div><div class="gl" style="left:${s.pos * P - 4 * z}px;top:${s.b * P}px;height:${z * 1.3}px;width:${8 * z}px;background:${col}"></div>`;
+        if (GC.labels) h += tag(s.pos + 14 * z / P, (s.a + s.b) / 2, gFmt(len), col);
+      }
+    });
+    (tags || []).forEach(t => { h += tag(t.x, t.y, t.txt, t.col); });
+    g.innerHTML = h;
+  }
+  function guideDrag(nx, ny) {
+    const sp = gesture.drag.startPositions, first = [...sp.keys()].map(findEl).find(Boolean), s0 = sp.get(first.id);
+    const gridOn = $('snapGrid').checked;
+    if (!GC.guides) { clearGuides(); return gridOn ? { x: snap(nx), y: snap(ny) } : { x: nx, y: ny }; }
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    sp.forEach((p, id) => { const e = findEl(id); if (!e) return; x0 = Math.min(x0, p.xCm); y0 = Math.min(y0, p.yCm); x1 = Math.max(x1, p.xCm + e.wCm); y1 = Math.max(y1, p.yCm + e.hCm); });
+    const box = { x: x0 + (nx - s0.xCm), y: y0 + (ny - s0.yCm), w: x1 - x0, h: y1 - y0 };
+    const T = smTargets(new Set(sp.keys())), tol = guideTol();
+    const sx = bestD([box.x, box.x + box.w / 2, box.x + box.w], T.xs, tol), sy = bestD([box.y, box.y + box.h / 2, box.y + box.h], T.ys, tol);
+    let doneX = sx !== null, doneY = sy !== null; const eq = { x: false, y: false };
+    if (doneX) box.x += sx; if (doneY) box.y += sy;
+    if (GC.gGap) {
+      const N0 = gNeighbors(box, T);
+      if (!doneX && N0.L && N0.R) { const gl = box.x - (N0.L.x + N0.L.w), gr = N0.R.x - (box.x + box.w); if (Math.abs(gl - gr) <= tol * 2) { box.x += (gr - gl) / 2; doneX = true; eq.x = true; } }
+      if (!doneY && N0.T && N0.B) { const gt = box.y - (N0.T.y + N0.T.h), gb = N0.B.y - (box.y + box.h); if (Math.abs(gt - gb) <= tol * 2) { box.y += (gb - gt) / 2; doneY = true; eq.y = true; } }
+    }
+    if (!doneX && gridOn) box.x += snap(nx) - nx;
+    if (!doneY && gridOn) box.y += snap(ny) - ny;
+    drawGuides(gMatches(box, T), GC.labels || GC.gGap ? gDistSegs(box, gNeighbors(box, T), eq) : [], []);
+    return { x: s0.xCm + (box.x - x0), y: s0.yCm + (box.y - y0) };
+  }
+  function guideResize(el, nw, nh) {
+    const out = { w: nw, h: nh, sw: false, sh: false };
+    if (!GC.guides) { clearGuides(); return out; }
+    const T = smTargets(new Set([el.id])), tol = guideTol(), box = { x: el.xCm, y: el.yCm, w: nw, h: nh };
+    const dx = bestD([box.x + box.w], T.xs, tol), dy = bestD([box.y + box.h], T.ys, tol);
+    if (dx !== null) { out.w = nw + dx; out.sw = true; } if (dy !== null) { out.h = nh + dy; out.sh = true; }
+    let sizeTag = '';
+    if (GC.gSize) {
+      let bw = null, bh = null;
+      T.others.forEach(o => { if (Math.abs(o.w - out.w) <= tol && (bw === null || Math.abs(o.w - out.w) < Math.abs(bw - out.w))) bw = o.w; if (Math.abs(o.h - out.h) <= tol && (bh === null || Math.abs(o.h - out.h) < Math.abs(bh - out.h))) bh = o.h; });
+      if (bw !== null) { out.w = bw; out.sw = true; sizeTag += ' =W'; } if (bh !== null) { out.h = bh; out.sh = true; sizeTag += ' =H'; }
+    }
+    box.w = out.w; box.h = out.h;
+    drawGuides(gMatches(box, T), [], [{ x: box.x + box.w, y: box.y + box.h + 22 / (PX_PER_CM * zoomScale), txt: `${gFmt(box.w)} × ${gFmt(box.h)} cm${sizeTag}`, col: sizeTag ? '#10b981' : null }]);
+    return out;
+  }
+
+  /* ====== PANEL MALLA Y GUÍAS ====== */
+  const XSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  const gSw = (id, t) => `<div class="switch-row"><span>${t}</span><label class="switch"><input type="checkbox" id="${id}"><span class="switch-slider"></span></label></div>`;
+  const gRg = (id, t, mn, mx, st) => `<label>${t} (<span id="${id}V"></span>)</label><input type="range" id="${id}" min="${mn}" max="${mx}" step="${st}">`;
+  const gridModal = mk(`<div class="modal" id="gridModal"><div class="modalbox" style="position:relative">
+    <button class="closebtn" id="gpClose">${XSVG}</button>
+    <h2>Malla y guías</h2>
+    <label style="color:var(--accent);font-weight:700">Malla y snap</label>
+    ${gSw('gp_show', 'Mostrar malla')}${gSw('gp_snap', 'Snap (imantar a la malla)')}
+    <label>Paso de malla = paso de snap (cm)</label>
+    <input type="number" id="gp_step" min="0.05" max="50" step="0.05" inputmode="decimal">
+    <div class="toggle" id="gp_chips"><button data-s="0.1">0.1</button><button data-s="0.25">0.25</button><button data-s="0.5">0.5</button><button data-s="1">1</button><button data-s="2">2</button></div>
+    <div class="row" style="margin-top:6px;align-items:flex-end"><div style="flex:0.5"><label>Color</label><input type="color" id="gp_color"></div><div><label>Resaltar cada N líneas (0 = no)</label><input type="number" id="gp_major" min="0" max="50" step="1" inputmode="numeric"></div></div>
+    ${gRg('gp_width', 'Grosor (px)', 0.5, 5, 0.5)}${gRg('gp_op', 'Opacidad (%)', 5, 100, 5)}
+    <label style="color:var(--accent);font-weight:700;margin-top:10px">Guías inteligentes</label>
+    ${gSw('gp_guides', 'Activar guías inteligentes')}${gSw('gp_el', 'Alinear con otros elementos')}${gSw('gp_page', 'Alinear con bordes y centro de la hoja')}
+    ${gSw('gp_umargin', 'Alinear con márgenes')}
+    <div class="row" style="align-items:center"><span style="font-size:12px;color:var(--muted);flex:1">Margen (cm)</span><input type="number" id="gp_margin" min="0" max="20" step="0.1" inputmode="decimal" style="flex:0 0 80px"></div>
+    ${gSw('gp_user', 'Alinear con mis guías')}${gSw('gp_gap', 'Espaciado igual entre elementos')}${gSw('gp_size', 'Igualar tamaños al redimensionar')}${gSw('gp_labels', 'Mostrar distancias y medidas')}
+    ${gRg('gp_tol', 'Fuerza de imán (px)', 2, 24, 1)}
+    <div class="row" style="margin-top:6px"><div><label>Color guías</label><input type="color" id="gp_gcolor"></div><div><label>Color mis guías</label><input type="color" id="gp_ucolor"></div></div>
+    <label style="color:var(--accent);font-weight:700;margin-top:10px">Mis guías (esta página)</label>
+    <div class="row"><button class="btn full" id="gp_addV">+ Vertical</button><button class="btn full" id="gp_addH">+ Horizontal</button></div>
+    <div id="gp_list"></div>
+    <button class="btn full danger" id="gp_clr">Borrar mis guías</button>
+  </div></div>`);
+  document.body.appendChild(gridModal);
+  function gpSync() {
+    $('gp_show').checked = $('showGrid').checked; $('gp_snap').checked = $('snapGrid').checked; $('gp_step').value = stepCm();
+    $('gp_color').value = GC.color; $('gp_major').value = GC.major; $('gp_width').value = GC.width; $('gp_op').value = Math.round(GC.opacity * 100);
+    $('gp_widthV').textContent = GC.width; $('gp_opV').textContent = Math.round(GC.opacity * 100);
+    $('gp_guides').checked = GC.guides; $('gp_el').checked = GC.gEl; $('gp_page').checked = GC.gPage; $('gp_umargin').checked = GC.gMargin; $('gp_margin').value = GC.margin;
+    $('gp_user').checked = GC.gUser; $('gp_gap').checked = GC.gGap; $('gp_size').checked = GC.gSize; $('gp_labels').checked = GC.labels;
+    $('gp_tol').value = GC.tol; $('gp_tolV').textContent = GC.tol; $('gp_gcolor').value = GC.gColor; $('gp_ucolor').value = GC.ugColor;
+    gridModal.querySelectorAll('#gp_chips button').forEach(b => b.classList.toggle('active', Math.abs(parseFloat(b.dataset.s) - stepCm()) < 1e-6));
+    gpList();
+  }
+  function gpList() {
+    const cp = currentPage(), L = $('gp_list');
+    L.innerHTML = (cp.guides || []).map((g, i) => `<div class="row" style="align-items:center;margin-top:4px"><span style="width:70px;font-size:11px;color:var(--muted)">${g.o === 'v' ? 'Vertical' : 'Horizontal'}</span><input type="number" data-gi="${i}" value="${g.p}" step="0.05" inputmode="decimal" style="flex:1"><button class="btn small" data-gd="${i}">✕</button></div>`).join('') || '<div style="font-size:11px;color:var(--muted);margin-top:4px">Sin guías propias en esta página.</div>';
+  }
+  function openGridPanel() { gpSync(); gridModal.classList.add('show'); setTimeout(() => gridModal.classList.add('visible'), 10); }
+  function closeGridPanel() { gridModal.classList.remove('visible'); setTimeout(() => gridModal.classList.remove('show'), 200); }
+  $('gridCfgBtn').addEventListener('click', () => { sfx.click(); openGridPanel(); });
+  $('gpClose').addEventListener('click', closeGridPanel);
+  gridModal.addEventListener('pointerdown', (e) => { if (e.target === gridModal) closeGridPanel(); });
+  gridModal.addEventListener('input', (e) => {
+    const t = e.target, id = t.id, num = parseFloat(t.value);
+    if (t.dataset.gi !== undefined) { const g = (currentPage().guides || [])[+t.dataset.gi]; if (g && Number.isFinite(num)) { g.p = num; renderAll(); } return; }
+    if (id === 'gp_show') { $('showGrid').checked = t.checked; readMainToGC(); renderAll(); }
+    else if (id === 'gp_snap') { $('snapGrid').checked = t.checked; readMainToGC(); }
+    else if (id === 'gp_step') { if (num > 0) { $('snapStep').value = num; readMainToGC(); renderAll(); gridModal.querySelectorAll('#gp_chips button').forEach(b => b.classList.toggle('active', Math.abs(parseFloat(b.dataset.s) - num) < 1e-6)); } }
+    else if (id === 'gp_color') { GC.color = t.value; saveGC(); renderAll(); }
+    else if (id === 'gp_major') { GC.major = Math.max(0, Math.round(num) || 0); saveGC(); renderAll(); }
+    else if (id === 'gp_width') { GC.width = num; $('gp_widthV').textContent = num; saveGC(); renderAll(); }
+    else if (id === 'gp_op') { GC.opacity = num / 100; $('gp_opV').textContent = num; saveGC(); renderAll(); }
+    else if (id === 'gp_guides') GC.guides = t.checked; else if (id === 'gp_el') GC.gEl = t.checked; else if (id === 'gp_page') GC.gPage = t.checked;
+    else if (id === 'gp_umargin') GC.gMargin = t.checked; else if (id === 'gp_margin') GC.margin = Math.max(0, num || 0); else if (id === 'gp_user') GC.gUser = t.checked;
+    else if (id === 'gp_gap') GC.gGap = t.checked; else if (id === 'gp_size') GC.gSize = t.checked; else if (id === 'gp_labels') GC.labels = t.checked;
+    else if (id === 'gp_tol') { GC.tol = num; $('gp_tolV').textContent = num; }
+    else if (id === 'gp_gcolor') GC.gColor = t.value; else if (id === 'gp_ucolor') { GC.ugColor = t.value; renderAll(); }
+    saveGC();
+  });
+  gridModal.addEventListener('change', (e) => { if (e.target.dataset.gi !== undefined) { saveState(); gpList(); } });
+  gridModal.addEventListener('click', (e) => {
+    const chip = e.target.closest('#gp_chips button');
+    if (chip) { sfx.tap(); $('snapStep').value = chip.dataset.s; readMainToGC(); $('gp_step').value = chip.dataset.s; gridModal.querySelectorAll('#gp_chips button').forEach(b => b.classList.toggle('active', b === chip)); renderAll(); return; }
+    const cp = currentPage(), P = getPaperCm();
+    const add = (o) => { cp.guides = cp.guides || []; cp.guides.push({ o, p: Math.round((o === 'v' ? P.w : P.h) / 2 * 100) / 100 }); saveState(); renderAll(); gpList(); };
+    if (e.target.closest('#gp_addV')) add('v'); else if (e.target.closest('#gp_addH')) add('h');
+    else if (e.target.closest('#gp_clr')) { cp.guides = []; saveState(); renderAll(); gpList(); }
+    else { const d = e.target.closest('[data-gd]'); if (d) { (cp.guides || []).splice(+d.dataset.gd, 1); saveState(); renderAll(); gpList(); } }
+  });
+
+  /* ====== SELECTOR DE COLOR (RUEDA + TRIÁNGULO) ====== */
+  const hsv2rgb = (h, s, v) => { const f = (n) => { const k = (n + h / 60) % 6; return v - v * s * Math.max(0, Math.min(k, 4 - k, 1)); }; return [Math.round(f(5) * 255), Math.round(f(3) * 255), Math.round(f(1) * 255)]; };
+  const rgb2hex = (r, g, b) => '#' + [r, g, b].map(x => Math.max(0, Math.min(255, x)).toString(16).padStart(2, '0')).join('');
+  function hex2hsv(hex, prevH) {
+    const n = parseInt(hex.slice(1), 16), r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; let h = prevH || 0;
+    if (d > 0) { h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360; }
+    return [h, mx === 0 ? 0 : d / mx, mx];
+  }
+  const CPK_PAL = ['#000000', '#434343', '#7f7f7f', '#bfbfbf', '#ffffff', '#e05353', '#ff8c42', '#fbbf24', '#facc15', '#a3e635', '#22c55e', '#10b981', '#06b6d4', '#3b82c4', '#5b7fff', '#8b5cf6', '#b088f9', '#ec4899', '#f43f5e', '#7c2d12', '#78350f', '#14532d', '#1e3a8a', '#4c1d95'];
+  const cpk = mk(`<div id="cpk"><div class="cpk-sheet">
+    <div class="cpk-top"><div class="cpk-sw"><i id="cpkOld"></i><i id="cpkNew"></i></div><input id="cpkHex" type="text" maxlength="7" spellcheck="false" autocomplete="off" autocapitalize="off"><button type="button" id="cpkEye" style="display:none">Gotero</button></div>
+    <div class="cpk-wheel"><canvas id="cpkCv"></canvas></div>
+    <div class="cpk-pal" id="cpkPal"></div><div class="cpk-pal" id="cpkRec"></div>
+    <div class="cpk-act"><button type="button" id="cpkCancel">Cancelar</button><button type="button" id="cpkOk">Aceptar</button></div>
+  </div></div>`);
+  document.body.appendChild(cpk);
+  (function () {
+    const cv = $('cpkCv'), SZ = 232, dpr = Math.min(2, window.devicePixelRatio || 1), PXS = SZ * dpr;
+    cv.width = cv.height = PXS; cv.style.width = cv.style.height = SZ + 'px';
+    const C = PXS / 2, R = C - 3 * dpr, R0 = R - PXS * 0.13, RT = R0 - 6 * dpr;
+    let H = 0, S = 1, V = 1, tgt = null, orig = '#000000', mode = null;
+    const ring = document.createElement('canvas'); ring.width = ring.height = PXS;
+    { const x = ring.getContext('2d'), id = x.createImageData(PXS, PXS), d = id.data;
+      for (let y = 0; y < PXS; y++) for (let xx = 0; xx < PXS; xx++) {
+        const dx = xx + .5 - C, dy = y + .5 - C, r = Math.hypot(dx, dy); if (r < R0 - 1 || r > R + 1) continue;
+        let a = Math.atan2(dy, dx) * 180 / Math.PI; if (a < 0) a += 360; const [rr, g, b] = hsv2rgb(a, 1, 1), i = (y * PXS + xx) * 4;
+        d[i] = rr; d[i + 1] = g; d[i + 2] = b; d[i + 3] = Math.round(255 * Math.max(0, Math.min(1, Math.min(r - R0, R - r) + .5)));
+      } x.putImageData(id, 0, 0); }
+    const tri = document.createElement('canvas'); tri.width = tri.height = PXS;
+    let VT = [0, 0, 0, 0, 0, 0];
+    const verts = () => { const p = (k) => [C + RT * Math.cos(-Math.PI / 2 + k * 2 * Math.PI / 3), C + RT * Math.sin(-Math.PI / 2 + k * 2 * Math.PI / 3)]; const [a1, b1] = p(0), [a2, b2] = p(1), [a3, b3] = p(2); VT = [a1, b1, a2, b2, a3, b3]; };
+    const bary = (px, py) => { const [x1, y1, x2, y2, x3, y3] = VT, d = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3); const a = ((y2 - y3) * (px - x3) + (x3 - x2) * (py - y3)) / d, b = ((y3 - y1) * (px - x3) + (x1 - x3) * (py - y3)) / d; return [a, b, 1 - a - b]; };
+    function buildTri() {
+      verts(); const x = tri.getContext('2d'), id = x.createImageData(PXS, PXS), d = id.data, [hr, hg, hb] = hsv2rgb(H, 1, 1), alt = 1.5 * RT;
+      const xs = [VT[0], VT[2], VT[4]], ys = [VT[1], VT[3], VT[5]];
+      const x0 = Math.max(0, Math.floor(Math.min(...xs)) - 2), x1 = Math.min(PXS - 1, Math.ceil(Math.max(...xs)) + 2), y0 = Math.max(0, Math.floor(Math.min(...ys)) - 2), y1 = Math.min(PXS - 1, Math.ceil(Math.max(...ys)) + 2);
+      for (let y = y0; y <= y1; y++) for (let xx = x0; xx <= x1; xx++) {
+        const [a, b, c] = bary(xx + .5, y + .5), m = Math.min(a, b, c); if (m < -0.03) continue;
+        const al = Math.max(0, Math.min(1, m * alt + .5)); if (al <= 0) continue;
+        const A = Math.max(0, a), B = Math.max(0, b), i = (y * PXS + xx) * 4;
+        d[i] = Math.min(255, A * hr + B * 255); d[i + 1] = Math.min(255, A * hg + B * 255); d[i + 2] = Math.min(255, A * hb + B * 255); d[i + 3] = Math.round(al * 255);
+      } x.putImageData(id, 0, 0);
+    }
+    const curHex = () => rgb2hex(...hsv2rgb(H, S, V));
+    function paint() {
+      const x = cv.getContext('2d'); x.clearRect(0, 0, PXS, PXS); x.drawImage(ring, 0, 0); x.drawImage(tri, 0, 0);
+      const a = H * Math.PI / 180, rm = (R + R0) / 2, hx = C + rm * Math.cos(a), hy = C + rm * Math.sin(a);
+      const mark = (px, py, fill) => { x.beginPath(); x.arc(px, py, 8 * dpr, 0, 7); x.fillStyle = fill; x.fill(); x.lineWidth = 3 * dpr; x.strokeStyle = '#fff'; x.stroke(); x.lineWidth = 1 * dpr; x.strokeStyle = 'rgba(0,0,0,.55)'; x.beginPath(); x.arc(px, py, 9.5 * dpr, 0, 7); x.stroke(); };
+      mark(hx, hy, rgb2hex(...hsv2rgb(H, 1, 1)));
+      const A = S * V, B = V * (1 - S), Cc = 1 - V; mark(A * VT[0] + B * VT[2] + Cc * VT[4], A * VT[1] + B * VT[3] + Cc * VT[5], curHex());
+    }
+    function update(live) {
+      const hex = curHex(); $('cpkNew').style.background = hex; if (document.activeElement !== $('cpkHex')) $('cpkHex').value = hex; paint();
+      if (tgt && live) { tgt.value = hex; tgt.dispatchEvent(new Event('input', { bubbles: true })); }
+    }
+    const recents = () => { try { return JSON.parse(localStorage.getItem('image-editor-recent-colors')) || []; } catch (e) { return []; } };
+    function drawPal() {
+      $('cpkPal').innerHTML = CPK_PAL.map(c => `<button type="button" data-c="${c}" style="background:${c}"></button>`).join('');
+      const r = recents(); $('cpkRec').innerHTML = r.length ? r.map(c => `<button type="button" data-c="${c}" style="background:${c}"></button>`).join('') : '';
+      $('cpkRec').style.display = r.length ? 'flex' : 'none';
+    }
+    function setHex(hex, live) { if (!/^#[0-9a-f]{6}$/i.test(hex)) return; [H, S, V] = hex2hsv(hex.toLowerCase(), H); buildTri(); update(live); }
+    const pos = (e) => { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * PXS / r.width, y: (e.clientY - r.top) * PXS / r.height }; };
+    function move(e) {
+      const p = pos(e);
+      if (mode === 'h') { let a = Math.atan2(p.y - C, p.x - C) * 180 / Math.PI; if (a < 0) a += 360; H = a; buildTri(); }
+      else { let [a, b, c] = bary(p.x, p.y); a = Math.max(0, a); b = Math.max(0, b); c = Math.max(0, c); const s = a + b + c || 1; a /= s; b /= s; V = a + b; S = V > 0 ? a / V : 0; }
+      update(true);
+    }
+    cv.addEventListener('pointerdown', (e) => { e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (_) {} const p = pos(e); mode = Math.hypot(p.x - C, p.y - C) >= R0 - 8 * dpr ? 'h' : 'sv'; move(e); });
+    cv.addEventListener('pointermove', (e) => { if (mode) move(e); });
+    ['pointerup', 'pointercancel'].forEach(t => cv.addEventListener(t, () => { mode = null; }));
+    cpk.addEventListener('pointerdown', (e) => { if (e.target.id !== 'cpkHex') e.preventDefault(); });
+    cpk.addEventListener('mousedown', (e) => { if (e.target.id !== 'cpkHex') e.preventDefault(); });
+    $('cpkHex').addEventListener('input', (e) => { let v = e.target.value.trim(); if (v[0] !== '#') v = '#' + v; if (/^#[0-9a-f]{6}$/i.test(v)) setHex(v, true); });
+    cpk.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-c]'); if (b) { sfx.tap(); setHex(b.dataset.c, true); return; }
+      if (e.target === cpk) cancel();
+    });
+    function close() {
+      cpk.classList.remove('show'); tgt = null; mode = null;
+      if (typeof edTA !== 'undefined' && edTA) edTA.focus({ preventScroll: true });
+    }
+    function cancel() {
+      if (tgt && tgt.value !== orig) { tgt.value = orig; tgt.dispatchEvent(new Event('input', { bubbles: true })); tgt.dispatchEvent(new Event('change', { bubbles: true })); }
+      close();
+    }
+    function accept() {
+      const hex = curHex();
+      if (tgt) { tgt.value = hex; tgt.dispatchEvent(new Event('input', { bubbles: true })); tgt.dispatchEvent(new Event('change', { bubbles: true })); }
+      const r = recents().filter(c => c !== hex); r.unshift(hex); try { localStorage.setItem('image-editor-recent-colors', JSON.stringify(r.slice(0, 10))); } catch (_) {}
+      close();
+    }
+    $('cpkCancel').addEventListener('click', () => { sfx.tap(); cancel(); });
+    $('cpkOk').addEventListener('click', () => { sfx.success(); accept(); });
+    if (window.EyeDropper) {
+      $('cpkEye').style.display = 'inline-block';
+      $('cpkEye').addEventListener('click', async () => { try { const r = await new window.EyeDropper().open(); setHex(r.sRGBHex, true); } catch (_) {} });
+    }
+    function openPicker(inp) {
+      tgt = inp; orig = inp.value || '#000000'; drawPal(); $('cpkOld').style.background = orig;
+      cpk.classList.add('show'); [H, S, V] = hex2hsv(/^#[0-9a-f]{6}$/i.test(orig) ? orig.toLowerCase() : '#000000', 0);
+      buildTri(); update(false);
+    }
+    document.addEventListener('click', (e) => {
+      const i = e.target && e.target.closest && e.target.closest('input[type=color]');
+      if (!i || i.disabled) return; e.preventDefault(); e.stopPropagation(); openPicker(i);
+    }, true);
+    document.addEventListener('mousedown', (e) => { if (e.target && e.target.matches && e.target.matches('input[type=color]')) e.preventDefault(); }, true);
+  })();
+
+  /* ====== EDITOR DE PÓSTER (VARIAS HOJAS) ====== */
+  const PS = { img: null, name: '', mode: 'size', cols: 2, rows: 2, pw: 60, ph: 90, lock: true, fit: 'fill', zoom: 100, offX: 0, offY: 0, rot: 0, flipH: false, flipV: false,
+    bg: '#ffffff', overlap: 0.5, margin: 0.5, snapMove: true, detectLines: true, snapStep: 0.1, dpi: 200, fmt: 'jpg', bright: 100, contrast: 100, sat: 100, cropL: 0, cropR: 0, cropT: 0, cropB: 0, gray: false, maxSheets: 9, exactSheets: 6, paperPreset: 'carta',
+    skip: new Set(), sel: null, tab: 0, preset: '' };
+  const PS_FILTER = (() => { try { return 'filter' in document.createElement('canvas').getContext('2d'); } catch (e) { return false; } })();
+  let psOpen = false, psRaf = 0;
+  const psImgSize = () => { const im = PS.img; return im ? { w: im.naturalWidth || im.width, h: im.naturalHeight || im.height } : { w: 1, h: 1 }; };
+  const psQuarter = () => Math.round(PS.rot / 90) % 2 !== 0 && PS.rot % 90 === 0;
+  function psCropRect() { const s = psImgSize(), l = Math.min(45, Math.max(0, PS.cropL)) / 100, r = Math.min(45, Math.max(0, PS.cropR)) / 100, t = Math.min(45, Math.max(0, PS.cropT)) / 100, b = Math.min(45, Math.max(0, PS.cropB)) / 100; const sw = Math.max(1, s.w * (1 - Math.min(.9, l + r))), sh = Math.max(1, s.h * (1 - Math.min(.9, t + b))); return { sx: s.w * l, sy: s.h * t, sw, sh }; }
+  function psRatio() { const c = psCropRect(); return psQuarter() ? c.sh / c.sw : c.sw / c.sh; }
+  const psCode = (r, c) => String.fromCharCode(65 + (r % 26)) + (c + 1);
+  function psGeom() {
+    const p = getPaperCm(), m = Math.max(0, Math.min(PS.margin, Math.min(p.w, p.h) / 2 - 1)), uw = p.w - 2 * m, uh = p.h - 2 * m;
+    const ov = Math.max(0, Math.min(PS.overlap, Math.min(uw, uh) / 2 - 0.1)), sx = uw - ov, sy = uh - ov;
+    let cols = 1, rows = 1;
+    const targetRatio = Math.max(.05, (PS.pw || 60) / Math.max(1, PS.ph || 90));
+    if (PS.mode === 'grid') { cols = Math.max(1, Math.min(12, Math.round(PS.cols))); rows = Math.max(1, Math.min(12, Math.round(PS.rows))); }
+    else if (PS.mode === 'exact' || PS.mode === 'optimal') {
+      const cap = PS.mode === 'exact' ? Math.max(1, Math.min(144, Math.round(PS.exactSheets) || 1)) : Math.max(1, Math.min(144, Math.round(PS.maxSheets) || 9));
+      let best = null;
+      for (let c = 1; c <= Math.min(12, cap); c++) for (let r = 1; r <= Math.min(12, cap); r++) {
+        const n = c * r; if (PS.mode === 'exact' ? n !== cap : n > cap) continue;
+        const ratio = (c * sx + ov) / (r * sy + ov);
+        const score = Math.abs(Math.log(Math.max(.001, ratio / targetRatio))) + (PS.mode === 'optimal' ? n * .0005 : 0);
+        if (!best || score < best.score) best = { c, r, score };
+      }
+      if (best) { cols = best.c; rows = best.r; } else { cols = 1; rows = cap; }
+    } else { cols = Math.max(1, Math.min(12, Math.ceil((PS.pw - ov) / sx - 1e-6))); rows = Math.max(1, Math.min(12, Math.ceil((PS.ph - ov) / sy - 1e-6))); }
+    const UW = cols * uw - (cols - 1) * ov, UH = rows * uh - (rows - 1) * ov;
+    let PW = UW, PH = UH; if (PS.mode === 'size') { PW = Math.min(PS.pw, UW); PH = Math.min(PS.ph, UH); }
+    return { s: { w: p.w, h: p.h, uw, uh }, m, ov, stepX: sx, stepY: sy, cols, rows, UW, UH, PW, PH, px: (UW - PW) / 2, py: (UH - PH) / 2 };
+  }
+  function psLayout() {
+    const G = psGeom(), im = psCropRect(), q = psQuarter(), bw = q ? im.sh : im.sw, bh = q ? im.sw : im.sh;
+    let sx, sy;
+    if (PS.fit === 'stretch') { sx = G.PW / bw; sy = G.PH / bh; }
+    else { const s = PS.fit === 'fit' ? Math.min(G.PW / bw, G.PH / bh) : Math.max(G.PW / bw, G.PH / bh); sx = sy = s; }
+    return { G, sx, sy, q };
+  }
+  function psSnapOffset(axis, value) {
+    value = Number(value) || 0;
+    if (!PS.snapMove) return Math.round(value * 1000) / 1000;
+
+    const G = psGeom();
+    const isX = axis === 'x';
+    const span = isX ? G.stepX : G.stepY;
+    const count = isX ? G.cols : G.rows;
+    const start = isX ? G.px : G.py;
+    const size = isX ? G.PW : G.PH;
+    const base = start + size / 2;
+    const step = Math.max(0.01, Math.min(5, Number(PS.snapStep) || 0.1));
+    const candidates = [0, start - base, start + size - base];
+    for (let i = 1; i < count; i++) candidates.push(i * span - base);
+    candidates.push(Math.round(value / step) * step);
+
+    // La tolerancia depende de la escala de la vista: ~8 píxeles.
+    const threshold = 8 / Math.max(0.05, Number(PS._k) || 0.5);
+    let best = value, distance = threshold + 1;
+    for (const candidate of candidates) {
+      const d = Math.abs(value - candidate);
+      if (d <= threshold && d < distance) { best = candidate; distance = d; }
+    }
+    return Math.round(best * 1000) / 1000;
+  }
+  function psDrawContent(ctx, G) {
+    ctx.fillStyle = PS.bg; ctx.fillRect(0, 0, G.UW, G.UH);
+    if (!PS.img) return;
+    const { sx, sy, q } = psLayout(), im = PS.img, s = psCropRect(), z = PS.zoom / 100, ax = q ? sy : sx, ay = q ? sx : sy;
+    ctx.save(); ctx.beginPath(); ctx.rect(G.px, G.py, G.PW, G.PH); ctx.clip();
+    ctx.translate(G.px + G.PW / 2 + PS.offX, G.py + G.PH / 2 + PS.offY);
+    ctx.scale(PS.flipH ? -1 : 1, PS.flipV ? -1 : 1); ctx.rotate(PS.rot * Math.PI / 180); ctx.scale(z * ax, z * ay);
+    if (PS_FILTER && (PS.bright !== 100 || PS.contrast !== 100 || PS.sat !== 100 || PS.gray)) ctx.filter = `brightness(${PS.bright}%) contrast(${PS.contrast}%) saturate(${PS.sat}%)${PS.gray ? ' grayscale(1)' : ''}`;
+    ctx.drawImage(im, s.sx, s.sy, s.sw, s.sh, -s.sw / 2, -s.sh / 2, s.sw, s.sh); ctx.restore();
+  }
+  function psDpi() {
+    if (!PS.img) return 0; const { sx, sy } = psLayout(); const z = PS.zoom / 100;
+    return Math.round(2.54 / (Math.max(sx, sy) * z));
+  }
+  function psTiles(G) { const L = []; for (let r = 0; r < G.rows; r++) for (let c = 0; c < G.cols; c++) L.push({ r, c, code: `hoja_${r + 1}_${c + 1}` }); return L; }
+  function psRenderTile(r, c, dpi, n, total) {
+    const G = psGeom(), s = G.s, ppc = dpi / 2.54, cv = document.createElement('canvas');
+    cv.width = Math.round(s.w * ppc); cv.height = Math.round(s.h * ppc);
+    const ctx = cv.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, cv.width, cv.height);
+    const ox = c * G.stepX, oy = r * G.stepY;
+    ctx.save(); ctx.scale(ppc, ppc); ctx.beginPath(); ctx.rect(G.m, G.m, s.uw, s.uh); ctx.clip();
+    ctx.translate(G.m - ox, G.m - oy); psDrawContent(ctx, G); ctx.restore();
+    // La hoja contiene únicamente el recorte exacto de la imagen; sin marcas, códigos ni adornos.
+    return cv;
+  }
+  const psMime = () => PS.fmt === 'png' ? 'image/png' : 'image/jpeg';
+  const psTick = () => new Promise(r => setTimeout(r, 0));
+  async function psBuildAll() {
+    const G = psGeom(), list = psTiles(G), out = [];
+    for (let i = 0; i < list.length; i++) {
+      const t = list[i]; $('loading-label').textContent = `Hoja ${i + 1} de ${list.length}...`; await psTick();
+      out.push({ code: t.code, cv: psRenderTile(t.r, t.c, PS.dpi, i + 1, list.length) });
+    }
+    return out;
+  }
+  const psNeedImg = () => { if (PS.img && psTiles(psGeom()).length) return true; $('psInfo').textContent = PS.img ? 'No hay hojas para generar (todas omitidas).' : 'Primero elige una imagen o usa la página actual.'; $('psInfo').classList.add('warn'); return false; };
+  async function psToPages(replace) {
+    if (!psNeedImg()) return;
+    if (replace) { const ok = await confirmAction('¿Reemplazar páginas?', 'Se reemplazarán todas las páginas actuales por las hojas del póster.'); if (!ok) return; }
+    showLoading('Generando hojas...');
+    try {
+      const sheets = await psBuildAll(), p = getPaperCm(), news = [];
+      for (const sh of sheets) {
+        await psTick(); const url = sh.cv.toDataURL(psMime(), 0.92);
+        news.push({ id: ++pageCounter, els: [{ id: ++elCounter, src: url, xCm: 0, yCm: 0, wCm: p.w, hCm: p.h, mode: 'stretch', imgZoom: 100, imgPosX: 0, imgPosY: 0, imgRotate: 0, showOverflow: false }] });
+      }
+      if (replace) { state.pages = news; state.currentPageIndex = 0; thumbCache.clear(); }
+      else { state.pages.push(...news); state.currentPageIndex = state.pages.length - news.length; }
+      selectedIds = new Set(); multiSelectMode = false; saveState(); renderAll(); hideLoading(); sfx.success(); closePoster();
+    } catch (err) { hideLoading(); sfx.error(); $('psInfo').textContent = 'Error al generar las hojas (imagen demasiado grande). Baja la calidad.'; $('psInfo').classList.add('warn'); }
+  }
+  function psDownload(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000); }
+  async function psToPdf() {
+    if (!psNeedImg()) return; showLoading('Generando PDF...');
+    try {
+      const sheets = await psBuildAll(), { jsPDF } = window.jspdf, p = getPaperCm(), land = p.w > p.h, format = land ? [p.h, p.w] : [p.w, p.h], ori = land ? 'landscape' : 'portrait';
+      const pdf = new jsPDF({ unit: 'cm', format, orientation: ori, compress: true });
+      sheets.forEach((sh, i) => { if (i > 0) pdf.addPage(format, ori); pdf.addImage(sh.cv.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, p.w, p.h, undefined, 'FAST'); });
+      pdf.save('Poster.pdf'); hideLoading(); sfx.success();
+    } catch (err) { hideLoading(); sfx.error(); $('psInfo').textContent = 'Error al generar el PDF. Baja la calidad.'; $('psInfo').classList.add('warn'); }
+  }
+  async function psToZip() {
+    if (!psNeedImg()) return; showLoading('Generando ZIP...');
+    try {
+      const sheets = await psBuildAll(), zip = new JSZip(), ext = PS.fmt === 'png' ? 'png' : 'jpg';
+      for (const sh of sheets) { await psTick(); zip.file(`Poster_${sh.code}.${ext}`, sh.cv.toDataURL(psMime(), 0.92).split(',')[1], { base64: true }); }
+      psDownload(await zip.generateAsync({ type: 'blob' }), 'Poster.zip'); hideLoading(); sfx.success();
+    } catch (err) { hideLoading(); sfx.error(); $('psInfo').textContent = 'Error al generar el ZIP. Baja la calidad.'; $('psInfo').classList.add('warn'); }
+  }
+  async function psPrint() {
+    if (!psNeedImg()) return; showLoading('Preparando impresión...');
+    try {
+      const sheets = await psBuildAll(), p = getPaperCm(), w = window.open('', '_blank');
+      if (!w) throw new Error('Popup bloqueado');
+      const pages = sheets.map(sh => `<img src="${sh.cv.toDataURL(psMime(), 0.92)}">`).join('');
+      w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Imprimir póster</title><style>@page{size:${p.w}cm ${p.h}cm;margin:0}html,body{margin:0;padding:0}img{width:${p.w}cm;height:${p.h}cm;display:block;page-break-after:always}img:last-child{page-break-after:auto}</style></head><body>${pages}<script>window.onload=()=>{window.focus();window.print()}<\/script></body></html>`);
+      w.document.close(); hideLoading(); sfx.success();
+    } catch (err) { hideLoading(); sfx.error(); $('psInfo').textContent = 'No se pudo abrir la ventana de impresión. Permite las ventanas emergentes.'; $('psInfo').classList.add('warn'); }
+  }
+
+  const PS_PRESETS = [['', 'Personalizado'], ['29.7x42', 'A3 (29.7 × 42)'], ['42x59.4', 'A2 (42 × 59.4)'], ['59.4x84.1', 'A1 (59.4 × 84.1)'], ['84.1x118.9', 'A0 (84.1 × 118.9)'], ['50x70', '50 × 70'], ['60x90', '60 × 90'], ['70x100', '70 × 100'], ['100x150', '100 × 150']];
+  const psRg = (k, t, mn, mx, st) => `<label>${t} (<span data-o="${k}"></span>)</label><input type="range" data-ps="${k}" min="${mn}" max="${mx}" step="${st}">`;
+  const psSw = (k, t) => `<div class="switch-row"><span>${t}</span><label class="switch"><input type="checkbox" data-ps="${k}"><span class="switch-slider"></span></label></div>`;
+  const psTg = (k, arr) => `<div class="toggle">${arr.map(([v, t]) => `<button type="button" data-psv="${k}:${v}">${t}</button>`).join('')}</div>`;
+  const posterModal = mk(`<div class="modal" id="posterModal"><div class="modalbox" style="position:relative;max-width:520px">
+    <button class="closebtn" id="psClose">${XSVG}</button>
+    <h2>Editor de póster</h2>
+    <div class="ps-prev"><canvas id="psCanvas"></canvas><div id="psInfo" class="ps-info"></div></div>
+    <div class="toggle" id="psTabs"><button type="button" data-pt="0">Imagen</button><button type="button" data-pt="1">Tamaño y distribución</button><button type="button" data-pt="3">Exportar</button></div>
+    <div class="ps-tab" data-tab="0">
+      <div class="row"><button type="button" class="btn full cyan" data-pa="pick">Elegir imagen</button><button type="button" class="btn full" data-pa="camera">Cámara</button><button type="button" class="btn full" data-pa="page">Usar página actual</button></div>
+      <input type="file" id="psFile" accept="image/*" style="display:none"><input type="file" id="psCamera" accept="image/*" capture="environment" style="display:none">
+      <label>Ajuste</label>${psTg('fit', [['fill', 'Rellenar'], ['fit', 'Ajustar'], ['stretch', 'Estirar']])}
+      ${psRg('zoom', 'Zoom %', 10, 400, 1)}${psRg('rot', 'Rotación °', -180, 180, 1)}
+      <div class="row" style="margin-top:6px"><button type="button" class="btn full" data-pa="rotL">⟲ 90°</button><button type="button" class="btn full" data-pa="rotR">⟳ 90°</button><button type="button" class="btn full" data-pa="flipH">↔ Voltear</button><button type="button" class="btn full" data-pa="flipV">↕ Voltear</button></div>
+      <button type="button" class="btn full" data-pa="center">Centrar y restablecer posición</button>
+      <div class="ps-axis"><label for="psOffX">Desplazamiento X <b><span data-o="offX">0.0</span> cm</b></label><input id="psOffX" type="range" data-ps="offX" min="-100" max="100" step="0.1" aria-label="Desplazamiento horizontal en centímetros"></div>
+      <div class="ps-axis"><label for="psOffY">Desplazamiento Y <b><span data-o="offY">0.0</span> cm</b></label><input id="psOffY" type="range" data-ps="offY" min="-100" max="100" step="0.1" aria-label="Desplazamiento vertical en centímetros"></div>
+      ${psSw('snapMove', 'Ajuste magnético (snap)')}${psSw('detectLines', 'Detectar y mostrar líneas guía')}
+      <div class="row"><div><label>Precisión del snap (cm)</label><input type="number" data-ps="snapStep" min="0.01" max="5" step="0.01" inputmode="decimal"></div><div><label>Fondo</label><input type="color" data-ps="bg"></div></div>
+      <p class="ps-hint">Arrastra la imagen o usa los deslizadores X/Y. El ajuste magnético se aplica al soltar y al terminar el desplazamiento, alineando con el centro y las divisiones entre hojas.</p>
+      <div id="psFilters">${psRg('cropL', 'Recorte izquierda %', 0, 45, 1)}${psRg('cropR', 'Recorte derecha %', 0, 45, 1)}${psRg('cropT', 'Recorte superior %', 0, 45, 1)}${psRg('cropB', 'Recorte inferior %', 0, 45, 1)}${psRg('bright', 'Brillo %', 50, 150, 1)}${psRg('contrast', 'Contraste %', 50, 150, 1)}${psRg('sat', 'Saturación %', 0, 200, 1)}${psSw('gray', 'Escala de grises')}</div>
+    </div>
+    <div class="ps-tab" data-tab="1">
+      <label>Hoja de impresión</label>
+      <select id="psPaper"><option value="carta">Carta (21.6 × 27.9)</option><option value="oficio">Oficio (21.6 × 34)</option><option value="legal">Legal (21.6 × 35.6)</option><option value="a4">A4 (21 × 29.7)</option><option value="a3">A3 (29.7 × 42)</option><option value="a2">A2 (42 × 59.4)</option><option value="tabloide">Tabloide (27.9 × 43.2)</option><option value="10x15">10 × 15</option><option value="custom">Personalizado</option></select><div class="row" id="psCustomPaper" style="display:none"><div><label>Ancho hoja (cm)</label><input type="number" id="psPaperW" min="5" max="100" step="0.1" value="21.6"></div><div><label>Alto hoja (cm)</label><input type="number" id="psPaperH" min="5" max="150" step="0.1" value="27.9"></div></div>
+      <div class="toggle"><button type="button" id="psOA">Auto</button><button type="button" id="psOV">Vertical</button><button type="button" id="psOH">Horizontal</button></div>
+      <label style="margin-top:8px">Tamaño total del póster</label>${psTg('mode', [['size', 'Por tamaño'], ['grid', 'Por hojas'], ['optimal', 'Optimizar hojas'], ['exact', 'Hojas exactas']])}
+      <div id="psSizeBox"><label>Medidas predefinidas</label><select data-ps="preset">${PS_PRESETS.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select>
+        <div class="row"><div><label>Ancho total (cm)</label><input type="number" data-ps="pw" min="5" max="1000" step="0.1" inputmode="decimal"></div><div><label>Alto total (cm)</label><input type="number" data-ps="ph" min="5" max="1000" step="0.1" inputmode="decimal"></div></div>
+        ${psSw('lock', 'Mantener proporción de la imagen')}<button type="button" class="btn full" data-pa="swap">⇄ Intercambiar ancho y alto</button>
+      </div>
+      <div id="psGridBox" class="row"><div><label>Columnas</label><input type="number" data-ps="cols" min="1" max="12" step="1" inputmode="numeric"></div><div><label>Filas</label><input type="number" data-ps="rows" min="1" max="12" step="1" inputmode="numeric"></div></div><div id="psOptimalBox" class="row" style="display:none"><div><label>Máximo de hojas</label><input type="number" data-ps="maxSheets" min="1" max="144" step="1"></div></div><div id="psExactBox" class="row" style="display:none"><div><label>Número exacto de hojas</label><input type="number" data-ps="exactSheets" min="1" max="144" step="1"></div></div>
+      <div class="row" style="margin-top:8px"><div><label>Margen no imprimible (cm)</label><input type="number" data-ps="margin" min="0" max="3" step="0.1" inputmode="decimal"></div><div><label>Superposición (cm)</label><input type="number" data-ps="overlap" min="0" max="5" step="0.1" inputmode="decimal"></div></div>
+      <p class="ps-hint">Las divisiones se calculan desde el área imprimible real de cada hoja. La superposición controla cuánto se repite la imagen entre hojas para facilitar el montaje.</p>
+    </div>
+    <div class="ps-tab" data-tab="3">
+      <div class="row"><div><label>Calidad</label><select data-ps="dpi"><option value="100">Borrador (100 dpi)</option><option value="150">Normal (150 dpi)</option><option value="200">Alta (200 dpi)</option><option value="300">Máxima (300 dpi)</option></select></div><div><label>Formato</label><select data-ps="fmt"><option value="jpg">JPG</option><option value="png">PNG</option></select></div></div>
+      <button type="button" class="cta" style="margin-top:10px" data-pa="pages">Añadir hojas como páginas</button>
+      <button type="button" class="btn full" data-pa="replace">Reemplazar todas las páginas</button>
+      <button type="button" class="btn full cyan" data-pa="pdf">Descargar PDF</button>
+      <button type="button" class="btn full" data-pa="zip">Descargar ZIP de imágenes</button><button type="button" class="btn full" data-pa="print">Imprimir hojas</button>
+    </div>
+  </div></div>`);
+  document.body.appendChild(posterModal);
+  const psBox = posterModal.querySelector('.modalbox');
+  function psSync() {
+    const G = psGeom(), act = document.activeElement;
+    psBox.querySelectorAll('[data-ps]').forEach(t => {
+      const k = t.dataset.ps;
+      if (t === act) return;
+      if (t.type === 'range' && (k === 'offX' || k === 'offY')) {
+        const horizontal = k === 'offX';
+        const lim = Math.max(10, Math.ceil((horizontal ? G.UW : G.UH) + (horizontal ? G.PW : G.PH)));
+        t.min = -lim; t.max = lim;
+        PS[k] = Math.max(-lim, Math.min(lim, Number(PS[k]) || 0));
+      }
+      const v = PS[k];
+      if (t.type === 'checkbox') t.checked = !!v; else t.value = v;
+    });
+    psBox.querySelectorAll('[data-o]').forEach(o => {
+      const k = o.dataset.o, v = Number(PS[k]) || 0;
+      o.textContent = (k === 'offX' || k === 'offY') ? v.toFixed(1) : String(Math.round(v));
+    });
+    psBox.querySelectorAll('[data-psv]').forEach(b => { const [k, v] = b.dataset.psv.split(':'); b.classList.toggle('active', String(PS[k]) === v); });
+    psBox.querySelectorAll('[data-pt]').forEach(b => b.classList.toggle('active', +b.dataset.pt === PS.tab));
+    psBox.querySelectorAll('.ps-tab').forEach(t => t.classList.toggle('on', +t.dataset.tab === PS.tab));
+    $('psSizeBox').style.display = PS.mode === 'size' ? 'block' : 'none'; $('psGridBox').style.display = PS.mode === 'grid' ? 'flex' : 'none'; $('psOptimalBox').style.display = PS.mode === 'optimal' ? 'flex' : 'none'; $('psExactBox').style.display = PS.mode === 'exact' ? 'flex' : 'none';
+    $('psFilters').style.display = PS_FILTER ? 'block' : 'none';
+    $('psPaper').value = state.paperType; $('psCustomPaper').style.display = state.paperType === 'custom' ? 'flex' : 'none'; $('psPaperW').value = state.customW; $('psPaperH').value = state.customH; $('psOV').classList.toggle('active', state.orientation === 'vertical'); $('psOH').classList.toggle('active', state.orientation === 'horizontal'); $('psOA').classList.toggle('active', false);
+    const tiles = psTiles(G), dpi = psDpi();
+    const info = `${G.cols * G.rows} hojas (${G.cols} × ${G.rows}) · póster ${gFmt(G.PW)} × ${gFmt(G.PH)} cm` + (PS.img ? ` · ${dpi} dpi efectivos` : '');
+    $('psInfo').textContent = info + (PS.img && dpi < 100 ? ' · ⚠ resolución baja' : ''); $('psInfo').classList.toggle('warn', !!(PS.img && dpi < 100));
+  }
+  function psChange(k) {
+    if (k === 'preset') { const v = PS.preset; if (v) { const [w, h] = v.split('x').map(parseFloat); PS.pw = w; PS.ph = h; PS.lock = false; PS.mode = 'size'; } }
+    if (['pw', 'ph'].includes(k)) { PS.pw = Math.max(5, PS.pw || 5); PS.ph = Math.max(5, PS.ph || 5); PS.preset = ''; if (PS.lock && PS.img) { if (k === 'pw') PS.ph = Math.round(PS.pw / psRatio() * 10) / 10; else PS.pw = Math.round(PS.ph * psRatio() * 10) / 10; } }
+    if (k === 'lock' && PS.lock && PS.img) PS.ph = Math.round(PS.pw / psRatio() * 10) / 10;
+    if (['cols', 'rows'].includes(k)) { PS[k] = Math.max(1, Math.min(12, Math.round(PS[k]) || 1)); }
+    if (['maxSheets', 'exactSheets'].includes(k)) PS[k] = Math.max(1, Math.min(144, Math.round(PS[k]) || 1));
+    if (['cropL','cropR','cropT','cropB'].includes(k)) PS[k] = Math.max(0, Math.min(45, PS[k] || 0));
+    if (['margin', 'overlap'].includes(k)) PS[k] = Math.max(0, PS[k] || 0);
+    if (k === 'snapStep') PS.snapStep = Math.max(0.01, Math.min(5, Number(PS.snapStep) || 0.1));
+    if (k === 'offX' || k === 'offY') PS[k] = Number(PS[k]) || 0;
+    PS.dpi = +PS.dpi || 150;
+    const G = psGeom();
+    psSync(); psDraw();
+  }
+  function psAfterRot() { if (PS.lock && PS.img && PS.mode === 'size') PS.ph = Math.round(PS.pw / psRatio() * 10) / 10; }
+  async function psLoadImage(src, name) {
+    const im = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+    PS.img = im; PS.name = name || ''; PS.offX = PS.offY = 0; PS.zoom = 100; PS.rot = 0; PS.flipH = PS.flipV = false;
+    if (PS.mode === 'size' && PS.lock) PS.ph = Math.round(PS.pw / psRatio() * 10) / 10;
+    psSync(); psDraw();
+  }
+  function psAction(a) {
+    sfx.tap();
+    if (a === 'pick') $('psFile').click();
+    else if (a === 'camera') $('psCamera').click();
+    else if (a === 'page') { showLoading('Cargando página...'); renderPageToCanvas(state.currentPageIndex, 200).then(cv => { PS.img = null; return psLoadImage(cv.toDataURL('image/png'), 'Página'); }).catch(() => {}).then(hideLoading); }
+    else if (a === 'rotL' || a === 'rotR') { PS.rot = Math.round((PS.rot + (a === 'rotR' ? 90 : -90)) / 90) * 90; if (PS.rot > 180) PS.rot -= 360; if (PS.rot < -180) PS.rot += 360; psAfterRot(); psChange('rot'); }
+    else if (a === 'flipH') { PS.flipH = !PS.flipH; psChange('flipH'); } else if (a === 'flipV') { PS.flipV = !PS.flipV; psChange('flipV'); }
+    else if (a === 'center') { PS.offX = PS.offY = 0; PS.zoom = 100; PS.rot = 0; psAfterRot(); psChange('zoom'); }
+    else if (a === 'swap') { [PS.pw, PS.ph] = [PS.ph, PS.pw]; PS.preset = ''; psChange('pw'); }
+    else if (a === 'pages') psToPages(false); else if (a === 'replace') psToPages(true); else if (a === 'pdf') psToPdf(); else if (a === 'zip') psToZip(); else if (a === 'print') psPrint();
+  }
+  psBox.addEventListener('input', (e) => {
+    const t = e.target, k = t.dataset.ps; if (!k) return;
+    PS[k] = t.type === 'checkbox' ? t.checked : (t.type === 'number' || t.type === 'range') ? (parseFloat(t.value) || 0) : t.value;
+    if (k === 'rot') psAfterRot(); psChange(k);
+  });
+  psBox.addEventListener('change', (e) => {
+    const t = e.target, k = t.dataset.ps;
+    if (k !== 'offX' && k !== 'offY') return;
+    PS[k] = psSnapOffset(k === 'offX' ? 'x' : 'y', Number(PS[k]) || 0);
+    psSync(); psDraw();
+  });
+  psBox.addEventListener('click', (e) => {
+    const v = e.target.closest('[data-psv]'); if (v) { sfx.tap(); const [k, val] = v.dataset.psv.split(':'); PS[k] = val; psChange(k); return; }
+    const t = e.target.closest('[data-pt]'); if (t) { sfx.tap(); PS.tab = +t.dataset.pt; psSync(); psDraw(); return; }
+    const a = e.target.closest('[data-pa]'); if (a) psAction(a.dataset.pa);
+  });
+  async function psHandleFileInput(e) { const f = e.target.files && e.target.files[0]; if (!f) return; const url = URL.createObjectURL(f); try { await psLoadImage(url, f.name); } catch (err) { $('psInfo').textContent = 'No se pudo abrir esa imagen.'; $('psInfo').classList.add('warn'); } finally { URL.revokeObjectURL(url); e.target.value = ''; } }
+  $('psFile').addEventListener('change', psHandleFileInput); $('psCamera').addEventListener('change', psHandleFileInput);
+  $('psPaper').addEventListener('change', (e) => { state.paperType = e.target.value; $('paperType').value = e.target.value; $('customPaperRow').style.display = state.paperType === 'custom' ? 'flex' : 'none'; $('psCustomPaper').style.display = state.paperType === 'custom' ? 'flex' : 'none'; if (state.paperType === 'custom') { state.customW = parseFloat($('psPaperW').value) || 21.6; state.customH = parseFloat($('psPaperH').value) || 27.9; $('paperW').value = state.customW; $('paperH').value = state.customH; } saveState(); renderAll(); psChange('paper'); });
+  function psUpdateCustomPaper() { state.customW = Math.max(5, Math.min(100, parseFloat($('psPaperW').value) || 21.6)); state.customH = Math.max(5, Math.min(150, parseFloat($('psPaperH').value) || 27.9)); $('paperW').value = state.customW; $('paperH').value = state.customH; saveState(); renderAll(); psChange('paper'); }
+  $('psPaperW').addEventListener('change', psUpdateCustomPaper); $('psPaperH').addEventListener('change', psUpdateCustomPaper);
+  $('psOA').addEventListener('click', () => {
+    const original = state.orientation;
+    const targetRatio = Math.max(0.05, (PS.mode === 'size' ? PS.pw / Math.max(1, PS.ph) : psRatio()));
+    const candidates = [];
+    for (const orientation of ['vertical', 'horizontal']) {
+      state.orientation = orientation;
+      const g = psGeom();
+      const ratio = Math.max(0.001, g.PW / Math.max(0.001, g.PH));
+      candidates.push({ orientation, count: g.cols * g.rows, ratioError: Math.abs(Math.log(ratio / targetRatio)) });
+    }
+    candidates.sort((a, b) => a.count - b.count || a.ratioError - b.ratioError);
+    state.orientation = candidates.length ? candidates[0].orientation : original;
+    $('orientH').classList.toggle('active', state.orientation === 'horizontal');
+    $('orientV').classList.toggle('active', state.orientation === 'vertical');
+    saveState(); renderAll(); psSync(); psDraw();
+  });
+  $('psOV').addEventListener('click', () => { $('orientV').click(); psChange('paper'); });
+  $('psOH').addEventListener('click', () => { $('orientH').click(); psChange('paper'); });
+  $('psClose').addEventListener('click', () => closePoster());
+
+  function psDraw() { if (!psOpen) return; cancelAnimationFrame(psRaf); psRaf = requestAnimationFrame(psPaint); }
+  function psPaint() {
+    const cv = $('psCanvas'), wrap = cv.parentElement, aw = wrap.clientWidth - 6; if (aw <= 10) return;
+    const G = psGeom(), dpr = Math.min(2, window.devicePixelRatio || 1), maxH = Math.max(150, Math.round(window.innerHeight * 0.34));
+    const k = Math.min(aw / G.UW, maxH / G.UH), cw = G.UW * k, ch = G.UH * k;
+    cv.style.width = cw + 'px'; cv.style.height = ch + 'px'; cv.width = Math.max(1, Math.round(cw * dpr)); cv.height = Math.max(1, Math.round(ch * dpr)); PS._k = k; PS._G = G;
+    const x = cv.getContext('2d'); x.setTransform(k * dpr, 0, 0, k * dpr, 0, 0); const px = 1 / k;
+    psDrawContent(x, G);
+    if (!PS.img) { x.save(); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.fillStyle = 'rgba(0,0,0,.55)'; x.font = '600 13px Inter, sans-serif'; x.textAlign = 'center'; x.fillText('Elige una imagen para empezar', cw / 2, ch / 2); x.restore(); }
+    if (PS.mode === 'size') { x.save(); x.setLineDash([6 * px, 4 * px]); x.lineWidth = 1.5 * px; x.strokeStyle = '#111'; x.strokeRect(G.px, G.py, G.PW, G.PH); x.restore(); }
+    for (let r = 0; r < G.rows; r++) for (let c = 0; c < G.cols; c++) {
+      const tx = c * G.stepX, ty = r * G.stepY;
+      // Vista limpia: únicamente límites de las hojas, sin códigos A1/B2 ni selección por hoja.
+      x.lineWidth = 1.1 * px; x.strokeStyle = 'rgba(45,105,170,.72)'; x.strokeRect(tx, ty, G.s.uw, G.s.uh);
+      if (PS.detectLines && c > 0) { x.save(); x.strokeStyle = 'rgba(255,174,0,.95)'; x.lineWidth = 1.5 * px; x.setLineDash([5 * px, 4 * px]); x.beginPath(); x.moveTo(tx, ty); x.lineTo(tx, ty + G.s.uh); x.stroke(); x.restore(); }
+      if (PS.detectLines && r > 0) { x.save(); x.strokeStyle = 'rgba(255,174,0,.95)'; x.lineWidth = 1.5 * px; x.setLineDash([5 * px, 4 * px]); x.beginPath(); x.moveTo(tx, ty); x.lineTo(tx + G.s.uw, ty); x.stroke(); x.restore(); }
+    }
+  }
+  (function () {
+    const cv = $('psCanvas'), ptrs = new Map(); let pinch = null, moved = 0, t0 = 0;
+    cv.addEventListener('pointerdown', (e) => { cv.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (ptrs.size === 1) { moved = 0; t0 = Date.now(); } if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), z: PS.zoom }; } });
+    cv.addEventListener('pointermove', (e) => {
+      const p = ptrs.get(e.pointerId); if (!p) return; const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY; moved += Math.abs(dx) + Math.abs(dy);
+      if (ptrs.size === 2 && pinch) { const [a, b] = [...ptrs.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); PS.zoom = Math.max(10, Math.min(400, pinch.z * d / pinch.d)); psSync(); psDraw(); }
+      else if (ptrs.size === 1 && PS.img && moved > 4) { PS.offX += dx / Math.max(0.05, PS._k); PS.offY += dy / Math.max(0.05, PS._k); psSync(); psDraw(); }
+    });
+    const up = (e) => {
+      const wasDragging = ptrs.has(e.pointerId) && ptrs.size === 1 && moved > 4;
+      ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null;
+      if (wasDragging) {
+        PS.offX = psSnapOffset('x', PS.offX);
+        PS.offY = psSnapOffset('y', PS.offY);
+        psSync(); psDraw();
+      }
+      // El toque simple no selecciona hojas: el póster se mueve como una sola imagen.
+    };
+    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', (e) => { ptrs.delete(e.pointerId); pinch = null; });
+  })();
+  function openPoster() { psOpen = true; psSync(); posterModal.classList.add('show'); setTimeout(() => { posterModal.classList.add('visible'); psSync(); psDraw(); }, 20); }
+  function closePoster() { psOpen = false; posterModal.classList.remove('visible'); setTimeout(() => posterModal.classList.remove('show'), 200); }
+  window.addEventListener('resize', () => { if (psOpen) psDraw(); });
+  { const b = document.createElement('button'); b.id = 'openPosterBtn';
+    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>Editor de póster';
+    $('moreMenu').insertBefore(b, $('openCollageBtn')); b.addEventListener('click', () => { sfx.click(); $('moreMenu').classList.remove('show'); openPoster(); }); }
+
 })();
 </script>
+
+
 </body>
 </html>
