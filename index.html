@@ -136,11 +136,14 @@
     background: var(--panel2); padding: 2px 6px; border-radius: 6px;
     border: 1px solid var(--line); flex-shrink: 0; font-size: 10px; min-height: 30px;
   }
-  .quick-bar .group { display: flex; align-items: center; gap: 3px; }
+  .quick-bar::-webkit-scrollbar { display:none; }
+  .quick-bar .group { display: flex; align-items: center; gap: 3px; flex: 0 0 auto; }
+  .quick-bar .toggleViewBtn { display:inline-flex; }\n  .toggleViewBtn { flex: 0 0 auto; position: sticky; left: 0; z-index: 3; box-shadow: 2px 0 5px var(--panel2); }
   .quick-bar label { margin: 0; font-size: 9px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
   .quick-bar span { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent); font-weight: 600; min-width: 32px; text-align: center; }
   .compact-label { font-size: 9px; color: var(--muted); margin-right: 1px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; }
   .quick-bar select { height: 22px; min-width: 40px; padding: 0 3px; font-size: 10px; width: auto; }
+  @media (max-width: 480px) { .quick-bar { justify-content:flex-start; } .quick-bar .group { flex-shrink:0; } }
   .quick-bar .switch { width: 30px; height: 18px; }
   .quick-bar .switch-slider::before { height: 12px; width: 12px; }
   .quick-bar .switch input:checked + .switch-slider::before { transform: translateX(12px); }
@@ -189,7 +192,7 @@
   body.fullscreen-mode main.sidebar { display: none !important; }
   body.fullscreen-mode #stage-wrapper { width: 100% !important; }
   main.sidebar { padding: 10px; max-width: 560px; margin: 0 auto; width: 100%; overflow-y: auto; flex: 1; touch-action: auto; display: none; background: var(--panel); }
-  @media (min-width: 850px) { main.sidebar { display: block; } }
+  @media (min-width: 850px) { main.sidebar { display: block; } .toggleViewBtn { display:none !important; } }
   .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin-bottom: 8px; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
   .panel::before { content: attr(data-tag); position: absolute; top: -8px; left: 12px; background: var(--panel); padding: 0 5px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.05em; color: var(--muted); text-transform: uppercase; }
   label { display: block; font-size: 11px; color: var(--muted); margin: 6px 0 2px; font-weight: 500; }
@@ -539,10 +542,10 @@
     break-inside: avoid;
   }
 }
-  #kbMini { position: fixed; left: 8px; right: 8px; z-index: 20000; display: none; align-items: center; gap: 8px; padding: 6px 8px 6px 10px; background: var(--panel); border: 1px solid var(--accent); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.35); font-size: 13px; color: var(--text); touch-action: auto; }
+  #kbMini { position: fixed; left: 8px; right: 8px; max-height: min(30vh, 190px); z-index: 20000; display: none; align-items: center; gap: 8px; padding: 6px 8px 6px 10px; background: var(--panel); border: 1px solid var(--accent); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.35); font-size: 13px; color: var(--text); touch-action: auto; }
   #kbMini.show { display: flex; }
   #kbMini .km-l { font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; flex-shrink: 0; max-width: 32%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  #kbMini .km-v { flex: 1; max-height: 3.9em; overflow-y: auto; white-space: pre-wrap; word-break: break-word; line-height: 1.3; user-select: none; -webkit-user-select: none; }
+  #kbMini .km-v { flex: 1; min-width: 0; max-height: 3.9em; overflow-y: auto; white-space: pre-wrap; word-break: break-word; line-height: 1.3; user-select: none; -webkit-user-select: none; }
   #kbMini button.km-h { background: var(--btn-bg); color: var(--btn-text); border: 1px solid var(--btn-border); }
   #kbMini button { flex-shrink: 0; background: var(--accent); color: var(--cta-color); border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; min-height: 30px; }
   #inlineEd { position: fixed; z-index: 60; margin: 0; border: 2px solid var(--accent); border-radius: 2px; outline: none; resize: none; overflow: auto; box-sizing: border-box; touch-action: auto; user-select: text; -webkit-user-select: text; }
@@ -1461,7 +1464,7 @@ function undo() {
     const side = $('mainSidebar');
     const viewBtn = $('toggleViewModeBtn');
     if (window.innerWidth >= 850) { side.style.display = 'block'; viewBtn.style.display = 'none'; }
-    else { side.style.display = state.sidebarOpen ? 'block' : 'none'; }
+    else { viewBtn.style.display = 'inline-flex'; side.style.display = state.sidebarOpen ? 'block' : 'none'; }
     updateInspectorState();
   }
   function getPaperCm() {
@@ -4243,8 +4246,13 @@ ctx.restore();
     if (v && window.innerHeight - v.height - v.offsetTop > 100) return v.offsetTop + v.height;
     return null;
   }
-  const mini = mk('<div id="kbMini"><span class="km-l"></span><textarea class="km-v" rows="2" spellcheck="false" autocomplete="off"></textarea><button type="button" class="km-h">Ocultar</button><button type="button" class="km-ok">Listo</button></div>');
+  const mini = mk('<div id="kbMini"><span class="km-l"></span><textarea class="km-v" rows="2" spellcheck="false" autocomplete="off" aria-label="Edición rápida"></textarea><button type="button" class="km-h">Ocultar</button><button type="button" class="km-ok">Listo</button></div>');
   document.body.appendChild(mini);
+  const miniRestore = mk('<button id="kbMiniRestore" type="button">Mostrar panel de edición</button>');
+  miniRestore.style.cssText = 'position:fixed;display:none;left:8px;right:8px;z-index:20003;min-height:34px;border:1px solid var(--accent);border-radius:9px;background:var(--panel);color:var(--text);box-shadow:0 3px 12px rgba(0,0,0,.25);font-size:12px;touch-action:manipulation;';
+  document.body.appendChild(miniRestore);
+  miniRestore.addEventListener('pointerdown', e => e.preventDefault());
+  miniRestore.addEventListener('click', () => { miniDismissed = null; miniRestore.style.display = 'none'; updateKb0(); if (edTA) { try { edTA.focus({preventScroll:true}); } catch(_) {} } });
   const mv = mini.querySelector('.km-v'); let miniTarget = null, miniDirty = false;
   mv.addEventListener('input', () => {
     if (!miniTarget) return; let v = mv.value, fin = false;
@@ -4255,7 +4263,13 @@ ctx.restore();
   mv.addEventListener('blur', () => { if (miniDirty && miniTarget) { miniDirty = false; miniTarget.dispatchEvent(new Event('change', { bubbles: true })); } });
   mini.querySelectorAll('button').forEach(b => b.addEventListener('pointerdown', (e) => e.preventDefault()));
   mini.querySelector('.km-ok').addEventListener('click', () => { if (edTA) endInlineEdit(); else { const f = document.activeElement; if (f && f.blur) f.blur(); if (miniTarget && miniTarget.blur) miniTarget.blur(); } mini.classList.remove('show'); });
-  mini.querySelector('.km-h').addEventListener('click', () => { miniDismissed = miniTarget || document.activeElement; mini.classList.remove('show'); if (miniTarget) { try { miniTarget.focus({ preventScroll: true }); } catch (_) {} } });
+  mini.querySelector('.km-h').addEventListener('click', () => {
+    miniDismissed = miniTarget || document.activeElement; mini.classList.remove('show');
+    const kt = kbTop(); miniRestore.style.display = 'block';
+    miniRestore.style.top = Math.max(6, (kt == null ? window.innerHeight : kt) - 44) + 'px';
+    if (edTA) placeEd(); else updateKb0();
+    if (miniTarget) { try { miniTarget.focus({ preventScroll: true }); } catch (_) {} }
+  });
   function fieldLabel(f) {
     if (f === edTA) return 'Texto';
     const l = f.closest('div') && f.closest('div').querySelector('label');
@@ -4276,7 +4290,7 @@ ctx.restore();
   function updateKb0() {
     const f = document.activeElement; let kt = kbTop();
     if (f && f.closest && f.closest('#posterModal')) { mini.classList.remove('show'); return; }
-    if (f === edTA) { mini.classList.remove('show'); return; }
+    if (f === edTA) { miniTarget = edTA; mini.querySelector('.km-l').textContent = 'Texto'; if (mv.value !== edTA.value) mv.value = edTA.value; if (kt == null || !miniDismissed) { mini.classList.add('show'); mini.style.top = Math.max(6, (kt == null ? window.innerHeight : kt) - mini.offsetHeight - 8) + 'px'; } else mini.classList.remove('show'); return; }
     if (f === mv) { if (kt == null) { mini.classList.remove('show'); return; } mini.classList.add('show'); mini.style.top = (kt - mini.offsetHeight - 8) + 'px'; return; }
     if (!isTypeField(f) || kt == null || miniDismissed === f) { mini.classList.remove('show'); return; }
     const r = f.getBoundingClientRect();
@@ -4290,7 +4304,7 @@ ctx.restore();
   document.addEventListener('focusin', (e) => {
     const f = e.target; if (!isTypeField(f) || f === mv) return;
     if (f.closest && f.closest('#posterModal')) { if (f.tagName === 'INPUT') f.setAttribute('enterkeyhint', 'done'); mini.classList.remove('show'); return; }
-    if (miniDismissed && miniDismissed !== f) miniDismissed = null;
+    if (miniDismissed && miniDismissed !== f) miniDismissed = null; miniRestore.style.display = 'none';
     const saved = [];
     for (let n = f.parentElement; n; n = n.parentElement) if (n.scrollTop || n.scrollLeft || n.scrollHeight > n.clientHeight) saved.push([n, n.scrollTop, n.scrollLeft]);
     if (f !== edTA) [0, 60, 160, 320, 520].forEach(ms => setTimeout(() => { saved.forEach(([n, t, l]) => { n.scrollTop = t; n.scrollLeft = l; }); if (window.scrollX || window.scrollY) window.scrollTo(0, 0); }, ms));
@@ -4304,36 +4318,26 @@ ctx.restore();
   if (vk) vk.addEventListener('geometrychange', kbSoon);
   window.addEventListener('scroll', () => { if (window.scrollX || window.scrollY) window.scrollTo(0, 0); }, { passive: true });
 
-  document.addEventListener('pointerdown', (e) => { if (edTA && !e.target.closest('#inlineEd, #kbMini, #edDone, #edBar, #cpk')) endInlineEdit(); }, true);
-  function revealEd(el, limit) {
-    const d = $('stage').querySelector(`.el[data-id="${el.id}"]`), wr = $('stage-wrapper'); if (!d || !wr) return;
-    if (edPanY0 == null) edPanY0 = panY;
-    const r = d.getBoundingClientRect(), wt = wr.getBoundingClientRect().top;
-    let dy = 0;
-    if (r.bottom > limit) dy = limit - r.bottom - 8;
-    if (r.top + dy < wt + 4) dy = Math.min(0, wt + 4 - r.top);
-    if (dy) { panY += dy; applyStageTransform(); }
-  }
+  document.addEventListener('pointerdown', (e) => {
+    // Tocar el lienzo durante la edición no debe cerrar el texto: permite reencuadrar/zoom.
+    if (edTA && !e.target.closest('#inlineEd, #kbMini, #kbMiniRestore, #edDone, #edBar, #edBarRestore, #cpk, #stage-wrapper, .inspector, header')) endInlineEdit();
+  }, true);
+  // No desplazar ni reencuadrar la hoja al editar: se conserva el zoom y el pan elegidos.
+  function revealEd() { return; }
   function placeEd() {
     const el = findEl(editingTextId), d = $('stage').querySelector(`.el[data-id="${editingTextId}"]`);
     if (!el || !d || !edTA) return;
     const t = el.tx, z = PX_PER_CM * zoomScale;
     let kt = kbTop();
-    const bh = edBar.offsetHeight || 42, limit = kt == null ? null : kt - bh - 10;
     let r = d.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
     const w = el.wCm * z, h = el.hCm * z;
-    if (limit == null || edPanelHidden) edDock = false; else if ((cy - h / 2) >= limit - 2) edDock = true;
-    if (limit != null) { revealEd(el, edDock ? Math.max(120, limit - 100) : limit); r = d.getBoundingClientRect(); cx = r.left + r.width / 2; cy = r.top + r.height / 2; }
-    const covered = edDock;
-    if (covered) {
-      edTA.className = 'dk'; edTA.style.cssText = `left:8px;right:8px;width:auto;top:${Math.max(70, limit - 92)}px;height:84px;`;
-    } else {
-      const L = txLayout(SCR, el, z), pad = L.pad, pt = (t.valign === 'top' || el.flow) ? pad : t.valign === 'bottom' ? Math.max(pad, h - pad - L.th) : Math.max(pad, (h - L.th) / 2);
-      edTA.className = 'ov';
-      edTA.style.cssText = `left:${cx - w / 2}px;top:${cy - h / 2}px;width:${w}px;height:${h}px;font-family:"${t.font}",sans-serif;font-size:${L.fs}px;font-weight:${t.bold ? 700 : 400};font-style:${t.italic ? 'italic' : 'normal'};letter-spacing:${t.ls / 100 * L.fs}px;line-height:${L.lh}px;text-align:${t.align === 'justify' ? 'left' : t.align};padding:${pt}px ${pad}px 0 ${pad + L.hang}px;text-indent:${el.cont ? 0 : L.ind}px;text-transform:${t.caps ? 'uppercase' : 'none'};transform:${elCss(el)};`;
-    }
-    edTA.dataset.covered = covered ? '1' : '';
-    placeBar(el, kt, covered); syncDone();
+    // La edición siempre sigue al texto real en la hoja; nunca se convierte en una caja flotante.
+    edDock = false;
+    const L = txLayout(SCR, el, z), pad = L.pad, pt = (t.valign === 'top' || el.flow) ? pad : t.valign === 'bottom' ? Math.max(pad, h - pad - L.th) : Math.max(pad, (h - L.th) / 2);
+    edTA.className = 'ov';
+    edTA.style.cssText = `left:${cx - w / 2}px;top:${cy - h / 2}px;width:${w}px;height:${h}px;font-family:"${t.font}",sans-serif;font-size:${L.fs}px;font-weight:${t.bold ? 700 : 400};font-style:${t.italic ? 'italic' : 'normal'};letter-spacing:${t.ls / 100 * L.fs}px;line-height:${L.lh}px;text-align:${t.align === 'justify' ? 'left' : t.align};padding:${pt}px ${pad}px 0 ${pad + L.hang}px;text-indent:${el.cont ? 0 : L.ind}px;text-transform:${t.caps ? 'uppercase' : 'none'};transform:${elCss(el)};`;
+    edTA.dataset.covered = '';
+    placeBar(el, kt, false); syncDone();
   }
   function startInlineEdit(id, selectAll) {
     const el = findEl(id); if (!el || el.type !== 'text') return;
@@ -4351,7 +4355,7 @@ ctx.restore();
   function endInlineEdit() {
     if (!edTA) return;
     const ta = edTA, id = editingTextId; edTA = null; editingTextId = null; ta.remove();
-    if (edPanY0 != null) { panY = edPanY0; edPanY0 = null; applyStageTransform(); } edPanelHidden = false; edDock = false; mini.classList.remove('show'); edBar.classList.remove('show');
+    edPanY0 = null; edPanelHidden = false; edDock = false; mini.classList.remove('show'); miniRestore.style.display = 'none'; edBar.classList.remove('show'); edBarRestore.style.display = 'none';
     const el = findEl(id);
     if (el && !el.flow && !el.text.trim()) { el.text = edOrig && edOrig.trim() ? edOrig : 'Texto'; sanitizeGen(el); }
     edDone.style.display = 'none';
@@ -4360,21 +4364,36 @@ ctx.restore();
   SIC.addEventListener('click', (e) => { if (e.target.closest('#txtEdit')) openTextEditor(); });
 
   /* ====== BARRA DE FORMATO SOBRE EL TECLADO + DOCUMENTO (TEXTO EN LA HOJA) ====== */
-  const edBar = mk('<div id="edBar"><button data-e="bold"><b>N</b></button><button data-e="italic"><i>K</i></button><button data-e="underline"><u>S</u></button><button data-e="sdn">A−</button><button data-e="sup">A+</button><input type="color" data-e="color"><button data-e="align">Izq</button><button data-e="pg">Hoja</button><button data-e="panel">Ocultar panel</button><button data-e="done">Listo</button></div>');
+  const edBar = mk('<div id="edBar"><button data-e="bold"><b>N</b></button><button data-e="italic"><i>K</i></button><button data-e="underline"><u>S</u></button><button data-e="sdn">A−</button><button data-e="sup">A+</button><input type="color" data-e="color"><button data-e="align">Izq</button><button data-e="zoomout" title="Reducir zoom">−</button><button data-e="zoomval" disabled>Zoom</button><button data-e="zoomin" title="Aumentar zoom">+</button><button data-e="pg">Hoja</button><button data-e="panel">Ocultar panel</button><button data-e="done">Listo</button></div>');
   document.body.appendChild(edBar);
+  const edBarRestore = mk('<button id="edBarRestore" type="button">Mostrar herramientas de texto</button>');
+  edBarRestore.style.cssText = 'position:fixed;display:none;left:8px;right:8px;z-index:20002;min-height:34px;border:1px solid var(--accent);border-radius:9px;background:var(--panel);color:var(--text);box-shadow:0 3px 12px rgba(0,0,0,.25);font-size:12px;touch-action:manipulation;';
+  document.body.appendChild(edBarRestore);
+  edBarRestore.addEventListener('pointerdown', e => e.preventDefault());
+  edBarRestore.addEventListener('click', () => { edPanelHidden = false; edBarRestore.style.display = 'none'; if (edTA) { placeEd(); try { edTA.focus({preventScroll:true}); } catch(_) {} } });
   function placeBar(el, kt, covered) {
-    edBar.classList.add('show'); const h = edBar.offsetHeight || 42; edBar.style.top = ((kt == null ? window.innerHeight : kt) - h - 6) + 'px';
+    const h = edBar.offsetHeight || 42;
+    // Evitar dos barras apiladas encima del teclado: al editar texto se prioriza el panel blanco editable.
+    if (mini.classList.contains('show') && edTA && !edPanelHidden) {
+      edBar.classList.remove('show'); edBarRestore.style.display = 'none'; return;
+    }
+    edBar.style.top = Math.max(6, (kt == null ? window.innerHeight : kt) - h - (mini.classList.contains('show') ? mini.offsetHeight + 14 : 6)) + 'px';
+    if (edPanelHidden) { edBar.classList.remove('show'); edBarRestore.style.display = 'block'; edBarRestore.style.top = Math.max(6, (kt == null ? window.innerHeight : kt) - 44) + 'px'; return; }
+    edBarRestore.style.display = 'none'; edBar.classList.add('show');
     const t = el.tx;
-    edBar.querySelectorAll('[data-e]').forEach(b => { const k = b.dataset.e; if (k === 'bold' || k === 'italic' || k === 'underline') b.classList.toggle('on', !!t[k]); if (k === 'align') b.textContent = { left: 'Izq', center: 'Centro', right: 'Der', justify: 'Justif.' }[t.align]; if (k === 'pg') b.style.display = el.flow ? '' : 'none'; if (k === 'panel') { b.style.display = (covered || edPanelHidden) ? '' : 'none'; b.textContent = edPanelHidden ? 'Mostrar panel' : 'Ocultar panel'; } });
+    edBar.querySelectorAll('[data-e]').forEach(b => { const k = b.dataset.e; if (k === 'bold' || k === 'italic' || k === 'underline') b.classList.toggle('on', !!t[k]); if (k === 'align') b.textContent = { left: 'Izq', center: 'Centro', right: 'Der', justify: 'Justif.' }[t.align]; if (k === 'pg') b.style.display = el.flow ? '' : 'none'; if (k === 'panel') { b.style.display = ''; b.textContent = edPanelHidden ? 'Mostrar panel' : 'Ocultar panel'; b.setAttribute('aria-pressed', String(!edPanelHidden)); } });
     const c = edBar.querySelector('input'); if (document.activeElement !== c) c.value = t.color;
   }
   edBar.addEventListener('pointerdown', (e) => { if (e.target.tagName !== 'INPUT') e.preventDefault(); });
   edBar.addEventListener('click', (e) => {
     const b = e.target.closest('button[data-e]'); if (!b || !edTA) return; sfx.tap();
     const k = b.dataset.e, el = findEl(editingTextId); if (!el) return;
+    const zv = edBar.querySelector('[data-e="zoomval"]'); if (zv) zv.textContent = Math.round(zoomScale*100)+'%';
     if (k === 'done') endInlineEdit();
     else if (k === 'pg') { endInlineEdit(); docOpen(); }
     else if (k === 'panel') { edPanelHidden = !edPanelHidden; if (!edPanelHidden && edPanY0 != null) { panY = edPanY0; edPanY0 = null; applyStageTransform(); } placeEd(); }
+    else if (k === 'zoomin' || k === 'zoomout') { setZoomAtPoint(zoomScale * (k === 'zoomin' ? 1.15 : 1/1.15), window.innerWidth/2, Math.max(80, (kbTop() || window.innerHeight) * 0.42)); placeEd(); }
+    else if (k === 'zoomval') { setZoom(0.7, true); placeEd(); }
     else if (k === 'bold' || k === 'italic' || k === 'underline') fmtEd(k, v => !v);
     else if (k === 'sdn' || k === 'sup') fmtEd('size', v => Math.max(4, Math.min(200, v + (k === 'sup' ? 1 : -1) * (el.flow ? 1 : 2))));
     else if (k === 'align') { const o = ['left', 'center', 'right', 'justify']; fmtEd('align', v => o[(o.indexOf(v) + 1) % 4]); }
@@ -4637,6 +4656,7 @@ ctx.restore();
     };
     window.addEventListener('resize', onResize);
     window.addEventListener('orientationchange', () => setTimeout(() => {
+      if (edTA || isTypeField(document.activeElement)) { updateKb(); return; }
       recomputeScale(); recenterStage(); renderAll(); syncUIWithState();
       if ($('pdfReader').classList.contains('show') && pdfReaderState.pdfDoc) {
         pdfReaderState.scale = 1.0; pdfReaderState.pendingResetScroll = true; renderPdfCurrentPage();
