@@ -548,7 +548,7 @@
   #kbMini .km-v { flex: 1; min-width: 0; max-height: 3.9em; overflow-y: auto; white-space: pre-wrap; word-break: break-word; line-height: 1.3; user-select: none; -webkit-user-select: none; }
   #kbMini button.km-h { background: var(--btn-bg); color: var(--btn-text); border: 1px solid var(--btn-border); }
   #kbMini button { flex-shrink: 0; background: var(--accent); color: var(--cta-color); border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; min-height: 30px; }
-  #inlineEd { position: fixed; z-index: 60; margin: 0; border: 2px solid var(--accent); border-radius: 2px; outline: none; resize: none; overflow: auto; box-sizing: border-box; touch-action: auto; user-select: text; -webkit-user-select: text; }
+  #inlineEd { position: fixed; z-index: 60; margin: 0; border: 2px solid var(--accent); border-radius: 2px; outline: none; resize: none; overflow: auto; box-sizing: border-box; touch-action: none; user-select: text; -webkit-user-select: text; }
   .sl { display: flex; align-items: center; gap: 4px; }
   .sl-t { flex: 1; min-width: 0; touch-action: pan-y; padding: 8px 0; }
   .sl-t input { pointer-events: none; width: 100%; margin: 0; display: block; }
@@ -659,6 +659,8 @@
   <button id="resetAllBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L3 8"/></svg>Reiniciar todo</button>
   <button id="openCollageBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Plantillas collage</button>
   <button id="openLineDetectBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L3 21M9 3h12v12"/></svg>Detectar líneas</button>
+  <button id="openImageEnhancerBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="4"/></svg>Mejorar imagen / OCR</button>
+  <button id="openLayerManagerBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/></svg>Administrar capas</button>
   <label for="importPdfInput"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Importar PDF</label>
   <input type="file" id="importPdfInput" accept="application/pdf" style="display:none;" />
   <button id="exportZipBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Exportar ZIP</button>
@@ -1031,6 +1033,34 @@
       <div id="lineDetectStatus" style="font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:6px;">Listo.</div>
       <div class="collage-editor-canvas" id="lineDetectPreview" style="aspect-ratio: 1; margin-top:8px; display:none;"></div>
       <div class="row" style="margin-top:8px; display:none;" id="lineDetectActions"><button class="btn full" id="lineDetectAddBtn">Aplicar</button></div>
+    </div>
+  </div>
+
+  <div class="modal" id="layerManagerModal"><div class="modalbox">
+    <button class="closebtn" id="closeLayerManager"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+    <h2>Capas de la página</h2><p style="font-size:12px;color:var(--muted)">Toca una capa para seleccionarla. Usa las flechas para cambiar el orden de superposición.</p>
+    <div id="layerManagerList" style="display:flex;flex-direction:column;gap:6px;max-height:48vh;overflow:auto;margin:10px 0"></div>
+    <div class="row"><button class="btn full" id="layerMoveUpBtn">Subir una capa</button><button class="btn full" id="layerMoveDownBtn">Bajar una capa</button></div>
+    <div class="row" style="margin-top:6px"><button class="btn full" id="layerFrontBtn">Al frente</button><button class="btn full" id="layerBackBtn">Al fondo</button></div>
+  </div></div>
+
+  <div class="modal" id="imageEnhancerModal">
+    <div class="modalbox">
+      <button class="closebtn" id="closeImageEnhancer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+      <h2>Mejorador de imagen y texto</h2>
+      <p style="font-size:12px;color:var(--muted);line-height:1.45">Selecciona una imagen del lienzo antes de abrir esta herramienta. El aumento de resolución y el enfoque pueden mejorar la legibilidad, pero no recuperan detalles que no existen en el original. El OCR requiere conexión para cargar el motor de reconocimiento.</p>
+      <div id="enhanceSourceInfo" style="font-size:11px;color:var(--muted);margin:8px 0">Ninguna imagen seleccionada.</div>
+      <label>Ampliación</label><select id="enhanceScale"><option value="1">1× · tamaño original</option><option value="1.5">1,5×</option><option value="2" selected>2×</option><option value="3">3× (más memoria)</option></select>
+      <label>Enfoque <span id="enhanceSharpVal">35%</span></label><input type="range" id="enhanceSharp" min="0" max="100" value="35" step="5" />
+      <label>Contraste <span id="enhanceContrastVal">110%</span></label><input type="range" id="enhanceContrast" min="70" max="160" value="110" step="5" />
+      <label>Brillo <span id="enhanceBrightnessVal">100%</span></label><input type="range" id="enhanceBrightness" min="70" max="140" value="100" step="5" />
+      <div class="row" style="margin-top:10px"><button class="btn full" id="enhancePreviewBtn">Procesar vista previa</button><button class="btn full cyan" id="enhanceApplyBtn" disabled>Aplicar a imagen</button></div>
+      <canvas id="enhancePreviewCanvas" style="display:block;width:100%;max-height:34vh;object-fit:contain;background:#e5e7eb;border-radius:8px;margin-top:10px"></canvas>
+      <div class="divider" style="margin:12px 0;border-top:1px solid var(--line)"></div>
+      <h3 style="font-size:14px;margin:4px 0">Reconocimiento inteligente de texto (OCR)</h3>
+      <div class="row"><button class="btn full" id="enhanceOcrBtn">Reconocer texto</button><button class="btn full" id="enhanceInsertTextBtn" disabled>Crear texto editable</button></div>
+      <div id="enhanceOcrStatus" style="font-size:11px;color:var(--muted);margin:7px 0">El texto reconocido aparecerá abajo para que puedas corregirlo.</div>
+      <textarea id="enhanceOcrText" rows="5" placeholder="Texto reconocido…" style="width:100%;box-sizing:border-box;resize:vertical"></textarea>
     </div>
   </div>
 
@@ -3550,7 +3580,15 @@ ctx.restore();
       printArea.style.removeProperty('--pw'); printArea.style.removeProperty('--ph');
       let styleTag = document.getElementById('dynamicPageSize');
       if (!styleTag) { styleTag = document.createElement('style'); styleTag.id = 'dynamicPageSize'; document.head.appendChild(styleTag); }
-      const inchW = (paper.w / 2.54).toFixed(2), inchH = (paper.h / 2.54).toFixed(2);
+      // Usa las dimensiones físicas ya orientadas (getPaperCm() intercambia
+      // ancho/alto cuando la orientación es horizontal). Definir también el
+      // tamaño de cada .print-page evita que el contenido desborde el área
+      // imprimible y Chrome/Mopria inserten una hoja en blanco entre páginas.
+      const inchW = (paper.w / 2.54).toFixed(4), inchH = (paper.h / 2.54).toFixed(4);
+      // Deja un margen técnico mínimo de 1 punto para evitar redondeos del motor
+      // de impresión, sin cambiar el tamaño del papel seleccionado.
+      printArea.style.setProperty('--pw', `${(paper.w / 2.54 * 72).toFixed(2) - 1}pt`);
+      printArea.style.setProperty('--ph', `${(paper.h / 2.54 * 72).toFixed(2) - 1}pt`);
       let sizeRule;
       if (state.paperType === 'carta' && state.orientation === 'vertical') sizeRule = 'letter';
       else if (state.paperType === 'carta' && state.orientation === 'horizontal') sizeRule = 'letter landscape';
@@ -3574,6 +3612,104 @@ ctx.restore();
       setTimeout(() => window.print(), 450);
     } catch (err) { hideLoading(); sfx.error(); showToast('Error al imprimir', 'error'); }
   }
+
+  function closeLayerManager() { const m=$('layerManagerModal'); m.classList.remove('visible'); setTimeout(()=>m.classList.remove('show'),250); }
+  function renderLayerManager() {
+    const list=$('layerManagerList'); list.innerHTML=''; const els=currentPage().els;
+    if(!els.length) { list.textContent='Esta página todavía no tiene elementos.'; return; }
+    [...els].reverse().forEach((el,reverseIndex)=>{
+      const index=els.length-1-reverseIndex, row=document.createElement('div'); row.style.cssText='display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--line);border-radius:7px;background:var(--panel2);';
+      const pick=document.createElement('button'); pick.className='btn'; pick.style.cssText='flex:1;min-width:0;justify-content:flex-start;white-space:normal;text-align:left;';
+      const type=el.type==='text'?'Texto':el.type==='shape'?'Forma':el.src?'Imagen':'Elemento';
+      pick.textContent=`${index+1}. ${type}${el.text?': '+el.text.replace(/\s+/g,' ').slice(0,32):''}`;
+      pick.style.borderColor=selectedIds.has(el.id)?'var(--accent)':'var(--btn-border)'; pick.addEventListener('click',()=>{selectedIds=new Set([el.id]);multiSelectMode=false;renderAll();renderLayerManager();});
+      const up=document.createElement('button');up.className='btn';up.textContent='↑';up.title='Subir';up.disabled=index===els.length-1;up.addEventListener('click',()=>moveLayerBy(el.id,1));
+      const down=document.createElement('button');down.className='btn';down.textContent='↓';down.title='Bajar';down.disabled=index===0;down.addEventListener('click',()=>moveLayerBy(el.id,-1));
+      row.append(pick,up,down);list.appendChild(row);
+    });
+  }
+  function moveLayerBy(id,delta) { const els=currentPage().els, i=els.findIndex(e=>e.id===id), j=i+delta; if(i<0||j<0||j>=els.length)return; [els[i],els[j]]=[els[j],els[i]]; saveState();renderAll();renderLayerManager(); }
+  function openLayerManager() { renderLayerManager(); $('layerManagerModal').classList.add('show');setTimeout(()=>$('layerManagerModal').classList.add('visible'),10); }
+  $('openLayerManagerBtn').addEventListener('click',()=>{$('moreMenu').classList.remove('show');openLayerManager();});
+  $('closeLayerManager').addEventListener('click',closeLayerManager);
+  $('layerMoveUpBtn').addEventListener('click',()=>{const e=getSelectedEls()[0];if(e)moveLayerBy(e.id,1);});
+  $('layerMoveDownBtn').addEventListener('click',()=>{const e=getSelectedEls()[0];if(e)moveLayerBy(e.id,-1);});
+  $('layerFrontBtn').addEventListener('click',()=>{const e=getSelectedEls()[0];if(e){bringToFront(e.id);renderLayerManager();}});
+  $('layerBackBtn').addEventListener('click',()=>{const e=getSelectedEls()[0];if(e){sendToBack(e.id);renderLayerManager();}});
+  // Atajos de teclado de historial también funcionan en teclado físico.
+  document.addEventListener('keydown',e=>{const tag=(e.target&&e.target.tagName||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key.toLowerCase()==='z'&&!['input','textarea','select'].includes(tag)){e.preventDefault();undo();}else if((e.ctrlKey||e.metaKey)&&(e.key.toLowerCase()==='y'||(e.shiftKey&&e.key.toLowerCase()==='z'))&&!['input','textarea','select'].includes(tag)){e.preventDefault();redo();}});
+
+  // Herramienta local de mejora de imagen y OCR. El procesamiento visual ocurre en Canvas;
+  // el motor OCR se carga bajo demanda desde CDN y necesita conexión.
+  let enhanceWorkingCanvas = null, enhanceSourceElId = null, tesseractLoadPromise = null;
+  function openImageEnhancer() {
+    const selected = getSelectedEls().find(el => el.src && /^data:image\//i.test(el.src));
+    enhanceSourceElId = selected ? selected.id : null;
+    $('enhanceSourceInfo').textContent = selected ? `Imagen seleccionada: ${selected.wCm.toFixed(1)} × ${selected.hCm.toFixed(1)} cm` : 'Selecciona primero una imagen del lienzo. También puedes usar el OCR solo si hay una imagen seleccionada.';
+    enhanceWorkingCanvas = null; $('enhanceApplyBtn').disabled = true; $('enhanceInsertTextBtn').disabled = true;
+    $('enhanceOcrText').value = ''; $('enhanceOcrStatus').textContent = 'El texto reconocido aparecerá aquí para que puedas corregirlo.';
+    $('enhancePreviewCanvas').width = 1; $('enhancePreviewCanvas').height = 1;
+    $('imageEnhancerModal').classList.add('show'); setTimeout(() => $('imageEnhancerModal').classList.add('visible'), 10);
+  }
+  function closeImageEnhancer() { const m=$('imageEnhancerModal'); m.classList.remove('visible'); setTimeout(()=>m.classList.remove('show'),250); }
+  function selectedEnhanceImage() { return enhanceSourceElId ? findEl(enhanceSourceElId) : null; }
+  $('openImageEnhancerBtn').addEventListener('click', () => { $('moreMenu').classList.remove('show'); openImageEnhancer(); });
+  $('closeImageEnhancer').addEventListener('click', closeImageEnhancer);
+  $('enhanceSharp').addEventListener('input', e => $('enhanceSharpVal').textContent = `${e.target.value}%`);
+  $('enhanceContrast').addEventListener('input', e => $('enhanceContrastVal').textContent = `${e.target.value}%`);
+  $('enhanceBrightness').addEventListener('input', e => $('enhanceBrightnessVal').textContent = `${e.target.value}%`);
+  function sharpenCanvas(canvas, amount) {
+    if (amount <= 0) return canvas;
+    const ctx=canvas.getContext('2d',{willReadFrequently:true}), w=canvas.width,h=canvas.height;
+    if (w*h > 12000000) return canvas; // evita consumir demasiada memoria en móviles
+    const src=ctx.getImageData(0,0,w,h), out=ctx.createImageData(w,h), d=src.data, o=out.data, a=amount/100;
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++) { const i=(y*w+x)*4; for(let c=0;c<3;c++) { const center=d[i+c]; const left=d[(y*w+Math.max(0,x-1))*4+c], right=d[(y*w+Math.min(w-1,x+1))*4+c], up=d[(Math.max(0,y-1)*w+x)*4+c], down=d[(Math.min(h-1,y+1)*w+x)*4+c]; o[i+c]=Math.max(0,Math.min(255,center+(4*center-left-right-up-down)*a)); } o[i+3]=d[i+3]; }
+    ctx.putImageData(out,0,0); return canvas;
+  }
+  $('enhancePreviewBtn').addEventListener('click', async () => {
+    const el=selectedEnhanceImage(); if(!el) { $('enhanceOcrStatus').textContent='No hay imagen seleccionada. Selecciona una imagen y vuelve a abrir la herramienta.'; return; }
+    try {
+      showLoading('Mejorando imagen…'); const img=await getLoadedImage(el.src);
+      const scale=Number($('enhanceScale').value)||2, maxSide=5000;
+      const factor=Math.min(scale,maxSide/Math.max(img.naturalWidth,img.naturalHeight),Math.sqrt(12000000/(img.naturalWidth*img.naturalHeight)));
+      const c=document.createElement('canvas'); c.width=Math.max(1,Math.round(img.naturalWidth*factor)); c.height=Math.max(1,Math.round(img.naturalHeight*factor));
+      const ctx=c.getContext('2d',{willReadFrequently:true}); ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+      ctx.filter=`contrast(${$('enhanceContrast').value}%) brightness(${$('enhanceBrightness').value}%)`; ctx.drawImage(img,0,0,c.width,c.height); ctx.filter='none';
+      sharpenCanvas(c,Number($('enhanceSharp').value)); enhanceWorkingCanvas=c;
+      const preview=$('enhancePreviewCanvas'); preview.width=c.width; preview.height=c.height; preview.getContext('2d').drawImage(c,0,0);
+      $('enhanceApplyBtn').disabled=false; $('enhanceOcrStatus').textContent=`Vista previa lista: ${c.width} × ${c.height} píxeles. Revisa antes de aplicar.`;
+      hideLoading();
+    } catch(err) { hideLoading(); $('enhanceOcrStatus').textContent='No se pudo procesar esta imagen.'; }
+  });
+  $('enhanceApplyBtn').addEventListener('click', () => {
+    const el=selectedEnhanceImage(); if(!el || !enhanceWorkingCanvas) return;
+    try { const previousSrc=el.src; el.src=enhanceWorkingCanvas.toDataURL('image/jpeg',0.96); imgCache.delete(previousSrc); thumbCache.delete(currentPage().id); saveState(); renderAll(); $('enhanceSourceInfo').textContent=`Mejora aplicada: ${enhanceWorkingCanvas.width} × ${enhanceWorkingCanvas.height} px`; $('enhanceApplyBtn').disabled=true; sfx.success(); }
+    catch(err) { $('enhanceOcrStatus').textContent='No se pudo aplicar. Prueba una ampliación menor para ahorrar memoria.'; }
+  });
+  async function loadTesseract() {
+    if(window.Tesseract) return window.Tesseract;
+    if(!tesseractLoadPromise) tesseractLoadPromise=new Promise((resolve,reject)=>{ const sc=document.createElement('script'); sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'; sc.onload=()=>window.Tesseract?resolve(window.Tesseract):reject(new Error('OCR no disponible')); sc.onerror=()=>reject(new Error('No se pudo cargar OCR')); document.head.appendChild(sc); });
+    return tesseractLoadPromise;
+  }
+  $('enhanceOcrBtn').addEventListener('click', async () => {
+    const el=selectedEnhanceImage(); if(!el) { $('enhanceOcrStatus').textContent='Selecciona una imagen del lienzo primero.'; return; }
+    try {
+      $('enhanceOcrBtn').disabled=true; $('enhanceOcrStatus').textContent='Cargando reconocimiento de texto…';
+      const T=await loadTesseract(); let source=enhanceWorkingCanvas;
+      if(!source) { const img=await getLoadedImage(el.src); source=document.createElement('canvas'); const factor=Math.min(2,4000/Math.max(img.naturalWidth,img.naturalHeight)); source.width=Math.round(img.naturalWidth*factor); source.height=Math.round(img.naturalHeight*factor); const cx=source.getContext('2d'); cx.imageSmoothingEnabled=true; cx.imageSmoothingQuality='high'; cx.drawImage(img,0,0,source.width,source.height); }
+      $('enhanceOcrStatus').textContent='Reconociendo texto… puede tardar en el celular.';
+      const result=await T.recognize(source,'spa+eng',{logger:m=>{if(m.status) $('enhanceOcrStatus').textContent=`OCR: ${m.status}${m.progress!=null?' '+Math.round(m.progress*100)+'%':''}`;}});
+      $('enhanceOcrText').value=(result.data.text||'').trim(); $('enhanceInsertTextBtn').disabled=!$('enhanceOcrText').value.trim();
+      $('enhanceOcrStatus').textContent=$('enhanceOcrText').value.trim()?'Reconocimiento terminado. Corrige errores antes de crear el texto editable.':'No se detectó texto con suficiente confianza. Prueba más contraste o enfoque.';
+    } catch(err) { $('enhanceOcrStatus').textContent='No se pudo ejecutar el OCR. Comprueba tu conexión y vuelve a intentarlo.'; }
+    finally { $('enhanceOcrBtn').disabled=false; }
+  });
+  $('enhanceOcrText').addEventListener('input',()=> $('enhanceInsertTextBtn').disabled=!$('enhanceOcrText').value.trim());
+  $('enhanceInsertTextBtn').addEventListener('click', () => {
+    const text=$('enhanceOcrText').value.trim(), src=selectedEnhanceImage(); if(!text) return;
+    const P=getPaperCm(), el={id:++elCounter,type:'text',text,xCm:src?Math.min(P.w-1,src.xCm+src.wCm+0.2):1,yCm:src?src.yCm:1,wCm:src?Math.max(3,Math.min(src.wCm,P.w*0.8)):Math.min(12,P.w-2),hCm:src?Math.max(2,Math.min(src.hCm,P.h*0.35)):4,mode:'stretch',rot:0};
+    sanitizeEl(el); fitText(el); currentPage().els.push(el); selectedIds=new Set([el.id]); saveState(); renderAll(); closeImageEnhancer(); startInlineEdit(el.id,true);
+  });
 
   const pdfReaderState = {
     pdfDoc: null, numPages: 0, currentPage: 1, scale: 1.0, fitScale: 1,
@@ -4318,6 +4454,56 @@ ctx.restore();
   if (vk) vk.addEventListener('geometrychange', kbSoon);
   window.addEventListener('scroll', () => { if (window.scrollX || window.scrollY) window.scrollTo(0, 0); }, { passive: true });
 
+  // Gestos globales durante edición: el zoom/pan de dos dedos funciona incluso si los dedos
+  // caen sobre el texto o fuera del borde de la hoja. Los controles siguen recibiendo sus toques.
+  const editPointers = new Map();
+  const editPinch = { active: false, startDist: 1, startZoom: 1, startMidX: 0, startMidY: 0, startPanX: 0, startPanY: 0 };
+  function isEditGestureControl(target) {
+    return !!(target && target.closest && target.closest('#kbMini, #kbMiniRestore, #edDone, #edBar, #edBarRestore, #cpk, header, .inspector, .modal, .confirm-modal, .context-menu, .thumbnails-bar, button, input, select'));
+  }
+  document.addEventListener('pointerdown', (e) => {
+    if (!edTA || isEditGestureControl(e.target)) return;
+    editPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (editPointers.size >= 2) {
+      const pts = Array.from(editPointers.values());
+      const midX = (pts[0].x + pts[1].x) / 2, midY = (pts[0].y + pts[1].y) / 2;
+      editPinch.startDist = Math.max(1, Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y));
+      editPinch.startZoom = zoomScale; editPinch.startMidX = midX; editPinch.startMidY = midY;
+      editPinch.startPanX = panX; editPinch.startPanY = panY; editPinch.active = true;
+      cancelTapTimer(); gesture.pointers.clear(); gesture.pinch.active = false;
+      gesture.drag.active = false; gesture.resize.active = false; gesture.marquee.active = false;
+      if (gesture.marquee.box) { gesture.marquee.box.remove(); gesture.marquee.box = null; }
+      e.preventDefault(); e.stopImmediatePropagation();
+    }
+  }, true);
+  document.addEventListener('pointermove', (e) => {
+    if (!edTA || !editPointers.has(e.pointerId)) return;
+    editPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (!editPinch.active || editPointers.size < 2) return;
+    const pts = Array.from(editPointers.values());
+    const dist = Math.max(1, Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y));
+    const midX = (pts[0].x + pts[1].x) / 2, midY = (pts[0].y + pts[1].y) / 2;
+    const wrapper = $('stage-wrapper'), rect = wrapper.getBoundingClientRect();
+    const ratio = dist / editPinch.startDist;
+    const nextZoom = Math.max(0.2, Math.min(2.0, editPinch.startZoom * ratio));
+    const anchorX = (editPinch.startMidX - rect.left - editPinch.startPanX) / editPinch.startZoom;
+    const anchorY = (editPinch.startMidY - rect.top - editPinch.startPanY) / editPinch.startZoom;
+    zoomScale = nextZoom;
+    panX = midX - rect.left - anchorX * nextZoom;
+    panY = midY - rect.top - anchorY * nextZoom;
+    applyStageTransform();
+    const qz = $('quickZoomVal'); if (qz) qz.textContent = Math.round(zoomScale * 100) + '%';
+    placeEd(); e.preventDefault(); e.stopImmediatePropagation();
+  }, true);
+  const finishEditPointer = (e) => {
+    if (!editPointers.has(e.pointerId)) return;
+    editPointers.delete(e.pointerId);
+    if (editPointers.size < 2) editPinch.active = false;
+    if (editPinch.active || editPointers.size > 0) { e.preventDefault(); e.stopImmediatePropagation(); }
+  };
+  document.addEventListener('pointerup', finishEditPointer, true);
+  document.addEventListener('pointercancel', finishEditPointer, true);
+
   document.addEventListener('pointerdown', (e) => {
     // Tocar el lienzo durante la edición no debe cerrar el texto: permite reencuadrar/zoom.
     if (edTA && !e.target.closest('#inlineEd, #kbMini, #kbMiniRestore, #edDone, #edBar, #edBarRestore, #cpk, #stage-wrapper, .inspector, header')) endInlineEdit();
@@ -4355,7 +4541,7 @@ ctx.restore();
   function endInlineEdit() {
     if (!edTA) return;
     const ta = edTA, id = editingTextId; edTA = null; editingTextId = null; ta.remove();
-    edPanY0 = null; edPanelHidden = false; edDock = false; mini.classList.remove('show'); miniRestore.style.display = 'none'; edBar.classList.remove('show'); edBarRestore.style.display = 'none';
+    edPanY0 = null; edPanelHidden = false; edDock = false; editPointers.clear(); editPinch.active = false; mini.classList.remove('show'); miniRestore.style.display = 'none'; edBar.classList.remove('show'); edBarRestore.style.display = 'none';
     const el = findEl(id);
     if (el && !el.flow && !el.text.trim()) { el.text = edOrig && edOrig.trim() ? edOrig : 'Texto'; sanitizeGen(el); }
     edDone.style.display = 'none';
@@ -4373,9 +4559,11 @@ ctx.restore();
   edBarRestore.addEventListener('click', () => { edPanelHidden = false; edBarRestore.style.display = 'none'; if (edTA) { placeEd(); try { edTA.focus({preventScroll:true}); } catch(_) {} } });
   function placeBar(el, kt, covered) {
     const h = edBar.offsetHeight || 42;
-    // Evitar dos barras apiladas encima del teclado: al editar texto se prioriza el panel blanco editable.
-    if (mini.classList.contains('show') && edTA && !edPanelHidden) {
-      edBar.classList.remove('show'); edBarRestore.style.display = 'none'; return;
+    // En edición directa solo se muestra el panel blanco "Texto"; evita una segunda barra sobre el teclado.
+    if (edTA) {
+      edBar.classList.remove('show');
+      edBarRestore.style.display = 'none';
+      return;
     }
     edBar.style.top = Math.max(6, (kt == null ? window.innerHeight : kt) - h - (mini.classList.contains('show') ? mini.offsetHeight + 14 : 6)) + 'px';
     if (edPanelHidden) { edBar.classList.remove('show'); edBarRestore.style.display = 'block'; edBarRestore.style.top = Math.max(6, (kt == null ? window.innerHeight : kt) - 44) + 'px'; return; }
@@ -5668,8 +5856,8 @@ document.addEventListener('pointerdown', (e) => {
     try {
       const sheets = await psBuildAll(), p = getPaperCm(), w = window.open('', '_blank');
       if (!w) throw new Error('Popup bloqueado');
-      const pages = sheets.map(sh => `<img src="${sh.cv.toDataURL(psMime(), 0.92)}">`).join('');
-      w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Imprimir póster</title><style>@page{size:${p.w}cm ${p.h}cm;margin:0}html,body{margin:0;padding:0}img{width:${p.w}cm;height:${p.h}cm;display:block;page-break-after:always}img:last-child{page-break-after:auto}</style></head><body>${pages}<script>window.onload=()=>{window.focus();window.print()}<\/script></body></html>`);
+      const pages = sheets.map(sh => `<section class="sheet"><img src="${sh.cv.toDataURL(psMime(), 0.92)}"></section>`).join('');
+      w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Imprimir póster</title><style>@page{size:${p.w}cm ${p.h}cm;margin:0}html,body{margin:0;padding:0;width:100%;}.sheet{width:${p.w}cm;height:${p.h}cm;overflow:hidden;break-inside:avoid;page-break-inside:avoid}.sheet+.sheet{break-before:page;page-break-before:always}img{width:100%;height:100%;display:block;object-fit:fill;margin:0;padding:0;border:0}</style></head><body>${pages}<script>window.onload=()=>{window.focus();window.print()}<\/script></body></html>`);
       w.document.close(); hideLoading(); sfx.success();
     } catch (err) { hideLoading(); sfx.error(); $('psInfo').textContent = 'No se pudo abrir la ventana de impresión. Permite las ventanas emergentes.'; $('psInfo').classList.add('warn'); }
   }
