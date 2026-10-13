@@ -618,6 +618,20 @@
   #posterModal .ps-axis label { display:flex; justify-content:space-between; gap:8px; align-items:center; font-size:12px; }
   #posterModal .ps-axis input[type=range] { width:100%; min-height:32px; margin:3px 0 0; touch-action:pan-x; }
   #posterModal input, #posterModal select, #posterModal button { scroll-margin-block: 12px; }
+
+  /* Mejorador: controles compactos y seguros en pantallas móviles */
+  #imageEnhancerModal { padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)); align-items: flex-start; }
+  #imageEnhancerModal .modalbox { width: min(100%, 460px); max-width: 460px; max-height: calc(100dvh - 16px); overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; box-sizing: border-box; padding: 13px; margin: 0 auto; }
+  #imageEnhancerModal .modalbox > * { min-width: 0; max-width: 100%; box-sizing: border-box; }
+  #imageEnhancerModal .modalbox p { padding-right: 22px; }
+  #imageEnhancerModal select, #imageEnhancerModal textarea { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
+  #imageEnhancerModal .enhance-control-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 7px 10px; }
+  #imageEnhancerModal .enhance-control-grid > div { min-width: 0; }
+  #imageEnhancerModal .enhance-control-grid input[type=range] { display:block; width:100%; min-width:0; margin:5px 0; }
+  #imageEnhancerModal .enhance-actions { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:7px; margin-top:8px; }
+  #imageEnhancerModal .enhance-actions .btn { min-width:0; width:100%; max-width:100%; white-space:normal; overflow-wrap:anywhere; line-height:1.2; padding:9px 7px; font-size:12px; }
+  #imageEnhancerModal #enhancePreviewCanvas { max-width:100%; }
+  @media (max-width:380px) { #imageEnhancerModal .modalbox { padding:10px; } #imageEnhancerModal .enhance-actions { grid-template-columns:minmax(0,1fr); } #imageEnhancerModal .enhance-control-grid { gap:5px 8px; } #imageEnhancerModal .modalbox h2 { padding-right:20px; font-size:14px; } }
 </style>
 </head>
 
@@ -1049,17 +1063,18 @@
       <button class="closebtn" id="closeImageEnhancer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
       <h2>Mejorador de imagen y texto</h2>
       <p style="font-size:12px;color:var(--muted);line-height:1.45">Selecciona una imagen del lienzo antes de abrir esta herramienta. El aumento de resolución y el enfoque pueden mejorar la legibilidad, pero no recuperan detalles que no existen en el original. El OCR requiere conexión para cargar el motor de reconocimiento.</p>
-      <div id="enhanceSourceInfo" style="font-size:11px;color:var(--muted);margin:8px 0">Ninguna imagen seleccionada.</div>
-      <label>Ampliación</label><select id="enhanceScale"><option value="1">1× · tamaño original</option><option value="1.5">1,5×</option><option value="2" selected>2×</option><option value="3">3× (más memoria)</option></select>
-      <label>Enfoque <span id="enhanceSharpVal">35%</span></label><input type="range" id="enhanceSharp" min="0" max="100" value="35" step="5" />
-      <label>Contraste <span id="enhanceContrastVal">110%</span></label><input type="range" id="enhanceContrast" min="70" max="160" value="110" step="5" />
-      <label>Brillo <span id="enhanceBrightnessVal">100%</span></label><input type="range" id="enhanceBrightness" min="70" max="140" value="100" step="5" />
-      <div class="row" style="margin-top:10px"><button class="btn full" id="enhancePreviewBtn">Procesar vista previa</button><button class="btn full cyan" id="enhanceApplyBtn" disabled>Aplicar a imagen</button></div>
-      <canvas id="enhancePreviewCanvas" style="display:block;width:100%;max-height:34vh;object-fit:contain;background:#e5e7eb;border-radius:8px;margin-top:10px"></canvas>
-      <div class="divider" style="margin:12px 0;border-top:1px solid var(--line)"></div>
-      <h3 style="font-size:14px;margin:4px 0">Reconocimiento inteligente de texto (OCR)</h3>
-      <div class="row"><button class="btn full" id="enhanceOcrBtn">Reconocer texto</button><button class="btn full" id="enhanceInsertTextBtn" disabled>Crear texto editable</button></div>
-      <div id="enhanceOcrStatus" style="font-size:11px;color:var(--muted);margin:7px 0">El texto reconocido aparecerá abajo para que puedas corregirlo.</div>
+      <div id="enhanceSourceInfo" style="font-size:11px;color:var(--muted);margin:6px 0">Ninguna imagen seleccionada.</div>
+      <label for="enhanceScope">Aplicar a</label><select id="enhanceScope"><option value="selected">Imagen(es) seleccionada(s)</option><option value="page">Todas las imágenes de esta página</option><option value="all">Todas las imágenes de todas las páginas</option></select>
+      <div class="enhance-control-grid"><div><label for="enhanceScale">Ampliación</label><select id="enhanceScale"><option value="1">1× original</option><option value="1.5">1,5×</option><option value="2" selected>2×</option><option value="3">3× · alta memoria</option></select></div>
+      <div><label>Enfoque <span id="enhanceSharpVal">35%</span></label><input type="range" id="enhanceSharp" min="0" max="100" value="35" step="5" /></div>
+      <div><label>Contraste <span id="enhanceContrastVal">110%</span></label><input type="range" id="enhanceContrast" min="70" max="160" value="110" step="5" /></div>
+      <div><label>Brillo <span id="enhanceBrightnessVal">100%</span></label><input type="range" id="enhanceBrightness" min="70" max="140" value="100" step="5" /></div></div>
+      <div class="enhance-actions"><button class="btn" id="enhancePreviewBtn">Vista previa</button><button class="btn cyan" id="enhanceApplyBtn" disabled>Aplicar a todas las elegidas</button></div>
+      <canvas id="enhancePreviewCanvas" style="display:block;width:100%;height:auto;max-height:25vh;object-fit:contain;background:#e5e7eb;border-radius:8px;margin-top:8px"></canvas>
+      <div class="divider" style="margin:10px 0;border-top:1px solid var(--line)"></div>
+      <h3 style="font-size:13px;margin:4px 0">Reconocimiento inteligente de texto (OCR)</h3>
+      <div class="enhance-actions"><button class="btn" id="enhanceOcrBtn">Reconocer texto</button><button class="btn" id="enhanceInsertTextBtn" disabled>Crear texto editable</button></div>
+      <div id="enhanceOcrStatus" style="font-size:11px;color:var(--muted);margin:6px 0">El OCR analizará las imágenes incluidas en “Aplicar a”. Requiere Internet la primera vez.</div>
       <textarea id="enhanceOcrText" rows="5" placeholder="Texto reconocido…" style="width:100%;box-sizing:border-box;resize:vertical"></textarea>
     </div>
   </div>
@@ -3639,76 +3654,92 @@ ctx.restore();
   // Atajos de teclado de historial también funcionan en teclado físico.
   document.addEventListener('keydown',e=>{const tag=(e.target&&e.target.tagName||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key.toLowerCase()==='z'&&!['input','textarea','select'].includes(tag)){e.preventDefault();undo();}else if((e.ctrlKey||e.metaKey)&&(e.key.toLowerCase()==='y'||(e.shiftKey&&e.key.toLowerCase()==='z'))&&!['input','textarea','select'].includes(tag)){e.preventDefault();redo();}});
 
-  // Herramienta local de mejora de imagen y OCR. El procesamiento visual ocurre en Canvas;
-  // el motor OCR se carga bajo demanda desde CDN y necesita conexión.
+  // Mejorador por lotes y OCR. Procesamiento Canvas local; Tesseract se carga bajo demanda.
   let enhanceWorkingCanvas = null, enhanceSourceElId = null, tesseractLoadPromise = null;
+  function enhancerImages() { return state.pages.flatMap((p,pi)=>p.els.filter(el=>el.src && /^data:image\//i.test(el.src)).map(el=>({el,pageIndex:pi}))); }
+  function enhancerTargets() {
+    const scope=$('enhanceScope').value, all=enhancerImages();
+    if(scope==='all') return all;
+    if(scope==='page') return all.filter(x=>x.pageIndex===state.currentPageIndex);
+    const ids=new Set([...selectedIds]);
+    if(enhanceSourceElId) ids.add(enhanceSourceElId);
+    return all.filter(x=>ids.has(x.el.id));
+  }
+  function updateEnhanceTargetInfo() {
+    const targets=enhancerTargets();
+    $('enhanceSourceInfo').textContent=targets.length ? `${targets.length} imagen${targets.length===1?'':'es'} objetivo · ${$('enhanceScope').selectedOptions[0].textContent}` : 'No hay imágenes en el alcance elegido. Selecciona una imagen o cambia el alcance.';
+    $('enhanceApplyBtn').textContent=targets.length>1?'Aplicar a '+targets.length+' imágenes':'Aplicar mejora';
+    $('enhanceApplyBtn').disabled=!enhanceWorkingCanvas || !targets.length;
+    $('enhanceOcrBtn').disabled=!targets.length;
+  }
   function openImageEnhancer() {
-    const selected = getSelectedEls().find(el => el.src && /^data:image\//i.test(el.src));
-    enhanceSourceElId = selected ? selected.id : null;
-    $('enhanceSourceInfo').textContent = selected ? `Imagen seleccionada: ${selected.wCm.toFixed(1)} × ${selected.hCm.toFixed(1)} cm` : 'Selecciona primero una imagen del lienzo. También puedes usar el OCR solo si hay una imagen seleccionada.';
-    enhanceWorkingCanvas = null; $('enhanceApplyBtn').disabled = true; $('enhanceInsertTextBtn').disabled = true;
-    $('enhanceOcrText').value = ''; $('enhanceOcrStatus').textContent = 'El texto reconocido aparecerá aquí para que puedas corregirlo.';
-    $('enhancePreviewCanvas').width = 1; $('enhancePreviewCanvas').height = 1;
-    $('imageEnhancerModal').classList.add('show'); setTimeout(() => $('imageEnhancerModal').classList.add('visible'), 10);
+    const selected=getSelectedEls().find(el=>el.src && /^data:image\//i.test(el.src));
+    enhanceSourceElId=selected?selected.id:null;
+    $('enhanceScope').value=selected?'selected':'page';
+    enhanceWorkingCanvas=null; $('enhanceApplyBtn').disabled=true; $('enhanceInsertTextBtn').disabled=true;
+    $('enhanceOcrText').value=''; $('enhanceOcrStatus').textContent='El OCR analizará las imágenes incluidas en “Aplicar a”.';
+    $('enhancePreviewCanvas').width=1; $('enhancePreviewCanvas').height=1;
+    updateEnhanceTargetInfo();
+    $('imageEnhancerModal').classList.add('show'); setTimeout(()=>$('imageEnhancerModal').classList.add('visible'),10);
   }
   function closeImageEnhancer() { const m=$('imageEnhancerModal'); m.classList.remove('visible'); setTimeout(()=>m.classList.remove('show'),250); }
-  function selectedEnhanceImage() { return enhanceSourceElId ? findEl(enhanceSourceElId) : null; }
-  $('openImageEnhancerBtn').addEventListener('click', () => { $('moreMenu').classList.remove('show'); openImageEnhancer(); });
-  $('closeImageEnhancer').addEventListener('click', closeImageEnhancer);
-  $('enhanceSharp').addEventListener('input', e => $('enhanceSharpVal').textContent = `${e.target.value}%`);
-  $('enhanceContrast').addEventListener('input', e => $('enhanceContrastVal').textContent = `${e.target.value}%`);
-  $('enhanceBrightness').addEventListener('input', e => $('enhanceBrightnessVal').textContent = `${e.target.value}%`);
-  function sharpenCanvas(canvas, amount) {
-    if (amount <= 0) return canvas;
-    const ctx=canvas.getContext('2d',{willReadFrequently:true}), w=canvas.width,h=canvas.height;
-    if (w*h > 12000000) return canvas; // evita consumir demasiada memoria en móviles
-    const src=ctx.getImageData(0,0,w,h), out=ctx.createImageData(w,h), d=src.data, o=out.data, a=amount/100;
-    for(let y=0;y<h;y++) for(let x=0;x<w;x++) { const i=(y*w+x)*4; for(let c=0;c<3;c++) { const center=d[i+c]; const left=d[(y*w+Math.max(0,x-1))*4+c], right=d[(y*w+Math.min(w-1,x+1))*4+c], up=d[(Math.max(0,y-1)*w+x)*4+c], down=d[(Math.min(h-1,y+1)*w+x)*4+c]; o[i+c]=Math.max(0,Math.min(255,center+(4*center-left-right-up-down)*a)); } o[i+3]=d[i+3]; }
-    ctx.putImageData(out,0,0); return canvas;
+  function selectedEnhanceImage() { return enhanceSourceElId ? findEl(enhanceSourceElId) : (enhancerTargets()[0]?.el || null); }
+  $('openImageEnhancerBtn').addEventListener('click',()=>{$('moreMenu').classList.remove('show');openImageEnhancer();});
+  $('closeImageEnhancer').addEventListener('click',closeImageEnhancer);
+  $('enhanceScope').addEventListener('change',()=>{enhanceWorkingCanvas=null;$('enhanceApplyBtn').disabled=true;updateEnhanceTargetInfo();});
+  $('enhanceSharp').addEventListener('input',e=>$('enhanceSharpVal').textContent=`${e.target.value}%`);
+  $('enhanceContrast').addEventListener('input',e=>$('enhanceContrastVal').textContent=`${e.target.value}%`);
+  $('enhanceBrightness').addEventListener('input',e=>$('enhanceBrightnessVal').textContent=`${e.target.value}%`);
+  function sharpenCanvas(canvas,amount) {
+    if(amount<=0)return canvas;
+    const ctx=canvas.getContext('2d',{willReadFrequently:true}),w=canvas.width,h=canvas.height;
+    if(w*h>10000000)return canvas;
+    const src=ctx.getImageData(0,0,w,h),out=ctx.createImageData(w,h),d=src.data,o=out.data,a=amount/100;
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4;for(let c=0;c<3;c++){const center=d[i+c],left=d[(y*w+Math.max(0,x-1))*4+c],right=d[(y*w+Math.min(w-1,x+1))*4+c],up=d[(Math.max(0,y-1)*w+x)*4+c],down=d[(Math.min(h-1,y+1)*w+x)*4+c];o[i+c]=Math.max(0,Math.min(255,center+(4*center-left-right-up-down)*a));}o[i+3]=d[i+3];}
+    ctx.putImageData(out,0,0);return canvas;
   }
-  $('enhancePreviewBtn').addEventListener('click', async () => {
-    const el=selectedEnhanceImage(); if(!el) { $('enhanceOcrStatus').textContent='No hay imagen seleccionada. Selecciona una imagen y vuelve a abrir la herramienta.'; return; }
-    try {
-      showLoading('Mejorando imagen…'); const img=await getLoadedImage(el.src);
-      const scale=Number($('enhanceScale').value)||2, maxSide=5000;
-      const factor=Math.min(scale,maxSide/Math.max(img.naturalWidth,img.naturalHeight),Math.sqrt(12000000/(img.naturalWidth*img.naturalHeight)));
-      const c=document.createElement('canvas'); c.width=Math.max(1,Math.round(img.naturalWidth*factor)); c.height=Math.max(1,Math.round(img.naturalHeight*factor));
-      const ctx=c.getContext('2d',{willReadFrequently:true}); ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
-      ctx.filter=`contrast(${$('enhanceContrast').value}%) brightness(${$('enhanceBrightness').value}%)`; ctx.drawImage(img,0,0,c.width,c.height); ctx.filter='none';
-      sharpenCanvas(c,Number($('enhanceSharp').value)); enhanceWorkingCanvas=c;
-      const preview=$('enhancePreviewCanvas'); preview.width=c.width; preview.height=c.height; preview.getContext('2d').drawImage(c,0,0);
-      $('enhanceApplyBtn').disabled=false; $('enhanceOcrStatus').textContent=`Vista previa lista: ${c.width} × ${c.height} píxeles. Revisa antes de aplicar.`;
-      hideLoading();
-    } catch(err) { hideLoading(); $('enhanceOcrStatus').textContent='No se pudo procesar esta imagen.'; }
-  });
-  $('enhanceApplyBtn').addEventListener('click', () => {
-    const el=selectedEnhanceImage(); if(!el || !enhanceWorkingCanvas) return;
-    try { const previousSrc=el.src; el.src=enhanceWorkingCanvas.toDataURL('image/jpeg',0.96); imgCache.delete(previousSrc); thumbCache.delete(currentPage().id); saveState(); renderAll(); $('enhanceSourceInfo').textContent=`Mejora aplicada: ${enhanceWorkingCanvas.width} × ${enhanceWorkingCanvas.height} px`; $('enhanceApplyBtn').disabled=true; sfx.success(); }
-    catch(err) { $('enhanceOcrStatus').textContent='No se pudo aplicar. Prueba una ampliación menor para ahorrar memoria.'; }
-  });
-  async function loadTesseract() {
-    if(window.Tesseract) return window.Tesseract;
-    if(!tesseractLoadPromise) tesseractLoadPromise=new Promise((resolve,reject)=>{ const sc=document.createElement('script'); sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'; sc.onload=()=>window.Tesseract?resolve(window.Tesseract):reject(new Error('OCR no disponible')); sc.onerror=()=>reject(new Error('No se pudo cargar OCR')); document.head.appendChild(sc); });
-    return tesseractLoadPromise;
+  async function buildEnhancedCanvas(el) {
+    const img=await getLoadedImage(el.src), scale=Number($('enhanceScale').value)||2, maxSide=5000, maxPixels=9000000;
+    const factor=Math.max(0.1,Math.min(scale,maxSide/Math.max(img.naturalWidth,img.naturalHeight),Math.sqrt(maxPixels/(img.naturalWidth*img.naturalHeight))));
+    const c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.naturalWidth*factor));c.height=Math.max(1,Math.round(img.naturalHeight*factor));
+    const ctx=c.getContext('2d',{willReadFrequently:true});ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+    ctx.filter=`contrast(${$('enhanceContrast').value}%) brightness(${$('enhanceBrightness').value}%)`;ctx.drawImage(img,0,0,c.width,c.height);ctx.filter='none';
+    sharpenCanvas(c,Number($('enhanceSharp').value));return c;
   }
-  $('enhanceOcrBtn').addEventListener('click', async () => {
-    const el=selectedEnhanceImage(); if(!el) { $('enhanceOcrStatus').textContent='Selecciona una imagen del lienzo primero.'; return; }
-    try {
-      $('enhanceOcrBtn').disabled=true; $('enhanceOcrStatus').textContent='Cargando reconocimiento de texto…';
-      const T=await loadTesseract(); let source=enhanceWorkingCanvas;
-      if(!source) { const img=await getLoadedImage(el.src); source=document.createElement('canvas'); const factor=Math.min(2,4000/Math.max(img.naturalWidth,img.naturalHeight)); source.width=Math.round(img.naturalWidth*factor); source.height=Math.round(img.naturalHeight*factor); const cx=source.getContext('2d'); cx.imageSmoothingEnabled=true; cx.imageSmoothingQuality='high'; cx.drawImage(img,0,0,source.width,source.height); }
-      $('enhanceOcrStatus').textContent='Reconociendo texto… puede tardar en el celular.';
-      const result=await T.recognize(source,'spa+eng',{logger:m=>{if(m.status) $('enhanceOcrStatus').textContent=`OCR: ${m.status}${m.progress!=null?' '+Math.round(m.progress*100)+'%':''}`;}});
-      $('enhanceOcrText').value=(result.data.text||'').trim(); $('enhanceInsertTextBtn').disabled=!$('enhanceOcrText').value.trim();
-      $('enhanceOcrStatus').textContent=$('enhanceOcrText').value.trim()?'Reconocimiento terminado. Corrige errores antes de crear el texto editable.':'No se detectó texto con suficiente confianza. Prueba más contraste o enfoque.';
-    } catch(err) { $('enhanceOcrStatus').textContent='No se pudo ejecutar el OCR. Comprueba tu conexión y vuelve a intentarlo.'; }
-    finally { $('enhanceOcrBtn').disabled=false; }
+  $('enhancePreviewBtn').addEventListener('click',async()=>{
+    const targets=enhancerTargets();if(!targets.length){$('enhanceOcrStatus').textContent='No hay imágenes en el alcance elegido.';return;}
+    try{showLoading('Procesando vista previa…');const c=await buildEnhancedCanvas(targets[0].el);enhanceWorkingCanvas=c;
+      const preview=$('enhancePreviewCanvas');preview.width=c.width;preview.height=c.height;preview.getContext('2d').drawImage(c,0,0);
+      $('enhanceOcrStatus').textContent=`Vista previa de la primera imagen: ${c.width} × ${c.height} px. Al aplicar, se procesarán las ${targets.length} imágenes objetivo.`;updateEnhanceTargetInfo();hideLoading();
+    }catch(err){hideLoading();$('enhanceOcrStatus').textContent='No se pudo procesar la vista previa. Prueba una ampliación menor.';}
+  });
+  $('enhanceApplyBtn').addEventListener('click',async()=>{
+    const targets=enhancerTargets();if(!targets.length||!enhanceWorkingCanvas)return;
+    const ok=targets.length<3 || await confirmAction('Aplicar mejora a varias imágenes',`Se procesarán ${targets.length} imágenes. Esto puede tardar y consumir memoria en el celular. ¿Continuar?`);if(!ok)return;
+    showLoading('Mejorando imágenes…');let done=0,failed=0;
+    try{for(const item of targets){try{const c=await buildEnhancedCanvas(item.el);const previousSrc=item.el.src;item.el.src=c.toDataURL('image/jpeg',0.96);imgCache.delete(previousSrc);done++;}catch(e){failed++;} $('loading-label').textContent=`Mejorando imagen ${done+failed} de ${targets.length}…`;await new Promise(r=>setTimeout(r,0));}
+      thumbCache.clear();saveState();renderAll();enhanceWorkingCanvas=null;updateEnhanceTargetInfo();$('enhanceOcrStatus').textContent=`Mejora aplicada a ${done} de ${targets.length} imágenes${failed?`; ${failed} no se pudieron procesar`:''}.`;sfx.success();
+    }catch(err){$('enhanceOcrStatus').textContent='Ocurrió un error al aplicar las mejoras.';}finally{hideLoading();}
+  });
+  async function loadTesseract(){if(window.Tesseract)return window.Tesseract;if(!tesseractLoadPromise)tesseractLoadPromise=new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';sc.onload=()=>window.Tesseract?resolve(window.Tesseract):reject(new Error('OCR no disponible'));sc.onerror=()=>reject(new Error('No se pudo cargar OCR'));document.head.appendChild(sc);});return tesseractLoadPromise;}
+  $('enhanceOcrBtn').addEventListener('click',async()=>{
+    const targets=enhancerTargets();if(!targets.length){$('enhanceOcrStatus').textContent='No hay imágenes para reconocer.';return;}
+    try{$('enhanceOcrBtn').disabled=true;$('enhanceOcrStatus').textContent='Cargando reconocimiento de texto…';const T=await loadTesseract(),results=[];
+      for(let i=0;i<targets.length;i++){const el=targets[i].el;$('enhanceOcrStatus').textContent=`Reconociendo imagen ${i+1} de ${targets.length}…`;
+        let source=(i===0&&enhanceWorkingCanvas)?enhanceWorkingCanvas:null;
+        if(!source){const img=await getLoadedImage(el.src),factor=Math.min(2,3500/Math.max(img.naturalWidth,img.naturalHeight));source=document.createElement('canvas');source.width=Math.max(1,Math.round(img.naturalWidth*factor));source.height=Math.max(1,Math.round(img.naturalHeight*factor));const cx=source.getContext('2d');cx.imageSmoothingEnabled=true;cx.imageSmoothingQuality='high';cx.filter='contrast(115%) brightness(102%)';cx.drawImage(img,0,0,source.width,source.height);cx.filter='none';}
+        const result=await T.recognize(source,'spa+eng',{logger:m=>{if(m.status)$('enhanceOcrStatus').textContent=`Imagen ${i+1}/${targets.length}: ${m.status}${m.progress!=null?' '+Math.round(m.progress*100)+'%':''}`;}});
+        const text=(result.data.text||'').trim();if(text)results.push(`--- Imagen ${i+1} · página ${targets[i].pageIndex+1} ---\n${text}`);
+        await new Promise(r=>setTimeout(r,0));
+      }
+      $('enhanceOcrText').value=results.join('\n\n');$('enhanceInsertTextBtn').disabled=!$('enhanceOcrText').value.trim();$('enhanceOcrStatus').textContent=results.length?`OCR terminado: se encontró texto en ${results.length} imagen(es). Revisa y corrige el resultado.`:'No se detectó texto. Prueba ajustar el contraste o el enfoque.';
+    }catch(err){$('enhanceOcrStatus').textContent='No se pudo ejecutar el OCR. Comprueba tu conexión e inténtalo de nuevo.';}finally{$('enhanceOcrBtn').disabled=false;updateEnhanceTargetInfo();}
   });
   $('enhanceOcrText').addEventListener('input',()=> $('enhanceInsertTextBtn').disabled=!$('enhanceOcrText').value.trim());
-  $('enhanceInsertTextBtn').addEventListener('click', () => {
-    const text=$('enhanceOcrText').value.trim(), src=selectedEnhanceImage(); if(!text) return;
-    const P=getPaperCm(), el={id:++elCounter,type:'text',text,xCm:src?Math.min(P.w-1,src.xCm+src.wCm+0.2):1,yCm:src?src.yCm:1,wCm:src?Math.max(3,Math.min(src.wCm,P.w*0.8)):Math.min(12,P.w-2),hCm:src?Math.max(2,Math.min(src.hCm,P.h*0.35)):4,mode:'stretch',rot:0};
-    sanitizeEl(el); fitText(el); currentPage().els.push(el); selectedIds=new Set([el.id]); saveState(); renderAll(); closeImageEnhancer(); startInlineEdit(el.id,true);
+  $('enhanceInsertTextBtn').addEventListener('click',()=>{
+    const text=$('enhanceOcrText').value.trim(),src=selectedEnhanceImage();if(!text)return;const P=getPaperCm();
+    const el={id:++elCounter,type:'text',text,xCm:src?Math.min(P.w-1,src.xCm+src.wCm+0.2):1,yCm:src?src.yCm:1,wCm:src?Math.max(3,Math.min(src.wCm,P.w*0.8)):Math.min(12,P.w-2),hCm:src?Math.max(2,Math.min(src.hCm,P.h*0.35)):4,mode:'stretch',rot:0};
+    sanitizeEl(el);fitText(el);currentPage().els.push(el);selectedIds=new Set([el.id]);saveState();renderAll();closeImageEnhancer();startInlineEdit(el.id,true);
   });
 
   const pdfReaderState = {
