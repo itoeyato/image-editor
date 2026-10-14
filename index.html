@@ -237,6 +237,7 @@
   .el img { width: 100%; height: 100%; display: block; pointer-events: none; transform-origin: center center; transition: transform 0.2s ease; }
   .el.show-overflow img { opacity: 0.85; }
   .el.selected { outline: var(--el-outline); outline-offset: 2px; }
+  /* Las guías de selección son solo de edición; nunca forman parte del arte exportado. */
   body.multiselect-mode .el.selected { outline: var(--el-outline-multi); }
   .el.grouped { outline: 1px solid rgba(16,185,129,0.4); outline-offset: 3px; }
   .el.grouped.selected { outline: var(--el-outline); }
@@ -620,6 +621,9 @@
   #posterModal input, #posterModal select, #posterModal button { scroll-margin-block: 12px; }
 
   /* Mejorador: controles compactos y seguros en pantallas móviles */
+  #posterTemplatesModal { padding:max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)); }
+  #posterTemplatesModal .modalbox { width:min(100%,460px); max-height:calc(100dvh - 16px); overflow-y:auto; overflow-x:hidden; padding:13px; margin:auto; }
+  #posterTemplatesModal input { min-width:0; max-width:100%; }
   #imageEnhancerModal { padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)); align-items: flex-start; }
   #imageEnhancerModal .modalbox { width: min(100%, 460px); max-width: 460px; max-height: calc(100dvh - 16px); overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; box-sizing: border-box; padding: 13px; margin: 0 auto; }
   #imageEnhancerModal .modalbox > * { min-width: 0; max-width: 100%; box-sizing: border-box; }
@@ -632,6 +636,13 @@
   #imageEnhancerModal .enhance-actions .btn { min-width:0; width:100%; max-width:100%; white-space:normal; overflow-wrap:anywhere; line-height:1.2; padding:9px 7px; font-size:12px; }
   #imageEnhancerModal #enhancePreviewCanvas { max-width:100%; }
   @media (max-width:380px) { #imageEnhancerModal .modalbox { padding:10px; } #imageEnhancerModal .enhance-actions { grid-template-columns:minmax(0,1fr); } #imageEnhancerModal .enhance-control-grid { gap:5px 8px; } #imageEnhancerModal .modalbox h2 { padding-right:20px; font-size:14px; } }
+@media (max-width: 360px) {
+  .quick-actions, .quick-toolbar, .toolbar-actions { flex-wrap: wrap; min-width: 0; max-width: 100%; }
+  .icon-btn { min-width: 36px; min-height: 36px; }
+  .topbar, .toolbar, .header-actions { max-width: 100%; box-sizing: border-box; }
+  html, body { overflow-x: hidden; }
+  .topbar button, .toolbar button, .header-actions button { touch-action: manipulation; }
+}
 </style>
 </head>
 
@@ -673,6 +684,7 @@
   <button id="resetAllBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L3 8"/></svg>Reiniciar todo</button>
   <button id="openCollageBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Plantillas collage</button>
   <button id="openLineDetectBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L3 21M9 3h12v12"/></svg>Detectar líneas</button>
+  <button id="openPosterTemplatesBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10M7 12h7M7 16h4"/></svg>Plantillas de póster</button>
   <button id="openImageEnhancerBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="4"/></svg>Mejorar imagen / OCR</button>
   <button id="openLayerManagerBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/></svg>Administrar capas</button>
   <label for="importPdfInput"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Importar PDF</label>
@@ -736,12 +748,6 @@
         </div>
       </div>
       <div class="panel" data-tag="Exportar">
-        <label>Calidad de exportación</label>
-        <select id="exportQuality">
-          <option value="0.8">80%</option>
-          <option value="0.92" selected>90%</option>
-          <option value="1.0">100%</option>
-        </select>
         <button class="cta" id="pdfBtn" style="margin-top:8px">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
           Generar PDF
@@ -1052,7 +1058,7 @@
 
   <div class="modal" id="layerManagerModal"><div class="modalbox">
     <button class="closebtn" id="closeLayerManager"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
-    <h2>Capas de la página</h2><p style="font-size:12px;color:var(--muted)">Toca una capa para seleccionarla. Usa las flechas para cambiar el orden de superposición.</p>
+    <h2>Capas de la página</h2><p style="font-size:12px;color:var(--muted)">Toca una capa para seleccionarla. Usa «Ocultar» para trabajar sin verla y ⋯ para renombrar, duplicar o cambiar su orden. Las capas ocultas no se exportan ni se imprimen.</p>
     <div id="layerManagerList" style="display:flex;flex-direction:column;gap:6px;max-height:48vh;overflow:auto;margin:10px 0"></div>
     <div class="row"><button class="btn full" id="layerMoveUpBtn">Subir una capa</button><button class="btn full" id="layerMoveDownBtn">Bajar una capa</button></div>
     <div class="row" style="margin-top:6px"><button class="btn full" id="layerFrontBtn">Al frente</button><button class="btn full" id="layerBackBtn">Al fondo</button></div>
@@ -1062,7 +1068,7 @@
     <div class="modalbox">
       <button class="closebtn" id="closeImageEnhancer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
       <h2>Mejorador de imagen y texto</h2>
-      <p style="font-size:12px;color:var(--muted);line-height:1.45">Selecciona una imagen del lienzo antes de abrir esta herramienta. El aumento de resolución y el enfoque pueden mejorar la legibilidad, pero no recuperan detalles que no existen en el original. El OCR requiere conexión para cargar el motor de reconocimiento.</p>
+      
       <div id="enhanceSourceInfo" style="font-size:11px;color:var(--muted);margin:6px 0">Ninguna imagen seleccionada.</div>
       <label for="enhanceScope">Aplicar a</label><select id="enhanceScope"><option value="selected">Imagen(es) seleccionada(s)</option><option value="page">Todas las imágenes de esta página</option><option value="all">Todas las imágenes de todas las páginas</option></select>
       <div class="enhance-control-grid"><div><label for="enhanceScale">Ampliación</label><select id="enhanceScale"><option value="1">1× original</option><option value="1.5">1,5×</option><option value="2" selected>2×</option><option value="3">3× · alta memoria</option></select></div>
@@ -1070,7 +1076,26 @@
       <div><label>Contraste <span id="enhanceContrastVal">110%</span></label><input type="range" id="enhanceContrast" min="70" max="160" value="110" step="5" /></div>
       <div><label>Brillo <span id="enhanceBrightnessVal">100%</span></label><input type="range" id="enhanceBrightness" min="70" max="140" value="100" step="5" /></div></div>
       <div class="enhance-actions"><button class="btn" id="enhancePreviewBtn">Vista previa</button><button class="btn cyan" id="enhanceApplyBtn" disabled>Aplicar a todas las elegidas</button></div>
-      <canvas id="enhancePreviewCanvas" style="display:block;width:100%;height:auto;max-height:25vh;object-fit:contain;background:#e5e7eb;border-radius:8px;margin-top:8px"></canvas>
+      <div style="margin-top:8px;padding:10px;border:1px solid var(--line);border-radius:10px">
+        <strong style="font-size:12px">Superresolución y restauración (funciona sin Internet)</strong>
+        <div class="enhance-control-grid" style="margin-top:6px">
+          <div><label for="srQuality">Calidad</label><select id="srQuality"><option value="fast">Rápida</option><option value="normal" selected>Equilibrada</option><option value="max">Máxima (más lenta)</option></select></div>
+          <div><label>Corregir desenfoque <span id="srBlurVal">50</span></label><input type="range" id="srBlur" min="0" max="100" value="50" step="5" /></div>
+          <div><label>Quitar ruido / JPEG <span id="srDenoiseVal">30</span></label><input type="range" id="srDenoise" min="0" max="100" value="30" step="5" /></div>
+        </div>
+        <div class="enhance-actions"><button class="btn" id="enhanceAiBtn" type="button">Generar vista previa</button><button class="btn cyan" id="enhanceAiApplyBtn" type="button" disabled>Aplicar resultado</button></div>
+        <progress id="enhanceAiProgress" max="100" value="0" style="width:100%;height:8px;display:block;margin-top:7px;accent-color:var(--accent)"></progress>
+        <div id="enhanceAiStatus" role="status" style="font-size:11px;margin-top:6px;color:var(--muted)">Usa la “Ampliación” de arriba (2× recomendado). Reconstruye bordes, reduce desenfoque, ruido y artefactos JPEG. Todo se calcula en tu teléfono.</div>
+      </div>
+      <div style="margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:10px">
+        <strong style="font-size:12px">Eliminar fondo inteligente</strong>
+        
+        <div class="row" style="align-items:end"><div><label for="bgRemoveColor">Color del fondo</label><input type="color" id="bgRemoveColor" value="#ffffff" /></div><div><label for="bgRemoveTolerance">Sensibilidad <span id="bgRemoveToleranceVal">35</span></label><input type="range" id="bgRemoveTolerance" min="5" max="120" value="35" step="5" /></div></div><div class="row" style="align-items:end;margin-top:6px"><div><label for="bgRemoveMode">Método</label><select id="bgRemoveMode"><option value="connected" selected>Fondo conectado (respeta bordes)</option><option value="global">Todo el color similar</option></select></div><div><label for="bgRemoveFeather">Suavizar borde <span id="bgRemoveFeatherVal">2 px</span></label><input type="range" id="bgRemoveFeather" min="0" max="6" value="2" step="1" /></div></div>
+        <div class="enhance-actions"><button class="btn" id="bgSampleCornerBtn" type="button">Tomar color de esquina</button><button class="btn cyan" id="bgRemoveApplyBtn" type="button">Vista previa</button><button class="btn" id="bgRemoveCommitBtn" type="button" disabled>Aplicar recorte</button></div>
+        <div class="enhance-actions" style="margin-top:7px"><button class="btn" id="enhanceToolUndoBtn" type="button" disabled>↶ Deshacer</button><button class="btn" id="enhanceToolRedoBtn" type="button" disabled>↷ Rehacer</button></div>
+        <div id="bgRemoveStatus" role="status" style="font-size:11px;color:var(--muted);margin-top:6px">Selecciona una imagen. El resultado conserva transparencia y puede deshacerse con Deshacer.</div>
+      </div>
+      <canvas id="enhancePreviewCanvas" style="display:block;width:100%;height:auto;max-height:25vh;object-fit:contain;background-color:#fff;background-image:linear-gradient(45deg,#d7dbe3 25%,transparent 25%),linear-gradient(-45deg,#d7dbe3 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#d7dbe3 75%),linear-gradient(-45deg,transparent 75%,#d7dbe3 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0;border-radius:8px;margin-top:8px"></canvas>
       <div class="divider" style="margin:10px 0;border-top:1px solid var(--line)"></div>
       <h3 style="font-size:13px;margin:4px 0">Reconocimiento inteligente de texto (OCR)</h3>
       <div class="enhance-actions"><button class="btn" id="enhanceOcrBtn">Reconocer texto</button><button class="btn" id="enhanceInsertTextBtn" disabled>Crear texto editable</button></div>
@@ -1078,6 +1103,20 @@
       <textarea id="enhanceOcrText" rows="5" placeholder="Texto reconocido…" style="width:100%;box-sizing:border-box;resize:vertical"></textarea>
     </div>
   </div>
+
+  <div class="modal" id="posterTemplatesModal"><div class="modalbox">
+    <button class="closebtn" id="closePosterTemplates" type="button" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="6" y2="18"/></svg></button>
+    <h2>Plantillas de póster</h2>
+    <p style="font-size:12px;color:var(--muted)">Añade una estructura editable a la página actual. Las plantillas no borran los elementos existentes; podrás mover, editar o eliminar cada texto.</p>
+    <label for="posterTemplateSelect">Diseño</label>
+    <select id="posterTemplateSelect">
+      <option value="event">Evento moderno</option><option value="sale">Oferta comercial</option><option value="minimal">Minimalista editorial</option><option value="social">Anuncio / redes sociales</option>
+    </select>
+    <label for="posterTemplateTitle">Título</label><input id="posterTemplateTitle" type="text" maxlength="100" value="TU GRAN TÍTULO" />
+    <label for="posterTemplateSubtitle">Subtítulo</label><input id="posterTemplateSubtitle" type="text" maxlength="160" value="Una frase que explique tu idea" />
+    <label for="posterTemplateFooter">Texto inferior</label><input id="posterTemplateFooter" type="text" maxlength="120" value="FECHA · LUGAR · MÁS INFORMACIÓN" />
+    <div class="row" style="margin-top:8px"><button class="btn full" id="cancelPosterTemplates" type="button">Cancelar</button><button class="cta full" id="applyPosterTemplateBtn" type="button">Añadir plantilla</button></div>
+  </div></div>
 
   <div class="modal" id="printModal">
     <div class="modalbox">
@@ -1092,8 +1131,7 @@
       <label>Doble cara (dúplex manual)</label>
       <!-- FIX 1: "Solo frente" -> "Todas" -->
       <div class="toggle"><button id="printDuplexOff" class="active">Todas</button><button id="printDuplexOdd">Frente (impares)</button><button id="printDuplexEven">Reverso (pares)</button></div>
-      <label>Calidad</label>
-      <select id="printQuality"><option value="0.7">Borrador</option><option value="0.92" selected>Normal</option><option value="1.0">Alta</option></select>
+      <div class="hint" style="margin:8px 0;padding:8px;border-radius:6px;line-height:1.4">Tamaño físico: para que las medidas en cm sean exactas, en el diálogo de impresión selecciona <b>Tamaño real / 100%</b> y desactiva «Ajustar a página». La impresora puede tener márgenes no imprimibles.</div>
       <label>Vista previa</label>
       <div class="print-preview" id="printPreview"></div>
       <button class="cta full" id="doPrintBtn" style="margin-top: 12px;">Imprimir ahora</button>
@@ -1130,8 +1168,6 @@
       <label>Doble cara</label>
       <!-- FIX 1: "Solo frente" -> "Todas" -->
       <div class="toggle"><button id="pdfDuplexOff" class="active">Todas</button><button id="pdfDuplexOdd">Frente </button><button id="pdfDuplexEven">Reverso </button></div>
-      <label>Calidad</label>
-      <select id="pdfPrintQuality"><option value="0.7">Borrador</option><option value="0.92" selected>Normal</option><option value="1.0">Alta</option></select>
       <label>Vista previa</label>
       <div class="print-preview" id="pdfPrintPreview"></div>
       <button class="cta full" id="doPdfPrintBtn" style="margin-top: 12px;">Imprimir ahora</button>
@@ -1249,7 +1285,6 @@
     inspectorExpanded: false,
     inspectorHeight: null,
     inspectorLocked: false,
-    exportQuality: 0.92,
   };
   let selectedIds = new Set();
   let multiSelectMode = false;
@@ -1329,33 +1364,24 @@
   }
 
   async function processImageFile(file) {
-    const MAX_DIM = 2000;
-    let bitmap;
-    try { bitmap = await createImageBitmap(file); }
-    catch (e) {
-      return await new Promise((resolve, reject) => {
-        const r = new FileReader();
-        r.onload = e => resolve({ src: e.target.result });
-        r.onerror = reject; r.readAsDataURL(file);
-      });
+    // Importar sin recomprimir ni redimensionar: conserva resolución, alfa PNG y metadatos
+    // contenidos en el archivo original. La previsualización se limita por CSS, no aquí.
+    if (!file || !file.type || !/^image\/(png|jpeg|webp|gif|bmp|avif|svg\+xml|heic|heif)$/i.test(file.type)) {
+      if (!file || !file.type || !file.type.startsWith('image/')) throw new Error('Formato de imagen no compatible.');
     }
-    let { width, height } = bitmap;
-    if (width > MAX_DIM || height > MAX_DIM) {
-      const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
-      width = Math.round(width * ratio); height = Math.round(height * ratio);
-    }
-    const canvas = document.createElement('canvas');
-    canvas.width = width; canvas.height = height;
-    canvas.getContext('2d').drawImage(bitmap, 0, 0, width, height);
-    if (bitmap.close) bitmap.close();
-    return await new Promise((resolve, reject) => {
-      canvas.toBlob((blob) => {
-        const r = new FileReader();
-        r.onload = e => resolve({ src: e.target.result, width, height });
-        r.onerror = reject;
-        r.readAsDataURL(blob);
-      }, 'image/jpeg', 0.92);
+    const src = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = e => resolve(e.target.result);
+      r.onerror = () => reject(new Error('No se pudo leer la imagen.'));
+      r.readAsDataURL(file);
     });
+    let width, height;
+    try {
+      const bitmap = await createImageBitmap(file);
+      width = bitmap.width; height = bitmap.height;
+      if (bitmap.close) bitmap.close();
+    } catch (_) { /* algunos formatos pueden leerse como URL y decodificarse después */ }
+    return { src, width, height, originalName: file.name, originalType: file.type };
   }
 
   function getLoadedImage(src) {
@@ -1399,7 +1425,7 @@
 
   const STORAGE_KEY = 'image-editor-project-v11';
   function saveToLocalStorage() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, elCounter, pageCounter })); } catch (e) {}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, elCounter, pageCounter })); window.__editorStorageError = null; return true; } catch (e) { window.__editorStorageError = e && e.name ? e.name : 'StorageError'; return false; }
   }
   function loadFromLocalStorage() {
     try {
@@ -1418,7 +1444,6 @@
       state.inspectorExpanded = !!data.inspectorExpanded;
       state.inspectorHeight = data.inspectorHeight || null;
       state.inspectorLocked = !!data.inspectorLocked;
-      state.exportQuality = data.exportQuality || 0.92;
       elCounter = data.elCounter || elCounter;
       pageCounter = data.pageCounter || pageCounter;
       if (state.currentPageIndex >= state.pages.length) state.currentPageIndex = state.pages.length - 1;
@@ -1430,7 +1455,7 @@
     const snapshot = JSON.stringify(state);
     if (undoStack.length > 0 && undoStack[undoStack.length - 1] === snapshot) return;
     undoStack.push(snapshot);
-    if (undoStack.length > 30) undoStack.shift();
+    if (undoStack.length > 10) undoStack.shift();
     redoStack = [];
     updateHistoryButtons();
     saveToLocalStorage();
@@ -1503,7 +1528,6 @@ function undo() {
     $("orientV").classList.toggle("active", state.orientation === "vertical");
     $("orientH").classList.toggle("active", state.orientation === "horizontal");
     if (state.paperType === "custom") { $("paperW").value = state.customW; $("paperH").value = state.customH; }
-    $("exportQuality").value = String(state.exportQuality);
     const tb = $('thumbnailsBar');
     if (state.thumbsVisible) tb.classList.remove('hidden'); else tb.classList.add('hidden');
     const side = $('mainSidebar');
@@ -1768,6 +1792,7 @@ function undo() {
 
     cp.els.forEach(el => {
       sanitizeEl(el);
+      if (el.hidden) return;
       if (el.shadow && el.shadow.opacity > 0 && el.shadowBelow) {
         shadowLayer.appendChild(buildShadowDiv(el));
       }
@@ -1776,11 +1801,11 @@ function undo() {
     const renderedIds = new Set();
     let zCounter = 0;
     cp.els.forEach(el => {
-      if (renderedIds.has(el.id)) return;
+      if (renderedIds.has(el.id) || el.hidden) return;
       sanitizeEl(el);
       zCounter++;
       if (el.groupId) {
-        const groupEls = cp.els.filter(e => e.groupId === el.groupId);
+        const groupEls = cp.els.filter(e => e.groupId === el.groupId && !e.hidden);
         groupEls.forEach(e => renderedIds.add(e.id));
         const groupDiv = document.createElement("div");
         groupDiv.className = "element-group";
@@ -2663,8 +2688,10 @@ function updateThumbnails() {
     if (targetEls.length === 0) targetEls = currentPage().els.slice();
     if (targetEls.length === 0) { showToast('No hay imágenes', 'info'); return; }
     const paper = getPaperCm();
-    const margin = parseFloat($('collageMarginManual').value) || 1.0;
-    const gap = parseFloat($('collageGapManual').value) || 0.5;
+    const marginValue = parseFloat($('collageMarginManual').value);
+    const gapValue = parseFloat($('collageGapManual').value);
+    const margin = Number.isFinite(marginValue) ? Math.max(0, marginValue) : 1.0;
+    const gap = Number.isFinite(gapValue) ? Math.max(0, gapValue) : 0.5;
     const usableW = Math.max(0.5, paper.w - margin * 2);
     const usableH = Math.max(0.5, paper.h - margin * 2);
     const n = Math.min(ceCells.length, targetEls.length);
@@ -2693,7 +2720,7 @@ function updateThumbnails() {
         canvas.width = viewport.width; canvas.height = viewport.height;
         const ctx = canvas.getContext('2d');
         await page.render({ canvasContext: ctx, viewport }).promise;
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        const dataUrl = canvas.toDataURL('image/png');
         const newPage = { id: ++pageCounter, els: [] };
         newPage.els.push({
           id: ++elCounter, src: dataUrl,
@@ -2713,12 +2740,11 @@ function updateThumbnails() {
     showLoading('Generando ZIP...');
     try {
       const zip = new JSZip();
-      const q = state.exportQuality || 0.92;
       for (let i = 0; i < state.pages.length; i++) {
         const canvas = await renderPageToCanvas(i, 300, i + 1, state.pages.length);
-        const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', q));
+        const blob = await new Promise((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('No se pudo codificar PNG')), 'image/png'));
         const num = String(i + 1).padStart(2, '0');
-        zip.file(`pagina_${num}.jpg`, blob);
+        zip.file(`pagina_${num}.png`, blob);
       }
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       const url = URL.createObjectURL(zipBlob);
@@ -2865,7 +2891,7 @@ function updateThumbnails() {
       const outW = Math.max(200, Math.round(Math.max(wA, wB)));
       const outH = Math.max(200, Math.round(Math.max(hA, hB)));
       const outCanvas = await warpPerspective(img, srcPts, outW, outH);
-      const dataUrl = outCanvas.toDataURL('image/jpeg', 0.92);
+      const dataUrl = outCanvas.toDataURL('image/png');
       addScannedPageImage(dataUrl);
       closeScanCorrection(); hideLoading(); sfx.success();
       showToast('Documento agregado', 'success');
@@ -3358,6 +3384,7 @@ function updateThumbnails() {
 ctx.globalCompositeOperation = p.bg ? 'source-over' : 'darken';
 for (const el of p.els) {
   sanitizeEl(el);
+  if (el.hidden) continue;
   if (el.shadow && el.shadow.opacity > 0 && el.shadowBelow) {
     try {
       const xPx = el.xCm * pxPerCm, yPx = el.yCm * pxPerCm, wPx = el.wCm * pxPerCm, hPx = el.hCm * pxPerCm;
@@ -3382,6 +3409,7 @@ ctx.restore();
     
     for (const el of p.els) {
       sanitizeEl(el);
+      if (el.hidden) continue;
       try {
         const img = isGen(el) ? (await fontsReady(el), genCanvas(el, pxPerCm)) : await getLoadedImage(el.src);
         const xPx = el.xCm * pxPerCm, yPx = el.yCm * pxPerCm, wPx = el.wCm * pxPerCm, hPx = el.hCm * pxPerCm;
@@ -3507,12 +3535,12 @@ ctx.restore();
       const format = isLandscape ? [paper.h, paper.w] : [paper.w, paper.h];
       const pdfOrientation = isLandscape ? "landscape" : "portrait";
       const pdf = new jsPDF({ unit: "cm", format, orientation: pdfOrientation, compress: true });
-      const q = state.exportQuality || 0.92;
       for (let i = 0; i < state.pages.length; i++) {
         const canvas = await renderPageToCanvas(i, 300, i + 1, state.pages.length);
-        const imgData = canvas.toDataURL("image/jpeg", q);
+        // PNG evita la compresión JPEG con pérdida; 300 DPI es un estándar de impresión de alta calidad.
+        const imgData = canvas.toDataURL("image/png");
         if (i > 0) pdf.addPage(format, pdfOrientation);
-        pdf.addImage(imgData, "JPEG", 0, 0, paper.w, paper.h, undefined, "FAST");
+        pdf.addImage(imgData, "PNG", 0, 0, paper.w, paper.h, undefined, "FAST");
       }
       const blob = pdf.output('blob');
       lastGeneratedPdfBlob = blob;
@@ -3576,7 +3604,6 @@ ctx.restore();
   function openPrintModal() {
     $('printFrom').max = state.pages.length; $('printTo').max = state.pages.length;
     $('printFrom').value = 1; $('printTo').value = state.pages.length;
-    $('printQuality').value = String(state.exportQuality || 0.92);
     setPrintScope('all'); setPrintDuplex('off');
     const m = $('printModal'); m.classList.add('show'); setTimeout(() => m.classList.add('visible'), 10);
   }
@@ -3600,10 +3627,9 @@ ctx.restore();
       // tamaño de cada .print-page evita que el contenido desborde el área
       // imprimible y Chrome/Mopria inserten una hoja en blanco entre páginas.
       const inchW = (paper.w / 2.54).toFixed(4), inchH = (paper.h / 2.54).toFixed(4);
-      // Deja un margen técnico mínimo de 1 punto para evitar redondeos del motor
-      // de impresión, sin cambiar el tamaño del papel seleccionado.
-      printArea.style.setProperty('--pw', `${(paper.w / 2.54 * 72).toFixed(2) - 1}pt`);
-      printArea.style.setProperty('--ph', `${(paper.h / 2.54 * 72).toFixed(2) - 1}pt`);
+      // Usa el tamaño físico exacto en puntos; el diálogo de impresión debe estar al 100%.
+      printArea.style.setProperty('--pw', `${(paper.w / 2.54 * 72).toFixed(4)}pt`);
+      printArea.style.setProperty('--ph', `${(paper.h / 2.54 * 72).toFixed(4)}pt`);
       let sizeRule;
       if (state.paperType === 'carta' && state.orientation === 'vertical') sizeRule = 'letter';
       else if (state.paperType === 'carta' && state.orientation === 'horizontal') sizeRule = 'letter landscape';
@@ -3611,10 +3637,9 @@ ctx.restore();
       else if (state.paperType === 'legal' && state.orientation === 'horizontal') sizeRule = 'legal landscape';
       else sizeRule = `${inchW}in ${inchH}in`;
       styleTag.textContent = `@media print { @page { size: ${sizeRule}; margin: 0; } }`;
-      const q = parseFloat($('printQuality').value) || 0.92;
       for (const idx of pages) {
         const canvas = await renderPageToCanvas(idx, 300, null, null);
-        const dataUrl = canvas.toDataURL('image/jpeg', q);
+        const dataUrl = canvas.toDataURL('image/png');
         const pageDiv = document.createElement('div'); pageDiv.className = 'print-page';
         const img = document.createElement('img'); img.src = dataUrl;
         pageDiv.appendChild(img); printArea.appendChild(pageDiv);
@@ -3629,18 +3654,33 @@ ctx.restore();
   }
 
   function closeLayerManager() { const m=$('layerManagerModal'); m.classList.remove('visible'); setTimeout(()=>m.classList.remove('show'),250); }
+  function layerLabel(el, index) {
+    const type=el.type==='text'?'Texto':el.type==='shape'?'Forma':el.src?'Imagen':'Elemento';
+    const fallback = `${type}${el.text?': '+el.text.replace(/\s+/g,' ').slice(0,28):''}`;
+    return `${index+1}. ${el.layerName || fallback}`;
+  }
   function renderLayerManager() {
     const list=$('layerManagerList'); list.innerHTML=''; const els=currentPage().els;
     if(!els.length) { list.textContent='Esta página todavía no tiene elementos.'; return; }
     [...els].reverse().forEach((el,reverseIndex)=>{
-      const index=els.length-1-reverseIndex, row=document.createElement('div'); row.style.cssText='display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--line);border-radius:7px;background:var(--panel2);';
-      const pick=document.createElement('button'); pick.className='btn'; pick.style.cssText='flex:1;min-width:0;justify-content:flex-start;white-space:normal;text-align:left;';
-      const type=el.type==='text'?'Texto':el.type==='shape'?'Forma':el.src?'Imagen':'Elemento';
-      pick.textContent=`${index+1}. ${type}${el.text?': '+el.text.replace(/\s+/g,' ').slice(0,32):''}`;
-      pick.style.borderColor=selectedIds.has(el.id)?'var(--accent)':'var(--btn-border)'; pick.addEventListener('click',()=>{selectedIds=new Set([el.id]);multiSelectMode=false;renderAll();renderLayerManager();});
-      const up=document.createElement('button');up.className='btn';up.textContent='↑';up.title='Subir';up.disabled=index===els.length-1;up.addEventListener('click',()=>moveLayerBy(el.id,1));
-      const down=document.createElement('button');down.className='btn';down.textContent='↓';down.title='Bajar';down.disabled=index===0;down.addEventListener('click',()=>moveLayerBy(el.id,-1));
-      row.append(pick,up,down);list.appendChild(row);
+      const index=els.length-1-reverseIndex, row=document.createElement('div');
+      row.style.cssText='display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:5px;align-items:center;padding:7px;border:1px solid var(--line);border-radius:7px;background:var(--panel2);';
+      const pick=document.createElement('button'); pick.className='btn'; pick.style.cssText='min-width:0;justify-content:flex-start;white-space:normal;text-align:left;overflow-wrap:anywhere;';
+      pick.textContent=layerLabel(el,index); pick.title='Seleccionar capa';
+      pick.style.borderColor=selectedIds.has(el.id)?'var(--accent)':'var(--btn-border)';
+      pick.style.opacity=el.hidden?'.55':'1';
+      pick.addEventListener('click',()=>{selectedIds=new Set([el.id]);multiSelectMode=false;renderAll();renderLayerManager();});
+      const vis=document.createElement('button'); vis.className='btn'; vis.textContent=el.hidden?'Mostrar':'Ocultar'; vis.title=el.hidden?'Mostrar capa':'Ocultar capa';
+      vis.setAttribute('aria-label',vis.title); vis.addEventListener('click',()=>{el.hidden=!el.hidden;if(el.hidden)selectedIds.delete(el.id);saveState();renderAll();renderLayerManager();});
+      const more=document.createElement('button'); more.className='btn'; more.textContent='⋯'; more.title='Más acciones de capa';
+      more.addEventListener('click',()=>{
+        const action=prompt('Acción para esta capa:\n1 = Renombrar\n2 = Duplicar\n3 = Subir\n4 = Bajar','1');
+        if(action==='1') { const name=prompt('Nombre de la capa:',el.layerName||layerLabel(el,index).replace(/^\d+\. /,'')); if(name!==null){el.layerName=name.trim().slice(0,80);saveState();renderLayerManager();} }
+        else if(action==='2') { const copy=JSON.parse(JSON.stringify(el)); copy.id=++elCounter; copy.layerName=(el.layerName||'Capa')+' copia'; copy.xCm=Math.min(getPaperCm().w-copy.wCm,copy.xCm+0.3); copy.yCm=Math.min(getPaperCm().h-copy.hCm,copy.yCm+0.3); currentPage().els.splice(currentPage().els.indexOf(el)+1,0,copy); selectedIds=new Set([copy.id]);multiSelectMode=false;saveState();renderAll();renderLayerManager(); }
+        else if(action==='3') moveLayerBy(el.id,1);
+        else if(action==='4') moveLayerBy(el.id,-1);
+      });
+      row.append(pick,vis,more);list.appendChild(row);
     });
   }
   function moveLayerBy(id,delta) { const els=currentPage().els, i=els.findIndex(e=>e.id===id), j=i+delta; if(i<0||j<0||j>=els.length)return; [els[i],els[j]]=[els[j],els[i]]; saveState();renderAll();renderLayerManager(); }
@@ -3676,10 +3716,14 @@ ctx.restore();
     const selected=getSelectedEls().find(el=>el.src && /^data:image\//i.test(el.src));
     enhanceSourceElId=selected?selected.id:null;
     $('enhanceScope').value=selected?'selected':'page';
-    enhanceWorkingCanvas=null; $('enhanceApplyBtn').disabled=true; $('enhanceInsertTextBtn').disabled=true;
+    enhanceWorkingCanvas=null; enhanceAiPendingDataUrl=null; $('enhanceAiApplyBtn').disabled=true; $('enhanceApplyBtn').disabled=true; $('enhanceInsertTextBtn').disabled=true;
     $('enhanceOcrText').value=''; $('enhanceOcrStatus').textContent='El OCR analizará las imágenes incluidas en “Aplicar a”.';
-    $('enhancePreviewCanvas').width=1; $('enhancePreviewCanvas').height=1;
+    const previewCanvas=$('enhancePreviewCanvas'); previewCanvas.width=1; previewCanvas.height=1;
     updateEnhanceTargetInfo();
+    // Mostrar inmediatamente la imagen elegida para que los controles de color puedan muestrear desde el inicio.
+    const initialTarget=selectedEnhanceImage()||enhancerTargets()[0]?.el;
+    if(initialTarget){getLoadedImage(initialTarget.src).then(im=>{previewCanvas.width=im.naturalWidth;previewCanvas.height=im.naturalHeight;previewCanvas.getContext('2d').clearRect(0,0,previewCanvas.width,previewCanvas.height);previewCanvas.getContext('2d').drawImage(im,0,0);enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=im.naturalWidth;enhanceWorkingCanvas.height=im.naturalHeight;enhanceWorkingCanvas.getContext('2d').drawImage(im,0,0);updateEnhanceTargetInfo();}).catch(()=>{});}
+    updateToolHistoryButtons();
     $('imageEnhancerModal').classList.add('show'); setTimeout(()=>$('imageEnhancerModal').classList.add('visible'),10);
   }
   function closeImageEnhancer() { const m=$('imageEnhancerModal'); m.classList.remove('visible'); setTimeout(()=>m.classList.remove('show'),250); }
@@ -3717,9 +3761,193 @@ ctx.restore();
     const targets=enhancerTargets();if(!targets.length||!enhanceWorkingCanvas)return;
     const ok=targets.length<3 || await confirmAction('Aplicar mejora a varias imágenes',`Se procesarán ${targets.length} imágenes. Esto puede tardar y consumir memoria en el celular. ¿Continuar?`);if(!ok)return;
     showLoading('Mejorando imágenes…');let done=0,failed=0;
-    try{for(const item of targets){try{const c=await buildEnhancedCanvas(item.el);const previousSrc=item.el.src;item.el.src=c.toDataURL('image/jpeg',0.96);imgCache.delete(previousSrc);done++;}catch(e){failed++;} $('loading-label').textContent=`Mejorando imagen ${done+failed} de ${targets.length}…`;await new Promise(r=>setTimeout(r,0));}
+    try{for(const item of targets){try{const c=await buildEnhancedCanvas(item.el);const previousSrc=item.el.src;const previousImg=await getLoadedImage(previousSrc);const mime=(previousSrc.match(/^data:(image\/[a-zA-Z0-9.+-]+)/)||[])[1]||'image/png';item.el.src=await new Promise((resolve,reject)=>c.toBlob(blob=>{if(!blob){reject(new Error('No se pudo codificar la imagen'));return;}const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob);},mime==='image/jpeg'?'image/jpeg':'image/png',0.98));imgCache.delete(previousSrc);done++;}catch(e){failed++;} $('loading-label').textContent=`Mejorando imagen ${done+failed} de ${targets.length}…`;await new Promise(r=>setTimeout(r,0));}
       thumbCache.clear();saveState();renderAll();enhanceWorkingCanvas=null;updateEnhanceTargetInfo();$('enhanceOcrStatus').textContent=`Mejora aplicada a ${done} de ${targets.length} imágenes${failed?`; ${failed} no se pudieron procesar`:''}.`;sfx.success();
     }catch(err){$('enhanceOcrStatus').textContent='Ocurrió un error al aplicar las mejoras.';}finally{hideLoading();}
+  });
+  let enhanceAiPendingDataUrl = null;
+  // ===== Superresolución local (sin red): denoise bilateral -> Lanczos3 -> retroproyección iterativa -> Richardson-Lucy -> control de halos =====
+  const srTick = () => new Promise(r => setTimeout(r, 0));
+  function srWeights(sn, dn) {
+    const scale = sn / dn, fs = Math.max(1, scale), sup = 3 * fs, stride = Math.ceil(sup * 2) + 2;
+    const starts = new Int32Array(dn), counts = new Int32Array(dn), w = new Float32Array(dn * stride);
+    for (let i = 0; i < dn; i++) {
+      const c = (i + 0.5) * scale, st = Math.max(0, Math.floor(c - sup + 0.5)), en = Math.min(sn - 1, Math.floor(c + sup - 0.5));
+      let sum = 0, n = 0;
+      for (let k = st; k <= en; k++) {
+        const x = (k + 0.5 - c) / fs; let v = 0;
+        if (Math.abs(x) < 1e-6) v = 1; else if (Math.abs(x) < 3) { const px = Math.PI * x; v = 3 * Math.sin(px) * Math.sin(px / 3) / (px * px); }
+        w[i * stride + n++] = v; sum += v;
+      }
+      if (sum === 0) { w[i * stride] = 1; n = 1; sum = 1; }
+      for (let q = 0; q < n; q++) w[i * stride + q] /= sum;
+      starts[i] = st; counts[i] = n;
+    }
+    return { starts, counts, w, stride };
+  }
+  function srResize(src, sw, sh, dw, dh, ch) {
+    const tmp = new Float32Array(dw * sh * ch), out = new Float32Array(dw * dh * ch);
+    const X = srWeights(sw, dw), Y = srWeights(sh, dh);
+    for (let y = 0; y < sh; y++) {
+      const rowS = y * sw * ch, rowD = y * dw * ch;
+      for (let x = 0; x < dw; x++) {
+        const st = X.starts[x], n = X.counts[x], wo = x * X.stride;
+        for (let c = 0; c < ch; c++) {
+          let a = 0; for (let k = 0; k < n; k++) a += src[rowS + (st + k) * ch + c] * X.w[wo + k];
+          tmp[rowD + x * ch + c] = a;
+        }
+      }
+    }
+    const rowLen = dw * ch;
+    for (let y = 0; y < dh; y++) {
+      const st = Y.starts[y], n = Y.counts[y], wo = y * Y.stride, rowD = y * rowLen;
+      for (let k = 0; k < n; k++) {
+        const wk = Y.w[wo + k], rowS = (st + k) * rowLen;
+        for (let i = 0; i < rowLen; i++) out[rowD + i] += tmp[rowS + i] * wk;
+      }
+    }
+    return out;
+  }
+  function srLuma(rgb, n, out) { for (let i = 0, j = 0; i < n; i++, j += 3) out[i] = 0.299 * rgb[j] + 0.587 * rgb[j + 1] + 0.114 * rgb[j + 2]; return out; }
+  function srBlur(src, w, h, sigma, out, tmp) {
+    const r = Math.max(1, Math.ceil(sigma * 3)), k = new Float32Array(2 * r + 1); let sum = 0;
+    for (let i = -r; i <= r; i++) { k[i + r] = Math.exp(-(i * i) / (2 * sigma * sigma)); sum += k[i + r]; }
+    for (let i = 0; i < k.length; i++) k[i] /= sum;
+    for (let y = 0; y < h; y++) { const o = y * w; for (let x = 0; x < w; x++) { let a = 0; for (let i = -r; i <= r; i++) { let xx = x + i; xx = xx < 0 ? 0 : (xx >= w ? w - 1 : xx); a += src[o + xx] * k[i + r]; } tmp[o + x] = a; } }
+    for (let y = 0; y < h; y++) { for (let x = 0; x < w; x++) { let a = 0; for (let i = -r; i <= r; i++) { let yy = y + i; yy = yy < 0 ? 0 : (yy >= h ? h - 1 : yy); a += tmp[yy * w + x] * k[i + r]; } out[y * w + x] = a; } }
+    return out;
+  }
+  function srMinMax(src, w, h, r, tmpA, tmpB, outMin, outMax) {
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let mn = 1e9, mx = -1e9; for (let i = -r; i <= r; i++) { let xx = x + i; xx = xx < 0 ? 0 : (xx >= w ? w - 1 : xx); const v = src[y * w + xx]; if (v < mn) mn = v; if (v > mx) mx = v; } tmpA[y * w + x] = mn; tmpB[y * w + x] = mx; }
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let mn = 1e9, mx = -1e9; for (let i = -r; i <= r; i++) { let yy = y + i; yy = yy < 0 ? 0 : (yy >= h ? h - 1 : yy); const a = tmpA[yy * w + x], b = tmpB[yy * w + x]; if (a < mn) mn = a; if (b > mx) mx = b; } outMin[y * w + x] = mn; outMax[y * w + x] = mx; }
+  }
+  function srDenoise(data, w, h, strength) {
+    const n = w * h, out = new Float32Array(n * 3);
+    if (strength <= 0) { for (let i = 0, j = 0; i < n; i++, j += 4) { out[i*3] = data[j]; out[i*3+1] = data[j+1]; out[i*3+2] = data[j+2]; } return out; }
+    const sR = 6 + strength * 0.35, lut = new Float32Array(256); for (let d = 0; d < 256; d++) lut[d] = Math.exp(-(d * d) / (2 * sR * sR));
+    const R = 2, sp = []; for (let dy = -R; dy <= R; dy++) for (let dx = -R; dx <= R; dx++) sp.push([dx, dy, Math.exp(-(dx*dx+dy*dy) / 4)]);
+    const Y = new Float32Array(n); for (let i = 0, j = 0; i < n; i++, j += 4) Y[i] = 0.299*data[j] + 0.587*data[j+1] + 0.114*data[j+2];
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = y * w + x, yc = Y[i]; let a = 0, b = 0, c = 0, ws = 0;
+      for (let q = 0; q < sp.length; q++) {
+        const xx = x + sp[q][0], yy = y + sp[q][1]; if (xx < 0 || yy < 0 || xx >= w || yy >= h) continue;
+        const k = yy * w + xx, d = Math.abs(Y[k] - yc) | 0, wt = sp[q][2] * lut[d > 255 ? 255 : d];
+        a += data[k*4] * wt; b += data[k*4+1] * wt; c += data[k*4+2] * wt; ws += wt;
+      }
+      out[i*3] = a / ws; out[i*3+1] = b / ws; out[i*3+2] = c / ws;
+    }
+    return out;
+  }
+  async function superResolveCanvas(img, opts, onProgress) {
+    const sw = img.naturalWidth, sh = img.naturalHeight, maxPixels = 4200000;
+    let factor = Math.max(1, opts.scale);
+    factor = Math.min(factor, Math.sqrt(maxPixels / (sw * sh)));
+    if (factor < 1.05) factor = 1;
+    const dw = Math.round(sw * factor), dh = Math.round(sh * factor), n = dw * dh;
+    const q = { fast: { ibp: 1, rl: 4 }, normal: { ibp: 2, rl: 8 }, max: { ibp: 3, rl: 14 } }[opts.quality] || { ibp: 2, rl: 8 };
+    const steps = (factor > 1 ? 2 + q.ibp * 2 : 0) + (opts.blur > 0 ? q.rl : 0) + 3; let done = 0;
+    const tick = async (msg) => { done++; onProgress(Math.min(99, done / steps * 100), msg); await srTick(); };
+
+    const c0 = document.createElement('canvas'); c0.width = sw; c0.height = sh;
+    const x0 = c0.getContext('2d', { willReadFrequently: true }); x0.drawImage(img, 0, 0);
+    const data = x0.getImageData(0, 0, sw, sh).data;
+    let hasAlpha = false; for (let i = 3; i < data.length; i += 4) if (data[i] < 255) { hasAlpha = true; break; }
+    await tick('Limpiando ruido y artefactos…');
+    let srcF = srDenoise(data, sw, sh, opts.denoise);
+    let alphaUp = null;
+    if (hasAlpha) {
+      const A = new Float32Array(sw * sh); for (let i = 0; i < A.length; i++) A[i] = data[i*4+3];
+      for (let i = 0; i < A.length; i++) { const a = A[i] / 255; srcF[i*3] *= a; srcF[i*3+1] *= a; srcF[i*3+2] *= a; }
+      alphaUp = factor > 1 ? srResize(A, sw, sh, dw, dh, 1) : A;
+    }
+    let up;
+    if (factor > 1) {
+      await tick('Ampliando con Lanczos…');
+      up = srResize(srcF, sw, sh, dw, dh, 3);
+      for (let k = 0; k < q.ibp; k++) {
+        await tick(`Reconstruyendo detalle (${k + 1}/${q.ibp})…`);
+        const down = srResize(up, dw, dh, sw, sh, 3);
+        for (let i = 0; i < down.length; i++) down[i] = srcF[i] - down[i];
+        const upErr = srResize(down, sw, sh, dw, dh, 3);
+        for (let i = 0; i < up.length; i++) up[i] += upErr[i];
+        await tick('Comparando con la original…');
+      }
+    } else up = srcF;
+    srcF = null;
+    if (opts.blur > 0) {
+      const Y0 = srLuma(up, n, new Float32Array(n)), u = Y0.slice(), est = new Float32Array(n), tmp = new Float32Array(n), ratio = new Float32Array(n), corr = new Float32Array(n);
+      const sigma = Math.min(3, (0.5 + opts.blur * 0.012) * (1 + (factor - 1) * 0.5));
+      for (let it = 0; it < q.rl; it++) {
+        await tick(`Afinando bordes (${it + 1}/${q.rl})…`);
+        srBlur(u, dw, dh, sigma, est, tmp);
+        for (let i = 0; i < n; i++) { let r = Y0[i] / (est[i] + 1); ratio[i] = r < 0.5 ? 0.5 : (r > 2 ? 2 : r); }
+        srBlur(ratio, dw, dh, sigma, corr, tmp);
+        for (let i = 0; i < n; i++) u[i] *= corr[i];
+      }
+      const mn = est, mx = ratio; srMinMax(Y0, dw, dh, 2, tmp, corr, mn, mx);
+      const m = 8;
+      for (let i = 0, j = 0; i < n; i++, j += 3) {
+        let v = u[i]; const lo = mn[i] - m, hi = mx[i] + m; v = v < lo ? lo : (v > hi ? hi : v);
+        const d = v - Y0[i]; up[j] += d; up[j+1] += d; up[j+2] += d;
+      }
+    }
+    await tick('Generando imagen…');
+    const out = document.createElement('canvas'); out.width = dw; out.height = dh;
+    const ox = out.getContext('2d'), id = ox.createImageData(dw, dh), o = id.data;
+    for (let i = 0, j = 0, k = 0; i < n; i++, j += 3, k += 4) {
+      let r = up[j], g = up[j+1], b = up[j+2], a = 255;
+      if (hasAlpha) { a = alphaUp[i]; a = a < 0 ? 0 : (a > 255 ? 255 : a); const f = a > 0.5 ? 255 / a : 0; r *= f; g *= f; b *= f; }
+      o[k] = r < 0 ? 0 : (r > 255 ? 255 : r); o[k+1] = g < 0 ? 0 : (g > 255 ? 255 : g); o[k+2] = b < 0 ? 0 : (b > 255 ? 255 : b); o[k+3] = a;
+    }
+    ox.putImageData(id, 0, 0);
+    return { canvas: out, factor };
+  }
+  $('srBlur').addEventListener('input', e => $('srBlurVal').textContent = e.target.value);
+  $('srDenoise').addEventListener('input', e => $('srDenoiseVal').textContent = e.target.value);
+  $('enhanceAiBtn').addEventListener('click', async () => {
+    const targets = enhancerTargets();
+    if (!targets.length) { $('enhanceAiStatus').textContent = 'Selecciona al menos una imagen.'; return; }
+    const btn = $('enhanceAiBtn'); btn.disabled = true; enhanceAiPendingDataUrl = null; $('enhanceAiApplyBtn').disabled = true; $('enhanceAiProgress').value = 0;
+    const t0 = performance.now();
+    try {
+      const img = await getLoadedImage(selectedEnhanceImage().src);
+      const res = await superResolveCanvas(img, { scale: Number($('enhanceScale').value) || 2, quality: $('srQuality').value, blur: Number($('srBlur').value), denoise: Number($('srDenoise').value) },
+        (pct, msg) => { $('enhanceAiProgress').value = pct; $('enhanceAiStatus').textContent = msg; });
+      const c = res.canvas;
+      const preview = $('enhancePreviewCanvas'); preview.width = c.width; preview.height = c.height;
+      const pctx = preview.getContext('2d'); pctx.clearRect(0, 0, c.width, c.height); pctx.drawImage(c, 0, 0);
+      enhanceWorkingCanvas = document.createElement('canvas'); enhanceWorkingCanvas.width = c.width; enhanceWorkingCanvas.height = c.height; enhanceWorkingCanvas.getContext('2d').drawImage(c, 0, 0);
+      enhanceAiPendingDataUrl = c.toDataURL('image/png');
+      $('enhanceAiProgress').value = 100; $('enhanceAiApplyBtn').disabled = false;
+      const note = (Number($('enhanceScale').value) > res.factor + 0.05 && res.factor > 1) ? ' (reducida al máximo seguro para el móvil)' : '';
+      $('enhanceAiStatus').textContent = `Listo en ${((performance.now() - t0) / 1000).toFixed(1)} s: ${img.naturalWidth}×${img.naturalHeight} → ${c.width}×${c.height}${note}. Pulsa “Aplicar resultado” si te convence.`;
+      updateEnhanceTargetInfo();
+    } catch (err) {
+      $('enhanceAiProgress').value = 0; $('enhanceAiStatus').textContent = 'No se pudo procesar: ' + (err && err.message ? err.message : 'poca memoria. Prueba calidad Rápida o menor ampliación.');
+    } finally { btn.disabled = false; }
+  });
+  // Historial local para operaciones de imagen; el historial general del documento también se mantiene.
+  let enhanceToolHistory=[], enhanceToolHistoryIndex=-1;
+  function recordEnhanceToolChange(target, before, after, label){
+    if(!target||!before||!after)return;
+    enhanceToolHistory=enhanceToolHistory.slice(0,enhanceToolHistoryIndex+1);
+    enhanceToolHistory.push({id:target.id,before,after,label});
+    if(enhanceToolHistory.length>20)enhanceToolHistory.shift();
+    enhanceToolHistoryIndex=enhanceToolHistory.length-1;updateToolHistoryButtons();
+  }
+  function updateToolHistoryButtons(){const u=$('enhanceToolUndoBtn'),r=$('enhanceToolRedoBtn');if(u)u.disabled=enhanceToolHistoryIndex<0;if(r)r.disabled=enhanceToolHistoryIndex>=enhanceToolHistory.length-1;}
+  async function applyToolHistory(direction){const next=direction==='undo'?enhanceToolHistoryIndex:enhanceToolHistoryIndex+1;if(next<0||next>=enhanceToolHistory.length)return;const entry=enhanceToolHistory[next],target=findEl(entry.id);if(!target){$('bgRemoveStatus').textContent='No se encontró la imagen del historial. Usa el historial general del editor.';return;}const src=direction==='undo'?entry.before:entry.after;target.src=src;imgCache.delete(entry.before);imgCache.delete(entry.after);thumbCache.clear();saveState();renderAll();enhanceToolHistoryIndex=direction==='undo'?enhanceToolHistoryIndex-1:enhanceToolHistoryIndex+1;updateToolHistoryButtons();try{const im=await getLoadedImage(src),cv=$('enhancePreviewCanvas');cv.width=im.naturalWidth;cv.height=im.naturalHeight;cv.getContext('2d').clearRect(0,0,cv.width,cv.height);cv.getContext('2d').drawImage(im,0,0);enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=cv.width;enhanceWorkingCanvas.height=cv.height;enhanceWorkingCanvas.getContext('2d').drawImage(im,0,0);}catch(e){}bgRemovePendingDataUrl=null;$('bgRemoveCommitBtn').disabled=true;$('bgRemoveStatus').textContent=(direction==='undo'?'Cambio deshecho: ':'Cambio rehecho: ')+entry.label+'. Vista previa sincronizada.';}
+  $('enhanceToolUndoBtn').addEventListener('click',()=>applyToolHistory('undo'));
+  $('enhanceToolRedoBtn').addEventListener('click',()=>applyToolHistory('redo'));
+
+  $('enhanceAiApplyBtn').addEventListener('click',()=>{
+    const target=selectedEnhanceImage()||enhancerTargets()[0]?.el;
+    if(!target||!enhanceAiPendingDataUrl){$('enhanceAiStatus').textContent='Primero genera una vista previa IA.';return;}
+    const included=enhancerTargets().some(x=>x.el.id===target.id);
+    if(!included){$('enhanceAiStatus').textContent='La imagen seleccionada no está incluida en el alcance actual.';return;}
+    const previous=target.src, result=enhanceAiPendingDataUrl;recordEnhanceToolChange(target,previous,result,'superresolución IA');target.src=result;imgCache.delete(previous);thumbCache.clear();saveState();renderAll();
+    enhanceAiPendingDataUrl=null;$('enhanceAiApplyBtn').disabled=true;
+    $('enhanceAiStatus').textContent='Resultado IA aplicado a una imagen. Usa Deshacer si no te convence.';sfx.success();
   });
   async function loadTesseract(){if(window.Tesseract)return window.Tesseract;if(!tesseractLoadPromise)tesseractLoadPromise=new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';sc.onload=()=>window.Tesseract?resolve(window.Tesseract):reject(new Error('OCR no disponible'));sc.onerror=()=>reject(new Error('No se pudo cargar OCR'));document.head.appendChild(sc);});return tesseractLoadPromise;}
   $('enhanceOcrBtn').addEventListener('click',async()=>{
@@ -3740,6 +3968,124 @@ ctx.restore();
     const text=$('enhanceOcrText').value.trim(),src=selectedEnhanceImage();if(!text)return;const P=getPaperCm();
     const el={id:++elCounter,type:'text',text,xCm:src?Math.min(P.w-1,src.xCm+src.wCm+0.2):1,yCm:src?src.yCm:1,wCm:src?Math.max(3,Math.min(src.wCm,P.w*0.8)):Math.min(12,P.w-2),hCm:src?Math.max(2,Math.min(src.hCm,P.h*0.35)):4,mode:'stretch',rot:0};
     sanitizeEl(el);fitText(el);currentPage().els.push(el);selectedIds=new Set([el.id]);saveState();renderAll();closeImageEnhancer();startInlineEdit(el.id,true);
+  });
+
+
+  // Fase 4: eliminación de fondo por similitud de color (sin servicio externo).
+  $('bgRemoveTolerance').addEventListener('input', e => $('bgRemoveToleranceVal').textContent=e.target.value);
+  $('bgRemoveFeather').addEventListener('input',e=>$('bgRemoveFeatherVal').textContent=e.target.value+' px');
+  function parseHexColor(hex) { const h=String(hex||'#ffffff').replace('#',''); return [parseInt(h.slice(0,2),16)||0,parseInt(h.slice(2,4),16)||0,parseInt(h.slice(4,6),16)||0]; }
+  function sampleCornerColor(img) {
+    const c=document.createElement('canvas'); c.width=Math.min(64,img.naturalWidth); c.height=Math.min(64,img.naturalHeight);
+    const x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(img,0,0,c.width,c.height);
+    const d=x.getImageData(0,0,c.width,c.height).data, points=[[1,1],[c.width-2,1],[1,c.height-2],[c.width-2,c.height-2]];
+    const rgb=points.map(([px,py])=>{const i=(Math.max(0,py)*c.width+Math.max(0,px))*4;return [d[i],d[i+1],d[i+2]];});
+    return rgb[0].map((_,k)=>Math.round(rgb.reduce((n,v)=>n+v[k],0)/rgb.length));
+  }
+  $('bgSampleCornerBtn').addEventListener('click',async()=>{
+    const target=selectedEnhanceImage()||enhancerTargets()[0]?.el;
+    if(!target){$('bgRemoveStatus').textContent='Selecciona una imagen primero.';return;}
+    try{const img=await getLoadedImage(target.src),rgb=sampleCornerColor(img);$('bgRemoveColor').value='#'+rgb.map(v=>v.toString(16).padStart(2,'0')).join('');$('bgRemoveStatus').textContent='Color aproximado de las cuatro esquinas seleccionado. Revisa el color antes de quitar el fondo.';}
+    catch(e){$('bgRemoveStatus').textContent='No se pudo leer la imagen.';}
+  });
+  let bgRemovePendingDataUrl=null;
+  $('bgRemoveApplyBtn').addEventListener('click',async()=>{
+    const targets=enhancerTargets();
+    if(!targets.length){$('bgRemoveStatus').textContent='No hay imágenes objetivo. Selecciona una imagen o cambia el alcance.';return;}
+    const target=selectedEnhanceImage()||targets[0].el;
+    if(!target || !targets.some(x=>x.el.id===target.id)){ $('bgRemoveStatus').textContent='El alcance actual no incluye la imagen seleccionada. Cambia el alcance a “Imagen(es) seleccionada(s)” o elige una imagen incluida.';return;}
+    const btn=$('bgRemoveApplyBtn');btn.disabled=true;
+    try{
+      showLoading('Eliminando fondo por color…');
+      const sourceBefore=target.src;
+      const img=await getLoadedImage(target.src);
+      if(img.naturalWidth*img.naturalHeight>12000000) throw new Error('Imagen demasiado grande para procesarla con seguridad en móvil');
+      const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
+      const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,c.width,c.height);
+      const im=ctx.getImageData(0,0,c.width,c.height),d=im.data, rgb=parseHexColor($('bgRemoveColor').value),tol=Number($('bgRemoveTolerance').value)||0, threshold=tol*tol*3;
+      const w=c.width,h=c.height,total=w*h, mode=$('bgRemoveMode')?.value||'connected', feather=Number($('bgRemoveFeather')?.value||0);
+      // Edge-aware background matte: connected flood fill from image edges. Similar pixels inside enclosed outlines are preserved.
+      const mask=new Uint8Array(total), queue=new Int32Array(total); let head=0,tail=0,removed=0;
+      const similar=(px)=>{const i=px*4,dr=d[i]-rgb[0],dg=d[i+1]-rgb[1],db=d[i+2]-rgb[2];return dr*dr+dg*dg+db*db<=threshold;};
+      if(mode==='global') { for(let px=0;px<total;px++) if(similar(px)) mask[px]=1; }
+      else {
+        const seed=px=>{if(px>=0&&px<total&&!mask[px]&&similar(px)){mask[px]=1;queue[tail++]=px;}};
+        for(let x=0;x<w;x++){seed(x);seed((h-1)*w+x);} for(let y=1;y<h-1;y++){seed(y*w);seed(y*w+w-1);}
+        while(head<tail){const px=queue[head++],x=px%w,y=(px/w)|0;if(x>0)seed(px-1);if(x+1<w)seed(px+1);if(y>0)seed(px-w);if(y+1<h)seed(px+w);}
+      }
+      // Feather the matte at the edge by partially reducing alpha of neighboring pixels.
+      const originalAlpha=new Uint8Array(total);for(let px=0;px<total;px++)originalAlpha[px]=d[px*4+3];
+      for(let px=0;px<total;px++){const i=px*4;if(mask[px]){d[i+3]=0;removed++;continue;}if(feather>0){const x=px%w,y=(px/w)|0;let near=0;for(let dy=-feather;dy<=feather&&!near;dy++)for(let dx=-feather;dx<=feather;dx++){if(dx*dx+dy*dy>feather*feather)continue;const nx=x+dx,ny=y+dy;if(nx>=0&&nx<w&&ny>=0&&ny<h&&mask[ny*w+nx]){near=1;break;}}if(near){const dr=d[i]-rgb[0],dg=d[i+1]-rgb[1],db=d[i+2]-rgb[2],dist=Math.sqrt(dr*dr+dg*dg+db*db);const fade=Math.max(.12,Math.min(1,dist/Math.max(1,tol*1.7)));d[i+3]=Math.round(originalAlpha[px]*fade);}}}
+      ctx.putImageData(im,0,0);
+      const dataUrl=await new Promise((resolve,reject)=>c.toBlob(b=>{if(!b){reject(new Error('No se pudo crear PNG'));return;}const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(b);},'image/png'));
+      const preview=$('enhancePreviewCanvas'); preview.width=c.width; preview.height=c.height; preview.getContext('2d').clearRect(0,0,c.width,c.height); preview.getContext('2d').drawImage(c,0,0); enhanceWorkingCanvas=c; bgRemovePendingDataUrl=dataUrl; window.__bgRemoveBefore=sourceBefore; window.__bgRemoveTargetId=target.id; $('bgRemoveCommitBtn').disabled=false;
+      $('bgRemoveStatus').textContent=`Vista previa lista (${c.width} × ${c.height}px). Método: ${mode==='connected'?'fondo conectado que respeta contornos cerrados':'color similar en toda la imagen'}. Se detectaron ${removed.toLocaleString()} píxeles de fondo. El original sigue intacto.`;
+    }catch(err){$('bgRemoveStatus').textContent='No se pudo quitar el fondo. Prueba una imagen de menos de 12 megapíxeles o con un fondo uniforme.';}
+    finally{hideLoading();btn.disabled=false;}
+  });
+
+  $('bgRemoveCommitBtn').addEventListener('click',()=>{
+    const targets=enhancerTargets(),target=selectedEnhanceImage()||targets[0]?.el;
+    if(!target||!bgRemovePendingDataUrl||!targets.some(x=>x.el.id===target.id)){ $('bgRemoveStatus').textContent='Genera una vista previa con una imagen incluida en el alcance.';return; }
+    const previous=target.src,result=bgRemovePendingDataUrl;recordEnhanceToolChange(target,window.__bgRemoveBefore||previous,result,'eliminación de fondo');target.src=result;imgCache.delete(previous);thumbCache.clear();saveState();renderAll();
+    $('bgRemoveStatus').textContent='Recorte aplicado. Puedes usar Deshacer para recuperar el original.';bgRemovePendingDataUrl=null;$('bgRemoveCommitBtn').disabled=true;sfx.success();
+  });
+
+  // Cuentagotas global: se añade a cada selector de color estático y dinámico.
+  // EyeDropper nativo cuando está disponible; alternativa: tocar la imagen de vista previa.
+  let activeEyedropperInput = null;
+  function attachEyedropper(input) {
+    if (!input || input.type !== 'color' || input.dataset.eyedropperReady) return;
+    input.dataset.eyedropperReady = '1';
+    const btn = document.createElement('button'); btn.type='button'; btn.className='btn'; btn.textContent='⌖'; btn.title='Cuentagotas: elegir un color de la pantalla o de la vista previa';
+    btn.setAttribute('aria-label','Cuentagotas'); btn.style.cssText='min-width:34px;padding:5px 8px;margin-left:4px;vertical-align:middle';
+    input.insertAdjacentElement('afterend',btn);
+    btn.addEventListener('click',async()=>{
+      if (window.EyeDropper) {
+        try { const result=await new window.EyeDropper().open(); input.value=result.sRGBHex; input.dispatchEvent(new Event('input',{bubbles:true})); input.dispatchEvent(new Event('change',{bubbles:true})); return; }
+        catch(e) { if (e && e.name==='AbortError') return; }
+      }
+      activeEyedropperInput=input;
+      const canvas=$('enhancePreviewCanvas');
+      if(canvas && canvas.width>1 && canvas.height>1){ $('bgRemoveStatus').textContent='Cuentagotas activo: toca un punto de la vista previa para tomar su color.'; canvas.style.cursor='crosshair'; canvas.title='Toca para tomar color'; }
+      else { const selected=selectedEnhanceImage(); if(!selected){alert('Selecciona una imagen y genera una vista previa para usar el cuentagotas.');activeEyedropperInput=null;return;} try {const im=await getLoadedImage(selected.src),c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const cx=c.getContext('2d',{willReadFrequently:true});cx.drawImage(im,0,0);const tmp=$('enhancePreviewCanvas');tmp.width=Math.min(900,c.width);tmp.height=Math.max(1,Math.round(c.height*tmp.width/c.width));tmp.getContext('2d').drawImage(c,0,0,tmp.width,tmp.height);tmp.style.display='block';alert('Vista previa preparada. Vuelve a pulsar el cuentagotas y toca el color en la vista previa.');}catch(e){activeEyedropperInput=null;} }
+    });
+  }
+  function installEyedroppers(root=document){root.querySelectorAll('input[type="color"]').forEach(attachEyedropper);}
+  const eyeObserver = new MutationObserver(()=>installEyedroppers());
+  eyeObserver.observe(document.body,{childList:true,subtree:true}); installEyedroppers();
+  $('enhancePreviewCanvas').addEventListener('pointerdown',e=>{
+    if(!activeEyedropperInput)return;const canvas=e.currentTarget,rect=canvas.getBoundingClientRect();
+    const x=Math.max(0,Math.min(canvas.width-1,Math.floor((e.clientX-rect.left)/rect.width*canvas.width))),y=Math.max(0,Math.min(canvas.height-1,Math.floor((e.clientY-rect.top)/rect.height*canvas.height)));
+    try{const d=canvas.getContext('2d',{willReadFrequently:true}).getImageData(x,y,1,1).data;const hex='#'+[d[0],d[1],d[2]].map(v=>v.toString(16).padStart(2,'0')).join('');activeEyedropperInput.value=hex;activeEyedropperInput.dispatchEvent(new Event('input',{bubbles:true}));activeEyedropperInput.dispatchEvent(new Event('change',{bubbles:true}));if(activeEyedropperInput.id==='bgRemoveColor')$('bgRemoveStatus').textContent='Color tomado: '+hex;activeEyedropperInput=null;canvas.style.cursor='default';}catch(e){activeEyedropperInput=null;}
+  });
+
+  // Plantillas de póster: inserta capas de texto editables, sin reemplazar el contenido existente.
+  function openPosterTemplates(){const m=$('posterTemplatesModal');m.classList.add('show');setTimeout(()=>m.classList.add('visible'),10);$('moreMenu').classList.remove('show');}
+  function closePosterTemplates(){const m=$('posterTemplatesModal');m.classList.remove('visible');setTimeout(()=>m.classList.remove('show'),250);}
+  $('openPosterTemplatesBtn').addEventListener('click',openPosterTemplates);
+  $('closePosterTemplates').addEventListener('click',closePosterTemplates);
+  $('cancelPosterTemplates').addEventListener('click',closePosterTemplates);
+  $('applyPosterTemplateBtn').addEventListener('click',()=>{
+    const P=getPaperCm(), kind=$('posterTemplateSelect').value;
+    const title=$('posterTemplateTitle').value.trim()||'TU GRAN TÍTULO', subtitle=$('posterTemplateSubtitle').value.trim(), footer=$('posterTemplateFooter').value.trim();
+    const colors={event:['#17324d','#e9f1f7'],sale:['#b91c1c','#fff1f2'],minimal:['#222222','#f4f0e8'],social:['#4338ca','#eef2ff']}[kind]||['#17324d','#e9f1f7'];
+    const margin=Math.max(.5,Math.min(1.5,P.w*.06)), titleH=Math.max(2,Math.min(P.h*.22,5));
+    const specs=[
+      {text:title,name:'Plantilla · Título',x:margin,y:Math.max(.5,P.h*.18),w:Math.max(1,P.w-2*margin),h:titleH},
+      {text:subtitle,name:'Plantilla · Subtítulo',x:margin,y:Math.max(1,P.h*.18+titleH+.5),w:Math.max(1,P.w-2*margin),h:Math.max(1.5,Math.min(3,P.h*.12))},
+      {text:footer,name:'Plantilla · Pie',x:margin,y:Math.max(.5,P.h-Math.max(2,P.h*.12)),w:Math.max(1,P.w-2*margin),h:Math.max(1.5,Math.min(2.5,P.h*.1))}
+    ].filter(v=>v.text);
+    const made=[];
+    for(const sp of specs){
+      const el={id:++elCounter,type:'text',text:sp.text,layerName:sp.name,xCm:Math.max(0,Math.min(P.w-.5,sp.x)),yCm:Math.max(0,Math.min(P.h-.5,sp.y)),wCm:Math.max(.5,Math.min(P.w,sp.w)),hCm:Math.max(.5,Math.min(P.h,sp.h)),mode:'stretch',rot:0};
+      sanitizeEl(el);fitText(el);currentPage().els.push(el);made.push(el);
+    }
+    // Add a slim accent bar as a native shape, so it can be recolored or deleted independently.
+    const bar={id:++elCounter,type:'shape',layerName:'Plantilla · Banda decorativa',xCm:0,yCm:0,wCm:P.w,hCm:Math.max(.25,Math.min(.7,P.h*.025)),mode:'stretch',rot:0,sh:{kind:'rect',fill:colors[0],stroke:colors[0],strokeW:0}};
+    sanitizeEl(bar);currentPage().els.push(bar);made.push(bar);
+    selectedIds=new Set(made.map(e=>e.id));multiSelectMode=true;saveState();renderAll();closePosterTemplates();
+    showToast('Plantilla añadida como capas editables. Ajusta colores, posición y tipografía.', 'success');sfx.success();
   });
 
   const pdfReaderState = {
@@ -3969,7 +4315,7 @@ ctx.restore();
         canvas.width = vp.width; canvas.height = vp.height;
         const ctx = canvas.getContext('2d');
         await page.render({ canvasContext: ctx, viewport: vp }).promise;
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        const dataUrl = canvas.toDataURL('image/png');
         const newPage = { id: ++pageCounter, els: [] };
         newPage.els.push({
           id: ++elCounter, src: dataUrl,
@@ -4116,7 +4462,6 @@ ctx.restore();
   // FIX 3: openPdfPrintModal ya NO llama a setPdfPrintDuplex (evita doble llamada)
   function openPdfPrintModal() {
     if (!pdfReaderState.pdfDoc) { showToast('Abre un PDF primero', 'info'); return; }
-    $('pdfPrintQuality').value = String(state.exportQuality || 0.92);
     pdfPrintDuplex = 'off';
     $('pdfDuplexOff').classList.add('active');
     $('pdfDuplexOdd').classList.remove('active');
@@ -4143,10 +4488,9 @@ ctx.restore();
       // Tamaño exacto en puntos (sin redondeo a 2 decimales en pulgadas)
       const ptW = vp1.width.toFixed(2), ptH = vp1.height.toFixed(2);
       styleTag.textContent = `@media print { @page { size: ${ptW}pt ${ptH}pt; margin: 0; } }`;
-      // La caja de cada página mide 1pt menos de alto para que jamás se desborde a otra hoja
+      // La caja de cada página conserva las dimensiones físicas del PDF.
       printArea.style.setProperty('--pw', `${ptW}pt`);
-      printArea.style.setProperty('--ph', `${(vp1.height - 1).toFixed(2)}pt`);
-      const q = parseFloat($('pdfPrintQuality').value) || 0.92;
+      printArea.style.setProperty('--ph', `${vp1.height.toFixed(4)}pt`);
       for (const pNum of pages) {
         const page = await pdf.getPage(pNum);
         const vp = page.getViewport({ scale: 2.5 });
@@ -4154,7 +4498,7 @@ ctx.restore();
         canvas.width = vp.width; canvas.height = vp.height;
         const ctx = canvas.getContext('2d');
         await page.render({ canvasContext: ctx, viewport: vp }).promise;
-        const dataUrl = canvas.toDataURL('image/jpeg', q);
+        const dataUrl = canvas.toDataURL('image/png');
         const pageDiv = document.createElement('div'); pageDiv.className = 'print-page';
         const img = document.createElement('img'); img.src = dataUrl;
         pageDiv.appendChild(img); printArea.appendChild(pageDiv);
@@ -4378,8 +4722,8 @@ ctx.restore();
   function addGen(kind) {
     const P = getPaperCm();
     const el = { id: ++elCounter, xCm: 0, yCm: 0, wCm: 6, hCm: 6, mode: 'stretch' };
-    if (kind === 'text') { el.type = 'text'; el.text = 'Texto'; el.wCm = Math.min(P.w * 0.7, 12); }
-    else { el.type = 'shape'; el.sh = { kind }; if (kind === 'line' || kind === 'arrow') { el.wCm = 8; el.hCm = 1.5; el.sh.stroke = '#111111'; el.sh.strokeW = 1.5; } }
+    if (kind === 'text') { el.type = 'text'; el.text = 'Texto'; el.layerName = 'Texto'; el.wCm = Math.min(P.w * 0.7, 12); }
+    else { el.type = 'shape'; el.layerName = ({rect:'Rectángulo',ellipse:'Elipse',triangle:'Triángulo',star:'Estrella',line:'Línea',arrow:'Flecha'})[kind] || 'Forma'; el.sh = { kind }; if (kind === 'line' || kind === 'arrow') { el.wCm = 8; el.hCm = 1.5; el.sh.stroke = '#111111'; el.sh.strokeW = 1.5; } }
     sanitizeEl(el);
     if (kind === 'text') fitText(el);
     el.xCm = (P.w - el.wCm) / 2; el.yCm = (P.h - el.hCm) / 2;
@@ -5000,7 +5344,6 @@ document.addEventListener('pointerdown', (e) => {
     $('showGrid').addEventListener('change', renderAll);
     $('snapGrid').addEventListener('change', renderAll);
     $('snapStep').addEventListener('change', renderAll);
-    $('exportQuality').addEventListener('change', (e) => { state.exportQuality = parseFloat(e.target.value) || 0.92; saveToLocalStorage(); });
 
     $('openBatchBtn').addEventListener('click', () => {
       sfx.click();
@@ -5020,12 +5363,13 @@ document.addEventListener('pointerdown', (e) => {
 
     function renderBatchThumbs() {
       const bar = $('batchThumbsBar');
+      bar.querySelectorAll('img[data-object-url]').forEach(img => { try { URL.revokeObjectURL(img.dataset.objectUrl); } catch (_) {} });
       if (batchOrderedFiles.length === 0) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
       bar.style.display = 'flex'; bar.innerHTML = '';
       batchOrderedFiles.forEach((file, idx) => {
         const thumb = document.createElement('div');
         thumb.className = 'batch-thumb'; thumb.draggable = true; thumb.dataset.idx = idx;
-        const img = document.createElement('img'); img.src = URL.createObjectURL(file);
+        const img = document.createElement('img'); img.src = URL.createObjectURL(file); img.dataset.objectUrl = img.src;
         const num = document.createElement('div'); num.className = 'bt-num'; num.textContent = idx + 1;
         thumb.appendChild(img); thumb.appendChild(num);
         thumb.addEventListener('dragstart', (e) => {
@@ -5361,10 +5705,10 @@ document.addEventListener('pointerdown', (e) => {
       showLoading('Exportando...');
       try {
         const canvas = await renderPageToCanvas(state.currentPageIndex, 300, state.currentPageIndex + 1, state.pages.length);
-        const q = state.exportQuality || 0.92;
         const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
         const extension = format === 'png' ? 'png' : 'jpg';
         canvas.toBlob(async (blob) => {
+          if (!blob) { hideLoading(); sfx.error(); showToast('No se pudo crear la imagen. Prueba con un lienzo más pequeño.', 'error'); return; }
           const file = new File([blob], `pagina_${state.currentPageIndex + 1}.${extension}`, { type: mimeType });
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             try { await navigator.share({ files: [file], title: 'Imagen' }); hideLoading(); sfx.success(); return; } catch (err) {}
@@ -5375,7 +5719,7 @@ document.addEventListener('pointerdown', (e) => {
           link.click();
           setTimeout(() => URL.revokeObjectURL(link.href), 1000);
           hideLoading(); sfx.success(); showToast('Imagen exportada', 'success');
-        }, mimeType, format === 'png' ? undefined : q);
+        }, mimeType, format === 'png' ? undefined : 1.0);
       } catch (err) { hideLoading(); sfx.error(); showToast('Error al exportar', 'error'); }
     }
     $('exportPngBtn').addEventListener('click', () => { sfx.click(); exportPageImage('png'); });
@@ -5751,7 +6095,7 @@ document.addEventListener('pointerdown', (e) => {
 
   /* ====== EDITOR DE PÓSTER (VARIAS HOJAS) ====== */
   const PS = { img: null, name: '', mode: 'size', cols: 2, rows: 2, pw: 60, ph: 90, lock: true, fit: 'fill', zoom: 100, offX: 0, offY: 0, rot: 0, flipH: false, flipV: false,
-    bg: '#ffffff', overlap: 0.5, margin: 0.5, snapMove: true, detectLines: true, snapStep: 0.1, dpi: 200, fmt: 'jpg', bright: 100, contrast: 100, sat: 100, cropL: 0, cropR: 0, cropT: 0, cropB: 0, gray: false, maxSheets: 9, exactSheets: 6, paperPreset: 'carta',
+    bg: '#ffffff', overlap: 0.5, margin: 0.5, snapMove: true, detectLines: true, snapStep: 0.1, dpi: 300, fmt: 'png', bright: 100, contrast: 100, sat: 100, cropL: 0, cropR: 0, cropT: 0, cropB: 0, gray: false, maxSheets: 9, exactSheets: 6, paperPreset: 'carta',
     skip: new Set(), sel: null, tab: 0, preset: '' };
   const PS_FILTER = (() => { try { return 'filter' in document.createElement('canvas').getContext('2d'); } catch (e) { return false; } })();
   let psOpen = false, psRaf = 0;
@@ -5856,41 +6200,75 @@ document.addEventListener('pointerdown', (e) => {
     try {
       const sheets = await psBuildAll(), p = getPaperCm(), news = [];
       for (const sh of sheets) {
-        await psTick(); const url = sh.cv.toDataURL(psMime(), 0.92);
+        await psTick(); const url = sh.cv.toDataURL('image/png');
         news.push({ id: ++pageCounter, els: [{ id: ++elCounter, src: url, xCm: 0, yCm: 0, wCm: p.w, hCm: p.h, mode: 'stretch', imgZoom: 100, imgPosX: 0, imgPosY: 0, imgRotate: 0, showOverflow: false }] });
       }
       if (replace) { state.pages = news; state.currentPageIndex = 0; thumbCache.clear(); }
       else { state.pages.push(...news); state.currentPageIndex = state.pages.length - news.length; }
       selectedIds = new Set(); multiSelectMode = false; saveState(); renderAll(); hideLoading(); sfx.success(); closePoster();
-    } catch (err) { hideLoading(); sfx.error(); $('psInfo').textContent = 'Error al generar las hojas (imagen demasiado grande). Baja la calidad.'; $('psInfo').classList.add('warn'); }
+    } catch (err) { hideLoading(); sfx.error(); $('psInfo').textContent = 'No se pudieron generar las hojas. Prueba con una imagen de menor tamaño o menos hojas.'; $('psInfo').classList.add('warn'); }
   }
   function psDownload(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000); }
   async function psToPdf() {
-    if (!psNeedImg()) return; showLoading('Generando PDF...');
+    if (!psNeedImg()) return; showLoading('Generando PDF…');
     try {
-      const sheets = await psBuildAll(), { jsPDF } = window.jspdf, p = getPaperCm(), land = p.w > p.h, format = land ? [p.h, p.w] : [p.w, p.h], ori = land ? 'landscape' : 'portrait';
-      const pdf = new jsPDF({ unit: 'cm', format, orientation: ori, compress: true });
-      sheets.forEach((sh, i) => { if (i > 0) pdf.addPage(format, ori); pdf.addImage(sh.cv.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, p.w, p.h, undefined, 'FAST'); });
+      const G = psGeom(), tiles = psTiles(G), { jsPDF } = window.jspdf, p = getPaperCm();
+      const land = p.w > p.h, format = land ? [p.h, p.w] : [p.w, p.h], ori = land ? 'landscape' : 'portrait';
+      const pdf = new jsPDF({ unit: 'cm', format, orientation: ori, compress: true, precision: 12 });
+      for (let i = 0; i < tiles.length; i++) {
+        const t = tiles[i]; $('loading-label').textContent = `Preparando PDF: hoja ${i + 1} de ${tiles.length}…`; await psTick();
+        const cv = psRenderTile(t.r, t.c, PS.dpi, i + 1, tiles.length);
+        if (i > 0) pdf.addPage(format, ori);
+        pdf.addImage(cv.toDataURL('image/png'), 'PNG', 0, 0, p.w, p.h, undefined, 'FAST');
+        // Liberar la memoria del lienzo inmediatamente después de incorporarlo al PDF.
+        cv.width = 1; cv.height = 1;
+      }
       pdf.save('Poster.pdf'); hideLoading(); sfx.success();
-    } catch (err) { hideLoading(); sfx.error(); $('psInfo').textContent = 'Error al generar el PDF. Baja la calidad.'; $('psInfo').classList.add('warn'); }
+    } catch (err) { hideLoading(); sfx.error(); $('psInfo').textContent = 'No se pudo generar el PDF. Reduce la cantidad de hojas o la resolución de la imagen.'; $('psInfo').classList.add('warn'); }
   }
   async function psToZip() {
-    if (!psNeedImg()) return; showLoading('Generando ZIP...');
+    if (!psNeedImg()) return; showLoading('Preparando imágenes…');
     try {
-      const sheets = await psBuildAll(), zip = new JSZip(), ext = PS.fmt === 'png' ? 'png' : 'jpg';
-      for (const sh of sheets) { await psTick(); zip.file(`Poster_${sh.code}.${ext}`, sh.cv.toDataURL(psMime(), 0.92).split(',')[1], { base64: true }); }
+      const G = psGeom(), tiles = psTiles(G), zip = new JSZip();
+      for (let i = 0; i < tiles.length; i++) {
+        const t = tiles[i]; $('loading-label').textContent = `Preparando ZIP: hoja ${i + 1} de ${tiles.length}…`; await psTick();
+        const cv = psRenderTile(t.r, t.c, PS.dpi, i + 1, tiles.length);
+        const data = cv.toDataURL('image/png').split(',')[1];
+        zip.file(`Poster_${t.code}.png`, data, { base64: true }); cv.width = 1; cv.height = 1;
+      }
+      $('loading-label').textContent = 'Comprimiendo ZIP…';
       psDownload(await zip.generateAsync({ type: 'blob' }), 'Poster.zip'); hideLoading(); sfx.success();
-    } catch (err) { hideLoading(); sfx.error(); $('psInfo').textContent = 'Error al generar el ZIP. Baja la calidad.'; $('psInfo').classList.add('warn'); }
+    } catch (err) { hideLoading(); sfx.error(); $('psInfo').textContent = 'No se pudo generar el ZIP. Reduce la cantidad de hojas o la resolución de la imagen.'; $('psInfo').classList.add('warn'); }
   }
   async function psPrint() {
-    if (!psNeedImg()) return; showLoading('Preparando impresión...');
+    if (!psNeedImg()) return; showLoading('Preparando impresión…');
     try {
-      const sheets = await psBuildAll(), p = getPaperCm(), w = window.open('', '_blank');
+      const G = psGeom(), tiles = psTiles(G), p = getPaperCm(), w = window.open('', '_blank');
       if (!w) throw new Error('Popup bloqueado');
-      const pages = sheets.map(sh => `<section class="sheet"><img src="${sh.cv.toDataURL(psMime(), 0.92)}"></section>`).join('');
-      w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Imprimir póster</title><style>@page{size:${p.w}cm ${p.h}cm;margin:0}html,body{margin:0;padding:0;width:100%;}.sheet{width:${p.w}cm;height:${p.h}cm;overflow:hidden;break-inside:avoid;page-break-inside:avoid}.sheet+.sheet{break-before:page;page-break-before:always}img{width:100%;height:100%;display:block;object-fit:fill;margin:0;padding:0;border:0}</style></head><body>${pages}<script>window.onload=()=>{window.focus();window.print()}<\/script></body></html>`);
-      w.document.close(); hideLoading(); sfx.success();
-    } catch (err) { hideLoading(); sfx.error(); $('psInfo').textContent = 'No se pudo abrir la ventana de impresión. Permite las ventanas emergentes.'; $('psInfo').classList.add('warn'); }
+      // Las imágenes se crean una por una y se liberan después de serializarlas, evitando
+      // mantener todos los canvas de alta resolución simultáneamente en memoria.
+      const pages = [];
+      for (let i = 0; i < tiles.length; i++) {
+        const t = tiles[i]; $('loading-label').textContent = `Preparando impresión: hoja ${i + 1} de ${tiles.length}…`; await psTick();
+        const cv = psRenderTile(t.r, t.c, PS.dpi, i + 1, tiles.length);
+        pages.push(`<section class="sheet"><img alt="Hoja ${i + 1}" src="${cv.toDataURL('image/png')}"></section>`);
+        cv.width = 1; cv.height = 1;
+      }
+      const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Imprimir póster</title><style>
+        @page{size:${p.w}cm ${p.h}cm;margin:0}
+        *{box-sizing:border-box}html,body{margin:0!important;padding:0!important;width:${p.w}cm!important;background:#fff!important}
+        body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+        .sheet{display:block;position:relative;width:${p.w}cm!important;height:${p.h}cm!important;min-width:${p.w}cm!important;min-height:${p.h}cm!important;max-width:none!important;max-height:none!important;overflow:hidden;margin:0;padding:0;break-after:page;page-break-after:always;break-inside:avoid;page-break-inside:avoid}
+        .sheet:last-child{break-after:auto;page-break-after:auto}
+        .sheet img{display:block!important;width:${p.w}cm!important;height:${p.h}cm!important;max-width:none!important;max-height:none!important;object-fit:fill;margin:0!important;padding:0!important;border:0!important}
+        @media screen{body{padding:12px!important}.sheet{margin:0 auto 12px!important;outline:1px solid #bbb}}
+      </style></head><body>${pages.join('')}<script>
+        window.addEventListener('load',async()=>{const imgs=[...document.images];await Promise.all(imgs.map(im=>im.decode?im.decode().catch(()=>{}):Promise.resolve()));window.focus();setTimeout(()=>window.print(),250)});
+      <\/script></body></html>`;
+      w.document.open(); w.document.write(html); w.document.close(); hideLoading(); sfx.success();
+      $('psInfo').textContent = 'Para conservar las medidas, imprime el PDF o las hojas con “Tamaño real / 100 %”; desactiva “Ajustar a página”. La impresora puede aplicar una escala propia.';
+      $('psInfo').classList.remove('warn');
+    } catch (err) { hideLoading(); sfx.error(); $('psInfo').textContent = 'No se pudo abrir la impresión. Permite ventanas emergentes e inténtalo de nuevo.'; $('psInfo').classList.add('warn'); }
   }
 
   const PS_PRESETS = [['', 'Personalizado'], ['29.7x42', 'A3 (29.7 × 42)'], ['42x59.4', 'A2 (42 × 59.4)'], ['59.4x84.1', 'A1 (59.4 × 84.1)'], ['84.1x118.9', 'A0 (84.1 × 118.9)'], ['50x70', '50 × 70'], ['60x90', '60 × 90'], ['70x100', '70 × 100'], ['100x150', '100 × 150']];
@@ -5930,7 +6308,7 @@ document.addEventListener('pointerdown', (e) => {
       <p class="ps-hint">Las divisiones se calculan desde el área imprimible real de cada hoja. La superposición controla cuánto se repite la imagen entre hojas para facilitar el montaje.</p>
     </div>
     <div class="ps-tab" data-tab="3">
-      <div class="row"><div><label>Calidad</label><select data-ps="dpi"><option value="100">Borrador (100 dpi)</option><option value="150">Normal (150 dpi)</option><option value="200">Alta (200 dpi)</option><option value="300">Máxima (300 dpi)</option></select></div><div><label>Formato</label><select data-ps="fmt"><option value="jpg">JPG</option><option value="png">PNG</option></select></div></div>
+      <div class="row"><div style="flex:1"><label>Resolución de exportación</label><div class="ps-hint" style="padding:8px;border:1px solid var(--line);border-radius:6px">Máxima fija: 300 dpi · PNG sin pérdida</div></div></div>
       <button type="button" class="cta" style="margin-top:10px" data-pa="pages">Añadir hojas como páginas</button>
       <button type="button" class="btn full" data-pa="replace">Reemplazar todas las páginas</button>
       <button type="button" class="btn full cyan" data-pa="pdf">Descargar PDF</button>
@@ -5977,7 +6355,7 @@ document.addEventListener('pointerdown', (e) => {
     if (['margin', 'overlap'].includes(k)) PS[k] = Math.max(0, PS[k] || 0);
     if (k === 'snapStep') PS.snapStep = Math.max(0.01, Math.min(5, Number(PS.snapStep) || 0.1));
     if (k === 'offX' || k === 'offY') PS[k] = Number(PS[k]) || 0;
-    PS.dpi = +PS.dpi || 150;
+    PS.dpi = 300;
     const G = psGeom();
     psSync(); psDraw();
   }
