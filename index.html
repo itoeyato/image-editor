@@ -634,7 +634,26 @@
   #imageEnhancerModal .enhance-control-grid input[type=range] { display:block; width:100%; min-width:0; margin:5px 0; }
   #imageEnhancerModal .enhance-actions { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:7px; margin-top:8px; }
   #imageEnhancerModal .enhance-actions .btn { min-width:0; width:100%; max-width:100%; white-space:normal; overflow-wrap:anywhere; line-height:1.2; padding:9px 7px; font-size:12px; }
-  #imageEnhancerModal #enhancePreviewCanvas { max-width:100%; }
+  #imageEnhancerModal .image-tool-preview { max-width:100%; }
+  #imageEnhancerModal .bg-edit-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-top:8px}
+  #imageEnhancerModal .bg-edit-tools .btn{white-space:normal;line-height:1.2;min-height:36px}
+  #imageEnhancerModal .bg-edit-tools .btn.active{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important}
+  #imageEnhancerModal .image-tool-tabs { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:10px 0 8px;position:sticky;top:-1px;z-index:3;padding:5px 0;background:var(--panel, #fff); }
+  #imageEnhancerModal .image-tool-tab { min-width:0;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--text)!important;font-size:11px;font-weight:700;padding:9px 4px;line-height:1.2;box-shadow:0 1px 2px rgba(0,0,0,.06);transition:background .15s,border-color .15s,transform .15s; }
+  #imageEnhancerModal .image-tool-tab:hover { border-color:var(--accent); }
+  #imageEnhancerModal .image-tool-tab:active { transform:scale(.98); }
+  #imageEnhancerModal .image-tool-tab.active { background:var(--accent)!important;color:#fff!important;border-color:var(--accent);box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 24%,transparent); }
+  #imageEnhancerModal .image-tool-panel[hidden], #imageEnhancerModal [hidden] { display:none !important; }
+  #imageEnhancerModal .image-preview-viewport { position:relative;width:100%;height:clamp(170px,30vh,320px);margin:7px 0 10px;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:9px;background-color:#fff;background-image:linear-gradient(45deg,#d7dbe3 25%,transparent 25%),linear-gradient(-45deg,#d7dbe3 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#d7dbe3 75%),linear-gradient(-45deg,transparent 75%,#d7dbe3 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0;touch-action:none;overscroll-behavior:contain; }
+
+  #imageEnhancerModal #bgPreviewViewport{position:relative}
+  #imageEnhancerModal #bgBrushCursor{will-change:left,top,width,height}
+  #imageEnhancerModal #bgZoneMode,#imageEnhancerModal #bgRemoveMode{font-size:11px}
+  #imageEnhancerModal #bgZoneIntensity,#imageEnhancerModal #bgClosedIntensity,#imageEnhancerModal #bgBrushSize,#imageEnhancerModal #bgEraserSize{min-width:0}
+  #imageEnhancerModal .image-tool-preview { display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;margin:0;touch-action:none;transform-origin:center center;will-change:transform; }
+  #eyedropperLoupe { position:fixed;z-index:100000;display:none;pointer-events:none;align-items:center;gap:7px;padding:6px 9px;border-radius:12px;background:#172033;color:#fff;box-shadow:0 4px 18px rgba(0,0,0,.32);font:600 11px 'JetBrains Mono',monospace;transform:translate(-50%,-115%); }
+  #eyedropperLoupe .eye-swatch { width:30px;height:30px;border:2px solid white;border-radius:50%;box-shadow:0 0 0 1px #0008;flex:none; }
+  .eye-active-button { border-color:var(--accent)!important;background:var(--accent)!important;color:#fff!important; }
   @media (max-width:380px) { #imageEnhancerModal .modalbox { padding:10px; } #imageEnhancerModal .enhance-actions { grid-template-columns:minmax(0,1fr); } #imageEnhancerModal .enhance-control-grid { gap:5px 8px; } #imageEnhancerModal .modalbox h2 { padding-right:20px; font-size:14px; } }
 @media (max-width: 360px) {
   .quick-actions, .quick-toolbar, .toolbar-actions { flex-wrap: wrap; min-width: 0; max-width: 100%; }
@@ -644,6 +663,7 @@
   .topbar button, .toolbar button, .header-actions button { touch-action: manipulation; }
 }
 </style>
+<meta name="editor-build" content="2026-10-15-tools-separated-history-v2">
 </head>
 
 <body class="theme-sunset">
@@ -1067,40 +1087,65 @@
   <div class="modal" id="imageEnhancerModal">
     <div class="modalbox">
       <button class="closebtn" id="closeImageEnhancer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
-      <h2>Mejorador de imagen y texto</h2>
+      <h2>Herramientas de imagen</h2>
       
       <div id="enhanceSourceInfo" style="font-size:11px;color:var(--muted);margin:6px 0">Ninguna imagen seleccionada.</div>
       <label for="enhanceScope">Aplicar a</label><select id="enhanceScope"><option value="selected">Imagen(es) seleccionada(s)</option><option value="page">Todas las imágenes de esta página</option><option value="all">Todas las imágenes de todas las páginas</option></select>
-      <div class="enhance-control-grid"><div><label for="enhanceScale">Ampliación</label><select id="enhanceScale"><option value="1">1× original</option><option value="1.5">1,5×</option><option value="2" selected>2×</option><option value="3">3× · alta memoria</option></select></div>
+      <div class="image-tool-tabs" role="tablist" aria-label="Herramientas de imagen">
+        <button type="button" class="image-tool-tab active" role="tab" aria-selected="true" data-tool-tab="superres">Superresolución</button>
+        <button type="button" class="image-tool-tab" role="tab" aria-selected="false" data-tool-tab="background">Quitar fondo</button>
+        <button type="button" class="image-tool-tab" role="tab" aria-selected="false" data-tool-tab="ocr">Reconocer texto</button>
+      </div>
+      <div id="legacyEnhancerControls" hidden>
+      <div class="enhance-control-grid">
       <div><label>Enfoque <span id="enhanceSharpVal">35%</span></label><input type="range" id="enhanceSharp" min="0" max="100" value="35" step="5" /></div>
       <div><label>Contraste <span id="enhanceContrastVal">110%</span></label><input type="range" id="enhanceContrast" min="70" max="160" value="110" step="5" /></div>
       <div><label>Brillo <span id="enhanceBrightnessVal">100%</span></label><input type="range" id="enhanceBrightness" min="70" max="140" value="100" step="5" /></div></div>
       <div class="enhance-actions"><button class="btn" id="enhancePreviewBtn">Vista previa</button><button class="btn cyan" id="enhanceApplyBtn" disabled>Aplicar a todas las elegidas</button></div>
+      </div>
+      <section id="toolPanelSuperres" class="image-tool-panel" role="tabpanel">
       <div style="margin-top:8px;padding:10px;border:1px solid var(--line);border-radius:10px">
-        <strong style="font-size:12px">Superresolución y restauración (funciona sin Internet)</strong>
+        <strong style="font-size:12px">Superresolución y restauración local</strong>
         <div class="enhance-control-grid" style="margin-top:6px">
+          <div><label for="enhanceScale">Ampliación</label><select id="enhanceScale"><option value="1">1× original</option><option value="1.5">1,5×</option><option value="2" selected>2×</option><option value="3">3× · alta memoria</option></select></div>
           <div><label for="srQuality">Calidad</label><select id="srQuality"><option value="fast">Rápida</option><option value="normal" selected>Equilibrada</option><option value="max">Máxima (más lenta)</option></select></div>
           <div><label>Corregir desenfoque <span id="srBlurVal">50</span></label><input type="range" id="srBlur" min="0" max="100" value="50" step="5" /></div>
           <div><label>Quitar ruido / JPEG <span id="srDenoiseVal">30</span></label><input type="range" id="srDenoise" min="0" max="100" value="30" step="5" /></div>
         </div>
         <div class="enhance-actions"><button class="btn" id="enhanceAiBtn" type="button">Generar vista previa</button><button class="btn cyan" id="enhanceAiApplyBtn" type="button" disabled>Aplicar resultado</button></div>
         <progress id="enhanceAiProgress" max="100" value="0" style="width:100%;height:8px;display:block;margin-top:7px;accent-color:var(--accent)"></progress>
-        <div id="enhanceAiStatus" role="status" style="font-size:11px;margin-top:6px;color:var(--muted)">Usa la “Ampliación” de arriba (2× recomendado). Reconstruye bordes, reduce desenfoque, ruido y artefactos JPEG. Todo se calcula en tu teléfono.</div>
+        <div id="enhanceAiStatus" role="status" style="font-size:11px;margin-top:6px;color:var(--muted)">Usa la “Ampliación” de arriba (2× recomendado). Amplía con interpolación avanzada y restauración local de bordes, ruido y desenfoque. No es un modelo generativo ni inventa detalles reales; todo se calcula en tu teléfono.</div>
       </div>
-      <div style="margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:10px">
-        <strong style="font-size:12px">Eliminar fondo inteligente</strong>
+      <canvas id="srPreviewCanvas" class="image-tool-preview" aria-label="Vista previa de superresolución"></canvas>
+      </section>
+      <section id="toolPanelBackground" class="image-tool-panel" role="tabpanel" hidden>
+      <div class="image-preview-viewport" id="bgPreviewViewport" aria-label="Vista previa ampliable: arrastra para mover, pellizca para zoom"><canvas id="bgPreviewCanvas" class="image-tool-preview" aria-label="Vista previa de eliminación de fondo"></canvas></div>
+      <div style="margin-top:4px;padding:10px;border:1px solid var(--line);border-radius:10px">
+        <strong style="font-size:12px">Eliminar fondo · máscara con bordes suaves</strong>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">Arrastra para mover la vista; pellizca para ampliar; doble toque restablece el encuadre. El resultado se mantiene como PNG transparente.</div>
         
-        <div class="row" style="align-items:end"><div><label for="bgRemoveColor">Color del fondo</label><input type="color" id="bgRemoveColor" value="#ffffff" /></div><div><label for="bgRemoveTolerance">Sensibilidad <span id="bgRemoveToleranceVal">35</span></label><input type="range" id="bgRemoveTolerance" min="5" max="120" value="35" step="5" /></div></div><div class="row" style="align-items:end;margin-top:6px"><div><label for="bgRemoveMode">Método</label><select id="bgRemoveMode"><option value="connected" selected>Fondo conectado (respeta bordes)</option><option value="global">Todo el color similar</option></select></div><div><label for="bgRemoveFeather">Suavizar borde <span id="bgRemoveFeatherVal">2 px</span></label><input type="range" id="bgRemoveFeather" min="0" max="6" value="2" step="1" /></div></div>
-        <div class="enhance-actions"><button class="btn" id="bgSampleCornerBtn" type="button">Tomar color de esquina</button><button class="btn cyan" id="bgRemoveApplyBtn" type="button">Vista previa</button><button class="btn" id="bgRemoveCommitBtn" type="button" disabled>Aplicar recorte</button></div>
+        <div class="row" style="align-items:end"><div><label for="bgRemoveColor">Color del fondo</label><input type="color" id="bgRemoveColor" value="#ffffff" /></div><div><label for="bgRemoveTolerance">Sensibilidad <span id="bgRemoveToleranceVal">35</span></label><input type="range" id="bgRemoveTolerance" min="5" max="120" value="35" step="5" /></div></div><div class="row" style="align-items:end;margin-top:6px"><div><label for="bgRemoveMode">Método de base</label><select id="bgRemoveMode"><option value="connected" selected>Fondo conectado (bordes)</option><option value="intelligent">Inteligente (color + bordes)</option><option value="closed">Solo zonas cerradas (manual)</option><option value="global">Todo el color similar (riesgo alto)</option></select></div><div><label for="bgRemoveFeather">Suavizar borde <span id="bgRemoveFeatherVal">2 px</span></label><input type="range" id="bgRemoveFeather" min="0" max="6" value="2" step="1" /></div></div>
+        <div class="row" style="align-items:end;margin-top:6px"><div style="flex:1"><label for="bgZoneMode">Selección de zona</label><select id="bgZoneMode"><option value="connected" selected>Región conectada</option><option value="closed">Solo zona cerrada</option><option value="intelligent">Inteligente: respeta bordes</option></select></div></div>
+        <div class="row" style="align-items:end;margin-top:4px"><div style="flex:1"><label for="bgZoneIntensity">Intensidad de selección <span id="bgZoneIntensityVal">50%</span></label><input id="bgZoneIntensity" type="range" min="10" max="100" value="50" step="5" style="width:100%" /></div><div style="flex:1"><label for="bgClosedIntensity">Intensidad zona cerrada <span id="bgClosedIntensityVal">45%</span></label><input id="bgClosedIntensity" type="range" min="5" max="100" value="45" step="5" style="width:100%" /></div></div>
+        <div class="enhance-actions"><button class="btn" id="bgSampleCornerBtn" type="button">Tomar color de esquina</button><button class="btn cyan" id="bgRemoveApplyBtn" type="button">Generar base</button></div>
+        <div class="bg-edit-tools" role="group" aria-label="Herramientas de máscara"><button class="btn active" type="button" data-bg-tool="pan">✋ Mover / zoom</button><button class="btn" type="button" data-bg-tool="zone">▧ Seleccionar zona</button><button class="btn" type="button" data-bg-tool="brush">✎ Pincel para quitar</button><button class="btn" type="button" data-bg-tool="eraser">⌫ Proteger / borrar</button></div>
+        <div class="row" style="align-items:center;margin-top:6px"><div style="flex:1"><label for="bgBrushSize">Tamaño del pincel <span id="bgBrushSizeVal">28 px</span></label><input type="range" id="bgBrushSize" min="4" max="180" value="28" step="2" style="width:100%" /></div><div style="flex:1"><label for="bgEraserSize">Tamaño del borrador <span id="bgEraserSizeVal">36 px</span></label><input type="range" id="bgEraserSize" min="4" max="180" value="36" step="2" style="width:100%" /></div></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">Las zonas retocadas se muestran con una superposición translúcida: rojo = quitar, azul = proteger. El indicador circular muestra el radio real del pincel.</div>
+        <div class="row" style="align-items:center;margin-top:6px"><button class="btn" id="bgEditUndoBtn" type="button" disabled>↶ Deshacer acción</button><button class="btn" id="bgEditRedoBtn" type="button" disabled>↷ Rehacer acción</button></div>
+        <div class="enhance-actions" style="margin-top:7px"><button class="btn" id="bgRemoveUndoPreviewBtn" type="button" disabled>Descartar vista previa</button><button class="btn cyan" id="bgRemoveCommitBtn" type="button" disabled>Aplicar recorte</button></div>
+        <label for="enhanceHistoryTarget" style="margin-top:8px">Historial independiente de la imagen</label><select id="enhanceHistoryTarget" aria-label="Imagen cuyo historial se va a deshacer o rehacer"></select>
         <div class="enhance-actions" style="margin-top:7px"><button class="btn" id="enhanceToolUndoBtn" type="button" disabled>↶ Deshacer</button><button class="btn" id="enhanceToolRedoBtn" type="button" disabled>↷ Rehacer</button></div>
         <div id="bgRemoveStatus" role="status" style="font-size:11px;color:var(--muted);margin-top:6px">Selecciona una imagen. El resultado conserva transparencia y puede deshacerse con Deshacer.</div>
       </div>
-      <canvas id="enhancePreviewCanvas" style="display:block;width:100%;height:auto;max-height:25vh;object-fit:contain;background-color:#fff;background-image:linear-gradient(45deg,#d7dbe3 25%,transparent 25%),linear-gradient(-45deg,#d7dbe3 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#d7dbe3 75%),linear-gradient(-45deg,transparent 75%,#d7dbe3 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0;border-radius:8px;margin-top:8px"></canvas>
+      </section>
+      <section id="toolPanelOcr" class="image-tool-panel" role="tabpanel" hidden>
       <div class="divider" style="margin:10px 0;border-top:1px solid var(--line)"></div>
-      <h3 style="font-size:13px;margin:4px 0">Reconocimiento inteligente de texto (OCR)</h3>
+      <h3 style="font-size:13px;margin:4px 0">Reconocimiento de texto (OCR)</h3>
       <div class="enhance-actions"><button class="btn" id="enhanceOcrBtn">Reconocer texto</button><button class="btn" id="enhanceInsertTextBtn" disabled>Crear texto editable</button></div>
       <div id="enhanceOcrStatus" style="font-size:11px;color:var(--muted);margin:6px 0">El OCR analizará las imágenes incluidas en “Aplicar a”. Requiere Internet la primera vez.</div>
       <textarea id="enhanceOcrText" rows="5" placeholder="Texto reconocido…" style="width:100%;box-sizing:border-box;resize:vertical"></textarea>
+      <canvas id="ocrPreviewCanvas" class="image-tool-preview" aria-label="Imagen analizada por OCR"></canvas>
+      </section>
     </div>
   </div>
 
@@ -1462,7 +1507,7 @@
     thumbCache.delete(currentPage().id);
     updateThumbnails();
   }
-  const UI_ONLY_FIELDS = ['sidebarOpen', 'thumbsVisible', 'inspectorExpanded', 'inspectorHeight', 'inspectorLocked'];
+  const UI_ONLY_FIELDS = ['sidebarOpen', 'thumbsVisible', 'inspectorExpanded', 'inspectorHeight', 'inspectorLocked', 'currentPageIndex'];
 
 function undo() {
   if (undoStack.length <= 1) return;
@@ -1475,7 +1520,7 @@ function undo() {
   UI_ONLY_FIELDS.forEach(f => { state[f] = currentUI[f]; });
   selectedIds = new Set(); checkMultiSelectState();
   syncUIWithState(); renderAll();
-  isHistoryAction = false; updateHistoryButtons(); saveToLocalStorage(); updateThumbnails();
+  isHistoryAction = false; updateHistoryButtons(); saveToLocalStorage(); updateThumbnails(); if (typeof refreshAllImageToolPreviews === 'function') refreshAllImageToolPreviews();
 }
   function redo() {
   if (redoStack.length === 0) return;
@@ -1489,7 +1534,7 @@ function undo() {
   UI_ONLY_FIELDS.forEach(f => { state[f] = currentUI[f]; });
   selectedIds = new Set(); checkMultiSelectState();
   syncUIWithState(); renderAll();
-  isHistoryAction = false; updateHistoryButtons(); saveToLocalStorage(); updateThumbnails();
+  isHistoryAction = false; updateHistoryButtons(); saveToLocalStorage(); updateThumbnails(); if (typeof refreshAllImageToolPreviews === 'function') refreshAllImageToolPreviews();
 }
   function updateHistoryButtons() {
     $("undoBtn").disabled = undoStack.length <= 1;
@@ -1699,44 +1744,42 @@ function undo() {
       // Handle de rotación independiente del control de escala.
       const rotateHandle = document.createElement("div");
       rotateHandle.className = "rotate-handle";
-      rotateHandle.title = "Arrastrar para rotar";
+      rotateHandle.title = "Arrastra para rotar. Configura el ajuste angular en Malla y guías.";
       rotateHandle.setAttribute("aria-label", "Rotar elemento");
       rotateHandle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4.5 16a8 8 0 0 0 13.2 2.1A8 8 0 0 0 18 6.5 8 8 0 0 0 5 8"/><path d="M4 4v5h5"/></svg>';
-      let rotating = false, startAngle = 0, startRotation = 0, centerX = 0, centerY = 0;
+      let rotating = false, startAngle = 0, startRotation = 0, centerX = 0, centerY = 0, pointerId = null;
       const finishRotation = (ev) => {
         if (!rotating) return;
         rotating = false;
-        try { rotateHandle.releasePointerCapture(ev.pointerId); } catch (_) {}
+        try { if(pointerId!==null)rotateHandle.releasePointerCapture(pointerId); } catch (_) {}
+        pointerId=null;
         el.rot = ((Number(el.rot) || 0) % 360 + 360) % 360;
-        saveState();
-        renderAll();
+        saveState(); renderAll();
       };
-      rotateHandle.addEventListener("pointerdown", (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
+      rotateHandle.addEventListener('pointerdown', (ev) => {
+        ev.preventDefault(); ev.stopPropagation();
         if (ev.button !== undefined && ev.button !== 0) return;
-        rotating = true;
+        rotating = true; pointerId=ev.pointerId;
         const rect = d.getBoundingClientRect();
-        centerX = rect.left + rect.width / 2;
-        centerY = rect.top + rect.height / 2;
+        centerX = rect.left + rect.width / 2; centerY = rect.top + rect.height / 2;
         startAngle = Math.atan2(ev.clientY - centerY, ev.clientX - centerX) * 180 / Math.PI;
         startRotation = Number(el.rot) || 0;
         try { rotateHandle.setPointerCapture(ev.pointerId); } catch (_) {}
       });
-      rotateHandle.addEventListener("pointermove", (ev) => {
+      rotateHandle.addEventListener('pointermove', (ev) => {
         if (!rotating) return;
-        ev.preventDefault();
-        ev.stopPropagation();
+        ev.preventDefault(); ev.stopPropagation();
         const angle = Math.atan2(ev.clientY - centerY, ev.clientX - centerX) * 180 / Math.PI;
         let next = startRotation + angle - startAngle;
+        const step = Math.max(1, Number(GC.rotStep) || 15);
+        if (GC.rotSnap !== false) next = Math.round(next / step) * step;
         next = ((next % 360) + 360) % 360;
-        el.rot = next;
-        d.style.transform = elCss(el);
+        el.rot = next; d.style.transform = elCss(el);
       });
-      rotateHandle.addEventListener("pointerup", finishRotation);
-      rotateHandle.addEventListener("pointercancel", finishRotation);
-      rotateHandle.addEventListener("lostpointercapture", () => {
-        if (rotating) { rotating = false; el.rot = ((Number(el.rot) || 0) % 360 + 360) % 360; saveState(); renderAll(); }
+      rotateHandle.addEventListener('pointerup', finishRotation);
+      rotateHandle.addEventListener('pointercancel', finishRotation);
+      rotateHandle.addEventListener('lostpointercapture', () => {
+        if (rotating) { rotating = false; pointerId=null; el.rot = ((Number(el.rot) || 0) % 360 + 360) % 360; saveState(); renderAll(); }
       });
       d.appendChild(rotateHandle);
     }
@@ -3718,19 +3761,19 @@ ctx.restore();
     $('enhanceScope').value=selected?'selected':'page';
     enhanceWorkingCanvas=null; enhanceAiPendingDataUrl=null; $('enhanceAiApplyBtn').disabled=true; $('enhanceApplyBtn').disabled=true; $('enhanceInsertTextBtn').disabled=true;
     $('enhanceOcrText').value=''; $('enhanceOcrStatus').textContent='El OCR analizará las imágenes incluidas en “Aplicar a”.';
-    const previewCanvas=$('enhancePreviewCanvas'); previewCanvas.width=1; previewCanvas.height=1;
+    const previewCanvas=$('srPreviewCanvas'); previewCanvas.width=1; previewCanvas.height=1; const bgCanvas=$('bgPreviewCanvas'); bgCanvas.width=1; bgCanvas.height=1; const ocrCanvas=$('ocrPreviewCanvas'); ocrCanvas.width=1; ocrCanvas.height=1;
     updateEnhanceTargetInfo();
     // Mostrar inmediatamente la imagen elegida para que los controles de color puedan muestrear desde el inicio.
     const initialTarget=selectedEnhanceImage()||enhancerTargets()[0]?.el;
-    if(initialTarget){getLoadedImage(initialTarget.src).then(im=>{previewCanvas.width=im.naturalWidth;previewCanvas.height=im.naturalHeight;previewCanvas.getContext('2d').clearRect(0,0,previewCanvas.width,previewCanvas.height);previewCanvas.getContext('2d').drawImage(im,0,0);enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=im.naturalWidth;enhanceWorkingCanvas.height=im.naturalHeight;enhanceWorkingCanvas.getContext('2d').drawImage(im,0,0);updateEnhanceTargetInfo();}).catch(()=>{});}
-    updateToolHistoryButtons();
+    if(initialTarget){getLoadedImage(initialTarget.src).then(im=>{[previewCanvas,bgCanvas,ocrCanvas].forEach(cv=>{cv.width=im.naturalWidth;cv.height=im.naturalHeight;const cx=cv.getContext('2d');cx.clearRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0);});enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=im.naturalWidth;enhanceWorkingCanvas.height=im.naturalHeight;enhanceWorkingCanvas.getContext('2d').drawImage(im,0,0);updateEnhanceTargetInfo();}).catch(()=>{});}
+    refreshHistoryTargetOptions();
     $('imageEnhancerModal').classList.add('show'); setTimeout(()=>$('imageEnhancerModal').classList.add('visible'),10);
   }
   function closeImageEnhancer() { const m=$('imageEnhancerModal'); m.classList.remove('visible'); setTimeout(()=>m.classList.remove('show'),250); }
   function selectedEnhanceImage() { return enhanceSourceElId ? findEl(enhanceSourceElId) : (enhancerTargets()[0]?.el || null); }
   $('openImageEnhancerBtn').addEventListener('click',()=>{$('moreMenu').classList.remove('show');openImageEnhancer();});
   $('closeImageEnhancer').addEventListener('click',closeImageEnhancer);
-  $('enhanceScope').addEventListener('change',()=>{enhanceWorkingCanvas=null;$('enhanceApplyBtn').disabled=true;updateEnhanceTargetInfo();});
+  $('enhanceScope').addEventListener('change',()=>{enhanceWorkingCanvas=null;$('enhanceApplyBtn').disabled=true;updateEnhanceTargetInfo();refreshHistoryTargetOptions();});
   $('enhanceSharp').addEventListener('input',e=>$('enhanceSharpVal').textContent=`${e.target.value}%`);
   $('enhanceContrast').addEventListener('input',e=>$('enhanceContrastVal').textContent=`${e.target.value}%`);
   $('enhanceBrightness').addEventListener('input',e=>$('enhanceBrightnessVal').textContent=`${e.target.value}%`);
@@ -3753,7 +3796,7 @@ ctx.restore();
   $('enhancePreviewBtn').addEventListener('click',async()=>{
     const targets=enhancerTargets();if(!targets.length){$('enhanceOcrStatus').textContent='No hay imágenes en el alcance elegido.';return;}
     try{showLoading('Procesando vista previa…');const c=await buildEnhancedCanvas(targets[0].el);enhanceWorkingCanvas=c;
-      const preview=$('enhancePreviewCanvas');preview.width=c.width;preview.height=c.height;preview.getContext('2d').drawImage(c,0,0);
+      const preview=$('srPreviewCanvas');preview.width=c.width;preview.height=c.height;preview.getContext('2d').clearRect(0,0,c.width,c.height);preview.getContext('2d').drawImage(c,0,0);
       $('enhanceOcrStatus').textContent=`Vista previa de la primera imagen: ${c.width} × ${c.height} px. Al aplicar, se procesarán las ${targets.length} imágenes objetivo.`;updateEnhanceTargetInfo();hideLoading();
     }catch(err){hideLoading();$('enhanceOcrStatus').textContent='No se pudo procesar la vista previa. Prueba una ampliación menor.';}
   });
@@ -3914,7 +3957,7 @@ ctx.restore();
       const res = await superResolveCanvas(img, { scale: Number($('enhanceScale').value) || 2, quality: $('srQuality').value, blur: Number($('srBlur').value), denoise: Number($('srDenoise').value) },
         (pct, msg) => { $('enhanceAiProgress').value = pct; $('enhanceAiStatus').textContent = msg; });
       const c = res.canvas;
-      const preview = $('enhancePreviewCanvas'); preview.width = c.width; preview.height = c.height;
+      const preview = $('srPreviewCanvas'); preview.width = c.width; preview.height = c.height;
       const pctx = preview.getContext('2d'); pctx.clearRect(0, 0, c.width, c.height); pctx.drawImage(c, 0, 0);
       enhanceWorkingCanvas = document.createElement('canvas'); enhanceWorkingCanvas.width = c.width; enhanceWorkingCanvas.height = c.height; enhanceWorkingCanvas.getContext('2d').drawImage(c, 0, 0);
       enhanceAiPendingDataUrl = c.toDataURL('image/png');
@@ -3926,35 +3969,93 @@ ctx.restore();
       $('enhanceAiProgress').value = 0; $('enhanceAiStatus').textContent = 'No se pudo procesar: ' + (err && err.message ? err.message : 'poca memoria. Prueba calidad Rápida o menor ampliación.');
     } finally { btn.disabled = false; }
   });
-  // Historial local para operaciones de imagen; el historial general del documento también se mantiene.
-  let enhanceToolHistory=[], enhanceToolHistoryIndex=-1;
-  function recordEnhanceToolChange(target, before, after, label){
-    if(!target||!before||!after)return;
-    enhanceToolHistory=enhanceToolHistory.slice(0,enhanceToolHistoryIndex+1);
-    enhanceToolHistory.push({id:target.id,before,after,label});
-    if(enhanceToolHistory.length>20)enhanceToolHistory.shift();
-    enhanceToolHistoryIndex=enhanceToolHistory.length-1;updateToolHistoryButtons();
+  // Historial aislado por imagen: nunca mezcla recortes de imágenes distintas.
+  const enhanceHistories = new Map();
+  function activeToolHistory(){
+    const requestedId=Number($('enhanceHistoryTarget')?.value||0);
+    const target=(requestedId?findEl(requestedId):null)||selectedEnhanceImage()||enhancerTargets()[0]?.el;
+    if(!target)return {target:null,items:[],index:-1};
+    if(!enhanceHistories.has(target.id))enhanceHistories.set(target.id,{items:[],index:-1});
+    return {target,...enhanceHistories.get(target.id)};
   }
-  function updateToolHistoryButtons(){const u=$('enhanceToolUndoBtn'),r=$('enhanceToolRedoBtn');if(u)u.disabled=enhanceToolHistoryIndex<0;if(r)r.disabled=enhanceToolHistoryIndex>=enhanceToolHistory.length-1;}
-  async function applyToolHistory(direction){const next=direction==='undo'?enhanceToolHistoryIndex:enhanceToolHistoryIndex+1;if(next<0||next>=enhanceToolHistory.length)return;const entry=enhanceToolHistory[next],target=findEl(entry.id);if(!target){$('bgRemoveStatus').textContent='No se encontró la imagen del historial. Usa el historial general del editor.';return;}const src=direction==='undo'?entry.before:entry.after;target.src=src;imgCache.delete(entry.before);imgCache.delete(entry.after);thumbCache.clear();saveState();renderAll();enhanceToolHistoryIndex=direction==='undo'?enhanceToolHistoryIndex-1:enhanceToolHistoryIndex+1;updateToolHistoryButtons();try{const im=await getLoadedImage(src),cv=$('enhancePreviewCanvas');cv.width=im.naturalWidth;cv.height=im.naturalHeight;cv.getContext('2d').clearRect(0,0,cv.width,cv.height);cv.getContext('2d').drawImage(im,0,0);enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=cv.width;enhanceWorkingCanvas.height=cv.height;enhanceWorkingCanvas.getContext('2d').drawImage(im,0,0);}catch(e){}bgRemovePendingDataUrl=null;$('bgRemoveCommitBtn').disabled=true;$('bgRemoveStatus').textContent=(direction==='undo'?'Cambio deshecho: ':'Cambio rehecho: ')+entry.label+'. Vista previa sincronizada.';}
+  function refreshHistoryTargetOptions(){
+    const sel=$('enhanceHistoryTarget');if(!sel)return;const previous=sel.value;
+    const targets=enhancerTargets();sel.replaceChildren();
+    targets.forEach((item,i)=>{const opt=document.createElement('option');opt.value=String(item.el.id);opt.textContent=`Imagen ${i+1} · página ${item.pageIndex+1}${item.el.layerName?' · '+item.el.layerName:''}`;sel.appendChild(opt);});
+    if(targets.some(x=>String(x.el.id)===previous))sel.value=previous;
+    else if(targets.some(x=>String(x.el.id)===String(enhanceSourceElId)))sel.value=String(enhanceSourceElId);
+    else if(targets[0])sel.value=String(targets[0].el.id);
+    updateToolHistoryButtons();
+  }
+  function recordEnhanceToolChange(target,before,after,label){
+    if(!target||!before||!after||before===after)return;
+    if(!enhanceHistories.has(target.id))enhanceHistories.set(target.id,{items:[],index:-1});
+    const h=enhanceHistories.get(target.id);h.items=h.items.slice(0,h.index+1);
+    h.items.push({before,after,label});if(h.items.length>30)h.items.shift();
+    h.index=h.items.length-1;updateToolHistoryButtons();
+  }
+  function updateToolHistoryButtons(){
+    const h=activeToolHistory(),u=$('enhanceToolUndoBtn'),r=$('enhanceToolRedoBtn');
+    if(u)u.disabled=!h.target||h.index<0;if(r)r.disabled=!h.target||h.index>=h.items.length-1;
+  }
+  async function syncImageToolPreview(target,src){
+    try{
+      const im=await getLoadedImage(src),canvases=[$('srPreviewCanvas'),$('bgPreviewCanvas'),$('ocrPreviewCanvas')];
+      canvases.forEach(cv=>{cv.width=im.naturalWidth;cv.height=im.naturalHeight;const ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);ctx.drawImage(im,0,0);});
+      enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=im.naturalWidth;enhanceWorkingCanvas.height=im.naturalHeight;
+      enhanceWorkingCanvas.getContext('2d').drawImage(im,0,0);
+      bgRemovePendingDataUrl=null;bgRemovePendingMap.clear();window.__bgRemoveBefore=null;window.__bgRemoveTargetId=null;$('bgRemoveCommitBtn').disabled=true;if($('bgRemoveUndoPreviewBtn'))$('bgRemoveUndoPreviewBtn').disabled=true;
+      $('bgRemoveStatus').textContent='Vista previa sincronizada con la imagen y su historial.';
+    }catch(e){}
+  }
+  async function refreshAllImageToolPreviews(){
+    const target=selectedEnhanceImage()||enhancerTargets()[0]?.el;
+    if(target)await syncImageToolPreview(target,target.src);
+  }
+  async function applyToolHistory(direction){
+    const h=activeToolHistory();if(!h.target)return;
+    const next=direction==='undo'?h.index:h.index+1;if(next<0||next>=h.items.length)return;
+    const entry=h.items[next],src=direction==='undo'?entry.before:entry.after,target=findEl(h.target.id);
+    if(!target)return;
+    target.src=src;const storedHistory=enhanceHistories.get(target.id);if(storedHistory)storedHistory.index=direction==='undo'?storedHistory.index-1:storedHistory.index+1;
+    imgCache.delete(src);thumbCache.clear();
+    // Persist without creating a second, mixed history entry.
+    const was=isHistoryAction;isHistoryAction=true;saveState();isHistoryAction=was;
+    renderAll();saveToLocalStorage();await syncImageToolPreview(target,src);updateToolHistoryButtons();
+    $('bgRemoveStatus').textContent=(direction==='undo'?'Acción deshecha: ':'Acción rehecha: ')+entry.label+'.';
+  }
+  $('enhanceHistoryTarget').addEventListener('change',async()=>{const t=findEl(Number($('enhanceHistoryTarget').value));if(t)await syncImageToolPreview(t,t.src);updateToolHistoryButtons();});
   $('enhanceToolUndoBtn').addEventListener('click',()=>applyToolHistory('undo'));
   $('enhanceToolRedoBtn').addEventListener('click',()=>applyToolHistory('redo'));
 
-  $('enhanceAiApplyBtn').addEventListener('click',()=>{
-    const target=selectedEnhanceImage()||enhancerTargets()[0]?.el;
-    if(!target||!enhanceAiPendingDataUrl){$('enhanceAiStatus').textContent='Primero genera una vista previa IA.';return;}
-    const included=enhancerTargets().some(x=>x.el.id===target.id);
-    if(!included){$('enhanceAiStatus').textContent='La imagen seleccionada no está incluida en el alcance actual.';return;}
-    const previous=target.src, result=enhanceAiPendingDataUrl;recordEnhanceToolChange(target,previous,result,'superresolución IA');target.src=result;imgCache.delete(previous);thumbCache.clear();saveState();renderAll();
-    enhanceAiPendingDataUrl=null;$('enhanceAiApplyBtn').disabled=true;
-    $('enhanceAiStatus').textContent='Resultado IA aplicado a una imagen. Usa Deshacer si no te convence.';sfx.success();
+  $('enhanceAiApplyBtn').addEventListener('click',async()=>{
+    const targets=enhancerTargets();
+    if(!targets.length||!enhanceAiPendingDataUrl){$('enhanceAiStatus').textContent='Primero genera una vista previa.';return;}
+    const ok=targets.length<2||await confirmAction('Aplicar superresolución',`Se procesarán ${targets.length} imágenes una por una. Esto puede tardar y consumir memoria en el celular. ¿Continuar?`);
+    if(!ok)return;
+    const btn=$('enhanceAiApplyBtn');btn.disabled=true;let done=0,failed=0;const total=targets.length;
+    try{showLoading('Aplicando superresolución…');
+      for(let i=0;i<targets.length;i++){
+        const item=targets[i];try{
+          let result;
+          if(i===0 && selectedEnhanceImage()?.id===item.el.id) result=enhanceAiPendingDataUrl;
+          else {const img=await getLoadedImage(item.el.src);const res=await superResolveCanvas(img,{scale:Number($('enhanceScale').value)||2,quality:$('srQuality').value,blur:Number($('srBlur').value),denoise:Number($('srDenoise').value)},(pct,msg)=>{$('enhanceAiStatus').textContent=`Imagen ${i+1}/${total}: ${msg}`;});result=res.canvas.toDataURL('image/png');}
+          const previous=item.el.src;recordEnhanceToolChange(item.el,previous,result,'superresolución');item.el.src=result;imgCache.delete(previous);done++;
+        }catch(e){failed++;}
+        $('loading-label').textContent=`Superresolución ${i+1} de ${total}…`;await new Promise(r=>setTimeout(r,0));
+      }
+      thumbCache.clear();saveState();renderAll();saveToLocalStorage();enhanceAiPendingDataUrl=null;
+      $('enhanceAiStatus').textContent=`Aplicada a ${done} de ${total} imágenes${failed?`; ${failed} no se pudieron procesar`:''}.`;updateToolHistoryButtons();sfx.success();
+      const current=selectedEnhanceImage();if(current)await syncImageToolPreview(current,current.src);
+    }catch(err){$('enhanceAiStatus').textContent='No se pudo aplicar la superresolución.';}
+    finally{hideLoading();btn.disabled=!enhanceAiPendingDataUrl;updateEnhanceTargetInfo();}
   });
   async function loadTesseract(){if(window.Tesseract)return window.Tesseract;if(!tesseractLoadPromise)tesseractLoadPromise=new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';sc.onload=()=>window.Tesseract?resolve(window.Tesseract):reject(new Error('OCR no disponible'));sc.onerror=()=>reject(new Error('No se pudo cargar OCR'));document.head.appendChild(sc);});return tesseractLoadPromise;}
   $('enhanceOcrBtn').addEventListener('click',async()=>{
     const targets=enhancerTargets();if(!targets.length){$('enhanceOcrStatus').textContent='No hay imágenes para reconocer.';return;}
     try{$('enhanceOcrBtn').disabled=true;$('enhanceOcrStatus').textContent='Cargando reconocimiento de texto…';const T=await loadTesseract(),results=[];
       for(let i=0;i<targets.length;i++){const el=targets[i].el;$('enhanceOcrStatus').textContent=`Reconociendo imagen ${i+1} de ${targets.length}…`;
-        let source=(i===0&&enhanceWorkingCanvas)?enhanceWorkingCanvas:null;
+        let source=(i===0&&enhanceWorkingCanvas&&selectedEnhanceImage()?.id===el.id)?enhanceWorkingCanvas:null;
         if(!source){const img=await getLoadedImage(el.src),factor=Math.min(2,3500/Math.max(img.naturalWidth,img.naturalHeight));source=document.createElement('canvas');source.width=Math.max(1,Math.round(img.naturalWidth*factor));source.height=Math.max(1,Math.round(img.naturalHeight*factor));const cx=source.getContext('2d');cx.imageSmoothingEnabled=true;cx.imageSmoothingQuality='high';cx.filter='contrast(115%) brightness(102%)';cx.drawImage(img,0,0,source.width,source.height);cx.filter='none';}
         const result=await T.recognize(source,'spa+eng',{logger:m=>{if(m.status)$('enhanceOcrStatus').textContent=`Imagen ${i+1}/${targets.length}: ${m.status}${m.progress!=null?' '+Math.round(m.progress*100)+'%':''}`;}});
         const text=(result.data.text||'').trim();if(text)results.push(`--- Imagen ${i+1} · página ${targets[i].pageIndex+1} ---\n${text}`);
@@ -3973,6 +4074,7 @@ ctx.restore();
 
   // Fase 4: eliminación de fondo por similitud de color (sin servicio externo).
   $('bgRemoveTolerance').addEventListener('input', e => $('bgRemoveToleranceVal').textContent=e.target.value);
+  $('bgRemoveMode').addEventListener('change',()=>{const m=$('bgRemoveMode').value;if(m==='closed')$('bgRemoveStatus').textContent='Modo de base «Solo zonas cerradas»: no elimina automáticamente el perímetro. Genera la base y selecciona las regiones interiores que quieres quitar.';else if(m==='global')$('bgRemoveStatus').textContent='Aviso: «Todo el color similar» puede quitar píxeles del mismo color en cualquier parte de la imagen.';});
   $('bgRemoveFeather').addEventListener('input',e=>$('bgRemoveFeatherVal').textContent=e.target.value+' px');
   function parseHexColor(hex) { const h=String(hex||'#ffffff').replace('#',''); return [parseInt(h.slice(0,2),16)||0,parseInt(h.slice(2,4),16)||0,parseInt(h.slice(4,6),16)||0]; }
   function sampleCornerColor(img) {
@@ -3989,76 +4091,183 @@ ctx.restore();
     catch(e){$('bgRemoveStatus').textContent='No se pudo leer la imagen.';}
   });
   let bgRemovePendingDataUrl=null;
-  $('bgRemoveApplyBtn').addEventListener('click',async()=>{
-    const targets=enhancerTargets();
-    if(!targets.length){$('bgRemoveStatus').textContent='No hay imágenes objetivo. Selecciona una imagen o cambia el alcance.';return;}
-    const target=selectedEnhanceImage()||targets[0].el;
-    if(!target || !targets.some(x=>x.el.id===target.id)){ $('bgRemoveStatus').textContent='El alcance actual no incluye la imagen seleccionada. Cambia el alcance a “Imagen(es) seleccionada(s)” o elige una imagen incluida.';return;}
-    const btn=$('bgRemoveApplyBtn');btn.disabled=true;
-    try{
-      showLoading('Eliminando fondo por color…');
-      const sourceBefore=target.src;
-      const img=await getLoadedImage(target.src);
-      if(img.naturalWidth*img.naturalHeight>12000000) throw new Error('Imagen demasiado grande para procesarla con seguridad en móvil');
-      const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
-      const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,c.width,c.height);
-      const im=ctx.getImageData(0,0,c.width,c.height),d=im.data, rgb=parseHexColor($('bgRemoveColor').value),tol=Number($('bgRemoveTolerance').value)||0, threshold=tol*tol*3;
-      const w=c.width,h=c.height,total=w*h, mode=$('bgRemoveMode')?.value||'connected', feather=Number($('bgRemoveFeather')?.value||0);
-      // Edge-aware background matte: connected flood fill from image edges. Similar pixels inside enclosed outlines are preserved.
-      const mask=new Uint8Array(total), queue=new Int32Array(total); let head=0,tail=0,removed=0;
-      const similar=(px)=>{const i=px*4,dr=d[i]-rgb[0],dg=d[i+1]-rgb[1],db=d[i+2]-rgb[2];return dr*dr+dg*dg+db*db<=threshold;};
-      if(mode==='global') { for(let px=0;px<total;px++) if(similar(px)) mask[px]=1; }
-      else {
-        const seed=px=>{if(px>=0&&px<total&&!mask[px]&&similar(px)){mask[px]=1;queue[tail++]=px;}};
-        for(let x=0;x<w;x++){seed(x);seed((h-1)*w+x);} for(let y=1;y<h-1;y++){seed(y*w);seed(y*w+w-1);}
-        while(head<tail){const px=queue[head++],x=px%w,y=(px/w)|0;if(x>0)seed(px-1);if(x+1<w)seed(px+1);if(y>0)seed(px-w);if(y+1<h)seed(px+w);}
+  let bgRemovePendingMap=new Map();
+  async function buildBackgroundRemoval(target){
+    const sourceBefore=target.src,img=await getLoadedImage(sourceBefore);
+    if(img.naturalWidth*img.naturalHeight>8000000)throw new Error('Imagen de más de 8 megapíxeles: reduce su tamaño para evitar agotar la memoria del móvil');
+    const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
+    const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,c.width,c.height);
+    const im=ctx.getImageData(0,0,c.width,c.height),d=im.data,w=c.width,h=c.height,total=w*h;
+    const picked=parseHexColor($('bgRemoveColor').value),tol=Number($('bgRemoveTolerance').value)||35,mode=$('bgRemoveMode')?.value||'connected',feather=Number($('bgRemoveFeather')?.value||0);
+    // Distancia perceptual aproximada en YCbCr: evita que diferencias de luminancia
+    // pequeñas pesen igual que diferencias de tono y reduce el borrado accidental.
+    const dist2=(i)=>{const r=d[i],g=d[i+1],b=d[i+2];const y=.299*r+.587*g+.114*b, cb=128-.168736*r-.331264*g+.5*b, cr=128+.5*r-.418688*g-.081312*b;const py=.299*picked[0]+.587*picked[1]+.114*picked[2], pcb=128-.168736*picked[0]-.331264*picked[1]+.5*picked[2], pcr=128+.5*picked[0]-.418688*picked[1]-.081312*picked[2];return (y-py)*(y-py)*.65+(cb-pcb)*(cb-pcb)*1.35+(cr-pcr)*(cr-pcr)*1.35;};
+    const threshold=tol*tol, hard=new Uint8Array(total), alpha=new Uint8Array(total), queue=new Int32Array(total);let head=0,tail=0,removed=0;
+    // Un poco más estricto en los bordes: un píxel solo entra al fondo conectado
+    // si su color coincide y existe una ruta continua desde el perímetro.
+    const similar=px=>dist2(px*4)<=threshold;
+    if(mode==='global') {
+      for(let px=0;px<total;px++) if(similar(px)) hard[px]=1;
+    } else if(mode==='closed') {
+      // Modo manual: no borra nada automáticamente. El usuario elige solo las regiones cerradas.
+    } else {
+      const intelligent=mode==='intelligent';
+      const seed=px=>{if(px<0||px>=total||hard[px]||!similar(px))return;hard[px]=1;queue[tail++]=px;};
+      for(let x=0;x<w;x++){seed(x);if(h>1)seed((h-1)*w+x);}for(let y=1;y<h-1;y++){seed(y*w);if(w>1)seed(y*w+w-1);}
+      while(head<tail){const px=queue[head++],x=px%w,y=(px/w)|0,pi=px*4;
+        const visit=n=>{if(n<0||n>=total||hard[n]||!similar(n))return;
+          if(intelligent){const ni=n*4,dr=d[ni]-d[pi],dg=d[ni+1]-d[pi+1],db=d[ni+2]-d[pi+2];const edge=Math.sqrt(.22*dr*dr+.60*dg*dg+.18*db*db);if(edge>Math.max(16,tol*(0.48+Number($('bgZoneIntensity')?.value||50)/180)))return;}
+          seed(n);
+        };
+        if(x>0)visit(px-1);if(x+1<w)visit(px+1);if(y>0)visit(px-w);if(y+1<h)visit(px+w);
       }
-      // Feather the matte at the edge by partially reducing alpha of neighboring pixels.
-      const originalAlpha=new Uint8Array(total);for(let px=0;px<total;px++)originalAlpha[px]=d[px*4+3];
-      for(let px=0;px<total;px++){const i=px*4;if(mask[px]){d[i+3]=0;removed++;continue;}if(feather>0){const x=px%w,y=(px/w)|0;let near=0;for(let dy=-feather;dy<=feather&&!near;dy++)for(let dx=-feather;dx<=feather;dx++){if(dx*dx+dy*dy>feather*feather)continue;const nx=x+dx,ny=y+dy;if(nx>=0&&nx<w&&ny>=0&&ny<h&&mask[ny*w+nx]){near=1;break;}}if(near){const dr=d[i]-rgb[0],dg=d[i+1]-rgb[1],db=d[i+2]-rgb[2],dist=Math.sqrt(dr*dr+dg*dg+db*db);const fade=Math.max(.12,Math.min(1,dist/Math.max(1,tol*1.7)));d[i+3]=Math.round(originalAlpha[px]*fade);}}}
-      ctx.putImageData(im,0,0);
-      const dataUrl=await new Promise((resolve,reject)=>c.toBlob(b=>{if(!b){reject(new Error('No se pudo crear PNG'));return;}const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(b);},'image/png'));
-      const preview=$('enhancePreviewCanvas'); preview.width=c.width; preview.height=c.height; preview.getContext('2d').clearRect(0,0,c.width,c.height); preview.getContext('2d').drawImage(c,0,0); enhanceWorkingCanvas=c; bgRemovePendingDataUrl=dataUrl; window.__bgRemoveBefore=sourceBefore; window.__bgRemoveTargetId=target.id; $('bgRemoveCommitBtn').disabled=false;
-      $('bgRemoveStatus').textContent=`Vista previa lista (${c.width} × ${c.height}px). Método: ${mode==='connected'?'fondo conectado que respeta contornos cerrados':'color similar en toda la imagen'}. Se detectaron ${removed.toLocaleString()} píxeles de fondo. El original sigue intacto.`;
-    }catch(err){$('bgRemoveStatus').textContent='No se pudo quitar el fondo. Prueba una imagen de menos de 12 megapíxeles o con un fondo uniforme.';}
+    }
+    // El suavizado solo se permite en el borde inmediato de la máscara detectada.
+    // Esto evita borrar por accidente otros objetos de color parecido en otra zona.
+    for(let px=0;px<total;px++){
+      const i=px*4,dd=Math.sqrt(dist2(i)),dist=dd/Math.max(1,tol);let a=hard[px]?0:255;
+      if(!hard[px]&&feather>0&&dist<1.65){const x=px%w,y=(px/w)|0;let near=false;if(x>0)near=near||hard[px-1]===1;if(x+1<w)near=near||hard[px+1]===1;if(y>0)near=near||hard[px-w]===1;if(y+1<h)near=near||hard[px+w]===1;if(near){const t=Math.max(0,Math.min(1,(dist-.45)/1.2));a=Math.round(255*(t*t*(3-2*t)));}}
+      if(hard[px])removed++;
+      if(a>0&&a<255){const blend=Math.min(.82,(255-a)/255*.9);d[i]=Math.round(d[i]*(1-blend)+picked[0]*blend);d[i+1]=Math.round(d[i+1]*(1-blend)+picked[1]*blend);d[i+2]=Math.round(d[i+2]*(1-blend)+picked[2]*blend);}
+      d[i+3]=Math.round(d[i+3]*a/255);
+    }
+    ctx.putImageData(im,0,0);
+    const dataUrl=await new Promise((resolve,reject)=>c.toBlob(b=>{if(!b){reject(new Error('No se pudo crear PNG'));return;}const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(b);},'image/png'));
+    return {target,sourceBefore,canvas:c,originalImage:img,dataUrl,removed,mode};
+  }
+  // Edición manual de máscara: selección de regiones conectadas, pincel de eliminación y borrador protector.
+  let bgEditTool='pan', bgEditBase=null, bgEditOriginal=null, bgEditMask=null, bgEditTargetId=null;
+  let bgEditUndo=[], bgEditRedo=[], bgEditPointer=null;
+  function setBgEditTool(tool){bgEditTool=tool;document.querySelectorAll('[data-bg-tool]').forEach(b=>b.classList.toggle('active',b.dataset.bgTool===tool));const cv=$('bgPreviewCanvas');if(cv)cv.style.cursor=tool==='brush'||tool==='eraser'?'none':tool==='zone'?'copy':tool==='pan'?'grab':'default';const er=$('bgEraserSize')?.closest('div'),br=$('bgBrushSize')?.closest('div');if(br)br.style.opacity=tool==='eraser'?'.65':'1';if(er)er.style.opacity=tool==='eraser'?'1':'.65';if(bgCursorEl)bgCursorEl.style.display=(tool==='brush'||tool==='eraser')?'block':'none';$('bgRemoveStatus').textContent=({pan:'Mover / zoom: arrastra para desplazar y pellizca para ampliar.',zone:'Toca una zona. El método y la intensidad determinan si selecciona región conectada, cerrada o si respeta mejor los bordes.',brush:'Pincel para quitar: pinta la máscara roja translúcida. El tamaño y el radio se muestran en la vista previa.',eraser:'Borrador protector: recupera la imagen original en la zona azul translúcida.'})[tool]||'';}
+  document.querySelectorAll('[data-bg-tool]').forEach(b=>b.addEventListener('click',()=>setBgEditTool(b.dataset.bgTool)));
+  $('bgBrushSize').addEventListener('input',e=>{$('bgBrushSizeVal').textContent=e.target.value+' px';});
+  $('bgEraserSize').addEventListener('input',e=>{$('bgEraserSizeVal').textContent=e.target.value+' px';});
+  $('bgZoneIntensity').addEventListener('input',e=>$('bgZoneIntensityVal').textContent=e.target.value+'%');
+  $('bgClosedIntensity').addEventListener('input',e=>$('bgClosedIntensityVal').textContent=e.target.value+'%');
+  let bgCursorEl=null;
+  const bgCursorViewport=$('bgPreviewViewport');if(bgCursorViewport&&!bgCursorEl){bgCursorEl=document.createElement('div');bgCursorEl.id='bgBrushCursor';bgCursorEl.style.cssText='position:absolute;z-index:8;pointer-events:none;display:none;border:2px solid #ff4b5c;border-radius:50%;box-shadow:0 0 0 1px #0007;transform:translate(-50%,-50%);box-sizing:border-box';bgCursorViewport.appendChild(bgCursorEl);}
+  function updateBgBrushCursor(e){const cv=$('bgPreviewCanvas'),vp=$('bgPreviewViewport');if(!cv||!vp||!bgCursorEl)return;const r=cv.getBoundingClientRect(),v=vp.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){bgCursorEl.style.display='none';return;}const size=Number((bgEditTool==='eraser'?$('bgEraserSize'):$('bgBrushSize'))?.value||28);const dia=Math.max(5,size*r.width/Math.max(1,cv.width));bgCursorEl.style.display='block';bgCursorEl.style.width=dia+'px';bgCursorEl.style.height=dia+'px';bgCursorEl.style.left=(e.clientX-v.left)+'px';bgCursorEl.style.top=(e.clientY-v.top)+'px';bgCursorEl.style.borderColor=bgEditTool==='eraser'?'#26c6da':'#ff4b5c';}
+  function bgSnapshot(){return bgEditMask?new Uint8Array(bgEditMask):null;}
+  function bgPushUndo(){if(!bgEditMask)return;bgEditUndo.push(bgSnapshot());if(bgEditUndo.length>24)bgEditUndo.shift();bgEditRedo=[];updateBgEditHistoryButtons();}
+  function updateBgEditHistoryButtons(){$('bgEditUndoBtn').disabled=!bgEditUndo.length;$('bgEditRedoBtn').disabled=!bgEditRedo.length;}
+  function bgPoint(canvas,e){const r=canvas.getBoundingClientRect();return {x:Math.max(0,Math.min(canvas.width-1,Math.floor((e.clientX-r.left)*canvas.width/Math.max(1,r.width)))),y:Math.max(0,Math.min(canvas.height-1,Math.floor((e.clientY-r.top)*canvas.height/Math.max(1,r.height))))};}
+  function bgColorDistance(data,i,rgb){const r=data[i],g=data[i+1],b=data[i+2],dr=r-rgb[0],dg=g-rgb[1],db=b-rgb[2];return .22*dr*dr+.60*dg*dg+.18*db*db;}
+  function bgSelectConnected(x,y){
+    if(!bgEditOriginal||!bgEditMask)return 0;
+    const w=$('bgPreviewCanvas').width,h=$('bgPreviewCanvas').height,d=bgEditOriginal.data,total=w*h;
+    const start=Math.max(0,Math.min(total-1,y*w+x)),si=start*4,rgb=[d[si],d[si+1],d[si+2]],mode=$('bgZoneMode')?.value||'connected';
+    const raw=mode==='closed'?Number($('bgClosedIntensity').value||45):Number($('bgZoneIntensity').value||50);
+    const tol=Number($('bgRemoveTolerance').value)||35,limit=Math.max(24,tol*tol*(raw/50)*(mode==='intelligent'?.85:1.25));
+    const seen=new Uint8Array(total),q=new Int32Array(total);let head=0,tail=0,touchesEdge=false;
+    const near=(i,seed)=>bgColorDistance(d,i,seed);
+    const add=(px,from)=>{if(px<0||px>=total||seen[px])return;seen[px]=1;const i=px*4;if(near(i,rgb)>limit)return;if(mode==='intelligent'&&from>=0){const fi=from*4;if(bgColorDistance(d,i,[d[fi],d[fi+1],d[fi+2]])>Math.max(18,limit*.42))return;}q[tail++]=px;};
+    add(start,-1);
+    while(head<tail){const px=q[head++],xx=px%w,yy=(px/w)|0;if(xx===0||yy===0||xx===w-1||yy===h-1)touchesEdge=true;if(xx>0)add(px-1,px);if(xx+1<w)add(px+1,px);if(yy>0)add(px-w,px);if(yy+1<h)add(px+w,px);}
+    if(mode==='closed'&&touchesEdge){$('bgRemoveStatus').textContent='Esa región llega al borde de la imagen; el modo «Solo zona cerrada» no la selecciona. Toca una región completamente encerrada o cambia el método.';return 0;}
+    let changed=0;for(let i=0;i<tail;i++){const px=q[i];if(bgEditMask[px]!==2){bgEditMask[px]=1;changed++;}}
+    return changed;
+  }
+  function bgPaintStroke(a,b,mode){if(!bgEditMask||!bgEditOriginal)return;const w=$('bgPreviewCanvas').width,h=$('bgPreviewCanvas').height,r=Math.max(2,Number((mode==='protect' ? $('bgEraserSize') : $('bgBrushSize')).value)||(mode==='protect'?36:28))/2;const steps=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.y-a.y)/Math.max(1,r*.35)));for(let s=0;s<=steps;s++){const t=s/steps,cx=a.x+(b.x-a.x)*t,cy=a.y+(b.y-a.y)*t,x0=Math.max(0,Math.floor(cx-r)),x1=Math.min(w-1,Math.ceil(cx+r)),y0=Math.max(0,Math.floor(cy-r)),y1=Math.min(h-1,Math.ceil(cy+r));for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){const dx=x-cx,dy=y-cy;const dist=Math.hypot(dx,dy);if(dist>r)continue;const px=y*w+x;if(mode==='remove'){const edge=Math.max(0,Math.min(1,(dist/r-.82)/.18));const alpha=Math.round(255*(edge*edge*(3-2*edge)));bgEditMask[px]=alpha<=2?1:Math.min(255,alpha+3);}else if(dist<=r*.92)bgEditMask[px]=2;}}}
+  function bgBuildCleanImageData(){if(!bgEditBase||!bgEditOriginal||!bgEditMask)return null;const cv=$('bgPreviewCanvas'),out=new ImageData(cv.width,cv.height),d=out.data,base=bgEditBase.data,orig=bgEditOriginal.data;for(let px=0;px<bgEditMask.length;px++){const i=px*4,m=bgEditMask[px];d[i]=m===2?orig[i]:base[i];d[i+1]=m===2?orig[i+1]:base[i+1];d[i+2]=m===2?orig[i+2]:base[i+2];d[i+3]=m===1?0:(m===2?orig[i+3]:(m>=3?Math.min(base[i+3],m-3):base[i+3]));}return out;}
+  function bgRenderMask(){if(!bgEditBase||!bgEditOriginal||!bgEditMask)return;const cv=$('bgPreviewCanvas'),ctx=cv.getContext('2d'),out=bgBuildCleanImageData(),d=out.data;for(let px=0;px<bgEditMask.length;px++){const i=px*4,m=bgEditMask[px];if(m===1){d[i]=Math.round(d[i]*.72+255*.28);d[i+1]=Math.round(d[i+1]*.72+65*.28);d[i+2]=Math.round(d[i+2]*.72+85*.28);d[i+3]=Math.max(d[i+3],65);}else if(m===2){d[i]=Math.round(d[i]*.72+25*.28);d[i+1]=Math.round(d[i+1]*.72+210*.28);d[i+2]=Math.round(d[i+2]*.72+230*.28);}}ctx.putImageData(out,0,0);const clean=bgBuildCleanImageData();enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=cv.width;enhanceWorkingCanvas.height=cv.height;enhanceWorkingCanvas.getContext('2d').putImageData(clean,0,0);cv.dataset.maskEdited='1';}
+  function bgStartEdit(canvas,e){if(!bgEditBase||!bgEditMask||bgEditTargetId!==String(window.__bgRemoveTargetId||'')){ $('bgRemoveStatus').textContent='Primero pulsa «Generar base» para crear la vista previa.';return false;}const pt=bgPoint(canvas,e);bgEditPointer={id:e.pointerId,last:pt,start:pt,tool:bgEditTool,moved:false};if(bgEditTool==='brush'||bgEditTool==='eraser'){bgPushUndo();bgPaintStroke(pt,pt,bgEditTool==='brush'?'remove':'protect');bgRenderMask();}try{canvas.parentElement.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault();return true;}
+  function bgMoveEdit(canvas,e){if(!bgEditPointer||bgEditPointer.id!==e.pointerId)return;const pt=bgPoint(canvas,e);if(Math.hypot(pt.x-bgEditPointer.start.x,pt.y-bgEditPointer.start.y)>3)bgEditPointer.moved=true;if(bgEditPointer.tool==='brush'||bgEditPointer.tool==='eraser'){bgPaintStroke(bgEditPointer.last,pt,bgEditPointer.tool==='brush'?'remove':'protect');bgEditPointer.last=pt;bgRenderMask();}e.preventDefault();}
+  function bgEndEdit(canvas,e){if(!bgEditPointer||bgEditPointer.id!==e.pointerId)return;const edit=bgEditPointer;bgEditPointer=null;if(edit.tool==='zone'&&!edit.moved){bgPushUndo();const n=bgSelectConnected(edit.start.x,edit.start.y);if(n>0){bgRenderMask();const zm=$('bgZoneMode').value;$('bgRemoveStatus').textContent=`${zm==='closed'?'Zona cerrada':zm==='intelligent'?'Zona inteligente':'Zona conectada'} seleccionada (${n.toLocaleString()} píxeles). Puedes seguir seleccionando, pintar para quitar o proteger partes.`;}else if(!/llega al borde/.test($('bgRemoveStatus').textContent)){ $('bgRemoveStatus').textContent='No se encontró una región con suficiente similitud. Aumenta la intensidad o toca otra zona.';}}else if(edit.tool==='brush'||edit.tool==='eraser')$('bgRemoveStatus').textContent=edit.tool==='brush'?'Trazo aplicado a la vista previa. Puedes deshacerlo o seguir retocando.':'Zona protegida desde la imagen original. Puedes deshacerlo o seguir retocando.';updateBgEditHistoryButtons();}
+  $('bgEditUndoBtn').addEventListener('click',()=>{if(!bgEditUndo.length||!bgEditMask)return;bgEditRedo.push(bgSnapshot());bgEditMask=bgEditUndo.pop();bgRenderMask();updateBgEditHistoryButtons();$('bgRemoveStatus').textContent='Último retoque deshecho.';});
+  $('bgEditRedoBtn').addEventListener('click',()=>{if(!bgEditRedo.length||!bgEditMask)return;bgEditUndo.push(bgSnapshot());bgEditMask=bgEditRedo.pop();bgRenderMask();updateBgEditHistoryButtons();$('bgRemoveStatus').textContent='Retoque rehecho.';});
+
+  $('bgRemoveApplyBtn').addEventListener('click',async()=>{
+    const targets=enhancerTargets();if(!targets.length){$('bgRemoveStatus').textContent='No hay imágenes objetivo. Selecciona una imagen o cambia el alcance.';return;}
+    const target=selectedEnhanceImage()||targets[0].el;
+    if(!target||!targets.some(x=>x.el.id===target.id)){$('bgRemoveStatus').textContent='La imagen seleccionada no está incluida en el alcance. Cambia el alcance o elige una imagen incluida.';return;}
+    const btn=$('bgRemoveApplyBtn');btn.disabled=true;
+    try{showLoading('Analizando fondo…');const result=await buildBackgroundRemoval(target);
+      const preview=$('bgPreviewCanvas');delete preview.dataset.maskEdited;preview.width=result.canvas.width;preview.height=result.canvas.height;const px=preview.getContext('2d');px.clearRect(0,0,preview.width,preview.height);px.drawImage(result.canvas,0,0);
+      enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=result.canvas.width;enhanceWorkingCanvas.height=result.canvas.height;enhanceWorkingCanvas.getContext('2d').drawImage(result.canvas,0,0);
+      bgRemovePendingDataUrl=result.dataUrl;bgRemovePendingMap=new Map([[String(target.id),result.dataUrl]]);window.__bgRemoveBefore=result.sourceBefore;window.__bgRemoveTargetId=target.id;bgEditTargetId=String(target.id);bgEditBase=result.canvas.getContext('2d',{willReadFrequently:true}).getImageData(0,0,result.canvas.width,result.canvas.height);const origCv=document.createElement('canvas');origCv.width=result.canvas.width;origCv.height=result.canvas.height;origCv.getContext('2d').drawImage(result.originalImage,0,0);bgEditOriginal=origCv.getContext('2d',{willReadFrequently:true}).getImageData(0,0,origCv.width,origCv.height);bgEditMask=new Uint8Array(origCv.width*origCv.height);bgEditUndo=[];bgEditRedo=[];updateBgEditHistoryButtons();setBgEditTool('pan');$('bgRemoveCommitBtn').disabled=false;$('bgRemoveUndoPreviewBtn').disabled=false;
+      $('bgRemoveStatus').textContent=result.mode==='closed'?`Base lista sin eliminación automática. Selecciona «Solo zona cerrada» y toca un hueco completamente encerrado; no se borrará nada que llegue al borde. El original sigue intacto.`:`Vista previa lista (${result.canvas.width} × ${result.canvas.height}px). Se detectaron ${result.removed.toLocaleString()} píxeles de fondo. El original sigue intacto. ${targets.length>1?`Al aplicar se procesarán las ${targets.length} imágenes del alcance.`:''}`;
+    }catch(err){$('bgRemoveStatus').textContent=err.message||'No se pudo quitar el fondo. Prueba una imagen de menos de 12 megapíxeles o con un fondo uniforme.';}
     finally{hideLoading();btn.disabled=false;}
   });
-
-  $('bgRemoveCommitBtn').addEventListener('click',()=>{
-    const targets=enhancerTargets(),target=selectedEnhanceImage()||targets[0]?.el;
-    if(!target||!bgRemovePendingDataUrl||!targets.some(x=>x.el.id===target.id)){ $('bgRemoveStatus').textContent='Genera una vista previa con una imagen incluida en el alcance.';return; }
-    const previous=target.src,result=bgRemovePendingDataUrl;recordEnhanceToolChange(target,window.__bgRemoveBefore||previous,result,'eliminación de fondo');target.src=result;imgCache.delete(previous);thumbCache.clear();saveState();renderAll();
-    $('bgRemoveStatus').textContent='Recorte aplicado. Puedes usar Deshacer para recuperar el original.';bgRemovePendingDataUrl=null;$('bgRemoveCommitBtn').disabled=true;sfx.success();
+  // Descartar una vista previa solo revierte la previsualización; nunca modifica el original.
+  $('bgRemoveUndoPreviewBtn').addEventListener('click',async()=>{
+    const id=Number(window.__bgRemoveTargetId||0),target=findEl(id)||selectedEnhanceImage()||enhancerTargets()[0]?.el;
+    bgRemovePendingDataUrl=null;bgRemovePendingMap.clear();window.__bgRemoveBefore=null;window.__bgRemoveTargetId=null;bgEditBase=null;bgEditOriginal=null;bgEditMask=null;bgEditTargetId=null;bgEditUndo=[];bgEditRedo=[];updateBgEditHistoryButtons();
+    $('bgRemoveCommitBtn').disabled=true;$('bgRemoveUndoPreviewBtn').disabled=true;
+    if(target){try{const im=await getLoadedImage(target.src),cv=$('bgPreviewCanvas');delete cv.dataset.maskEdited;cv.width=im.naturalWidth;cv.height=im.naturalHeight;const cx=cv.getContext('2d');cx.clearRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0);enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=im.naturalWidth;enhanceWorkingCanvas.height=im.naturalHeight;enhanceWorkingCanvas.getContext('2d').drawImage(im,0,0);$('bgRemoveStatus').textContent='Vista previa descartada. Se muestra de nuevo la imagen original; no se modificó el diseño.';}catch(e){$('bgRemoveStatus').textContent='Vista previa descartada. Genera otra para volver a comparar.';}}
+    else{$('bgPreviewCanvas').getContext('2d').clearRect(0,0,$('bgPreviewCanvas').width,$('bgPreviewCanvas').height);$('bgRemoveStatus').textContent='Vista previa descartada.';}
   });
 
-  // Cuentagotas global: se añade a cada selector de color estático y dinámico.
-  // EyeDropper nativo cuando está disponible; alternativa: tocar la imagen de vista previa.
-  let activeEyedropperInput = null;
-  function attachEyedropper(input) {
-    if (!input || input.type !== 'color' || input.dataset.eyedropperReady) return;
-    input.dataset.eyedropperReady = '1';
-    const btn = document.createElement('button'); btn.type='button'; btn.className='btn'; btn.textContent='⌖'; btn.title='Cuentagotas: elegir un color de la pantalla o de la vista previa';
-    btn.setAttribute('aria-label','Cuentagotas'); btn.style.cssText='min-width:34px;padding:5px 8px;margin-left:4px;vertical-align:middle';
-    input.insertAdjacentElement('afterend',btn);
-    btn.addEventListener('click',async()=>{
-      if (window.EyeDropper) {
-        try { const result=await new window.EyeDropper().open(); input.value=result.sRGBHex; input.dispatchEvent(new Event('input',{bubbles:true})); input.dispatchEvent(new Event('change',{bubbles:true})); return; }
-        catch(e) { if (e && e.name==='AbortError') return; }
+  $('bgRemoveCommitBtn').addEventListener('click',async()=>{
+    const targets=enhancerTargets(),previewTargetId=Number(window.__bgRemoveTargetId||0);
+    if(bgEditMask&&$('bgPreviewCanvas').dataset.maskEdited==='1'){const cv=$('bgPreviewCanvas'),clean=bgBuildCleanImageData(),exportCanvas=document.createElement('canvas');exportCanvas.width=cv.width;exportCanvas.height=cv.height;exportCanvas.getContext('2d').putImageData(clean,0,0);bgRemovePendingDataUrl=await new Promise((resolve,reject)=>exportCanvas.toBlob(b=>{if(!b){reject(new Error('No se pudo codificar la máscara'));return;}const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(b);},'image/png'));bgRemovePendingMap=new Map([[String(previewTargetId),bgRemovePendingDataUrl]]);}
+    if(!targets.length||!bgRemovePendingDataUrl||!targets.some(x=>x.el.id===previewTargetId)){$('bgRemoveStatus').textContent='Genera una vista previa para una imagen incluida en el alcance.';return;}
+    const ok=targets.length<2||await confirmAction('Aplicar eliminación de fondo',`Se procesarán ${targets.length} imágenes con los mismos ajustes de color. ¿Continuar?`);if(!ok)return;
+    const btn=$('bgRemoveCommitBtn');btn.disabled=true;let done=0,failed=0;
+    try{showLoading('Aplicando recorte transparente…');
+      for(let i=0;i<targets.length;i++){
+        const target=targets[i].el;try{
+          let result;
+          if(target.id===previewTargetId)result={sourceBefore:window.__bgRemoveBefore||target.src,dataUrl:bgRemovePendingDataUrl};
+          else result=await buildBackgroundRemoval(target);
+          recordEnhanceToolChange(target,result.sourceBefore||target.src,result.dataUrl,'eliminación de fondo');target.src=result.dataUrl;imgCache.delete(result.sourceBefore||target.src);done++;
+        }catch(e){failed++;}
+        $('loading-label').textContent=`Eliminando fondo ${i+1} de ${targets.length}…`;await new Promise(r=>setTimeout(r,0));
       }
-      activeEyedropperInput=input;
-      const canvas=$('enhancePreviewCanvas');
-      if(canvas && canvas.width>1 && canvas.height>1){ $('bgRemoveStatus').textContent='Cuentagotas activo: toca un punto de la vista previa para tomar su color.'; canvas.style.cursor='crosshair'; canvas.title='Toca para tomar color'; }
-      else { const selected=selectedEnhanceImage(); if(!selected){alert('Selecciona una imagen y genera una vista previa para usar el cuentagotas.');activeEyedropperInput=null;return;} try {const im=await getLoadedImage(selected.src),c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const cx=c.getContext('2d',{willReadFrequently:true});cx.drawImage(im,0,0);const tmp=$('enhancePreviewCanvas');tmp.width=Math.min(900,c.width);tmp.height=Math.max(1,Math.round(c.height*tmp.width/c.width));tmp.getContext('2d').drawImage(c,0,0,tmp.width,tmp.height);tmp.style.display='block';alert('Vista previa preparada. Vuelve a pulsar el cuentagotas y toca el color en la vista previa.');}catch(e){activeEyedropperInput=null;} }
-    });
-  }
-  function installEyedroppers(root=document){root.querySelectorAll('input[type="color"]').forEach(attachEyedropper);}
-  const eyeObserver = new MutationObserver(()=>installEyedroppers());
-  eyeObserver.observe(document.body,{childList:true,subtree:true}); installEyedroppers();
-  $('enhancePreviewCanvas').addEventListener('pointerdown',e=>{
-    if(!activeEyedropperInput)return;const canvas=e.currentTarget,rect=canvas.getBoundingClientRect();
-    const x=Math.max(0,Math.min(canvas.width-1,Math.floor((e.clientX-rect.left)/rect.width*canvas.width))),y=Math.max(0,Math.min(canvas.height-1,Math.floor((e.clientY-rect.top)/rect.height*canvas.height)));
-    try{const d=canvas.getContext('2d',{willReadFrequently:true}).getImageData(x,y,1,1).data;const hex='#'+[d[0],d[1],d[2]].map(v=>v.toString(16).padStart(2,'0')).join('');activeEyedropperInput.value=hex;activeEyedropperInput.dispatchEvent(new Event('input',{bubbles:true}));activeEyedropperInput.dispatchEvent(new Event('change',{bubbles:true}));if(activeEyedropperInput.id==='bgRemoveColor')$('bgRemoveStatus').textContent='Color tomado: '+hex;activeEyedropperInput=null;canvas.style.cursor='default';}catch(e){activeEyedropperInput=null;}
+      thumbCache.clear();saveState();renderAll();saveToLocalStorage();bgRemovePendingDataUrl=null;bgRemovePendingMap.clear();window.__bgRemoveBefore=null;window.__bgRemoveTargetId=null;$('bgRemoveUndoPreviewBtn').disabled=true;$('bgRemoveStatus').textContent=`Fondo eliminado en ${done} de ${targets.length} imágenes${failed?`; ${failed} no se pudieron procesar`:''}. El PNG conserva transparencia real.`;sfx.success();
+      const historyTarget=findEl(Number($('enhanceHistoryTarget').value))||selectedEnhanceImage();if(historyTarget)await syncImageToolPreview(historyTarget,historyTarget.src);updateToolHistoryButtons();
+    }catch(err){$('bgRemoveStatus').textContent='No se pudo aplicar el resultado.';}
+    finally{hideLoading();btn.disabled=!bgRemovePendingDataUrl;}
   });
+
+  // Pestañas independientes: cada herramienta conserva su propia vista previa.
+  function setImageToolTab(name){
+    const names={superres:'toolPanelSuperres',background:'toolPanelBackground',ocr:'toolPanelOcr'};
+    Object.entries(names).forEach(([key,id])=>{const panel=$(id);if(panel)panel.hidden=key!==name;});
+    document.querySelectorAll('[data-tool-tab]').forEach(btn=>{const active=btn.dataset.toolTab===name;btn.classList.toggle('active',active);btn.setAttribute('aria-selected',active?'true':'false');});
+    if(name==='background')updateToolHistoryButtons();
+  }
+  document.querySelectorAll('[data-tool-tab]').forEach(btn=>btn.addEventListener('click',()=>setImageToolTab(btn.dataset.toolTab)));
+  setImageToolTab('superres');
+
+  // Vista previa móvil: zoom con pellizco, paneo con un dedo y cuentagotas continuo.
+  const previewViewState = new Map();
+  function setupPreviewViewport(canvas){
+    const viewport=canvas?.parentElement;if(!viewport?.classList.contains('image-preview-viewport')||viewport.dataset.gesturesReady)return;
+    viewport.dataset.gesturesReady='1';const st={scale:1,x:0,y:0,pointers:new Map(),startDist:0,startScale:1,startX:0,startY:0,lastX:0,lastY:0};previewViewState.set(canvas,st);
+    const apply=()=>{canvas.style.transform=`translate(${st.x}px,${st.y}px) scale(${st.scale})`;};
+    const reset=()=>{st.scale=1;st.x=0;st.y=0;apply();};
+    viewport.addEventListener('pointerdown',e=>{
+      if(canvas.id==='bgPreviewCanvas')updateBgBrushCursor(e);
+      if(activeEyedropperInput){beginEyedropperSample(canvas,e);e.preventDefault();e.stopPropagation();try{viewport.setPointerCapture(e.pointerId)}catch(_){}return;}
+      if(canvas.id==='bgPreviewCanvas'&&['zone','brush','eraser'].includes(bgEditTool)){if(canvas.width<2||canvas.height<2)return;bgStartEdit(canvas,e);return;}
+      if(canvas.width<2||canvas.height<2)return;viewport.setPointerCapture?.(e.pointerId);st.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      if(st.pointers.size===1){st.lastX=e.clientX;st.lastY=e.clientY;}else if(st.pointers.size===2){const pts=[...st.pointers.values()];st.startDist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)||1;st.startScale=st.scale;st.startX=st.x;st.startY=st.y;}
+      e.preventDefault();
+    },{passive:false});
+    viewport.addEventListener('pointermove',e=>{
+      if(canvas.id==='bgPreviewCanvas')updateBgBrushCursor(e);
+      if(activeEyedropperInput&&eyedropperPointerId===e.pointerId){updateEyedropperSample(canvas,e);e.preventDefault();return;}
+      if(canvas.id==='bgPreviewCanvas'&&bgEditPointer&&bgEditPointer.id===e.pointerId){bgMoveEdit(canvas,e);return;}
+      if(!st.pointers.has(e.pointerId))return;st.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      if(st.pointers.size===1){st.x+=e.clientX-st.lastX;st.y+=e.clientY-st.lastY;st.lastX=e.clientX;st.lastY=e.clientY;}
+      else if(st.pointers.size>=2){const pts=[...st.pointers.values()],dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)||1;st.scale=Math.max(1,Math.min(8,st.startScale*dist/st.startDist));st.x=st.startX;st.y=st.startY;}
+      apply();e.preventDefault();
+    },{passive:false});
+    const finish=e=>{if(canvas.id==='bgPreviewCanvas'&&bgCursorEl&&(!['brush','eraser'].includes(bgEditTool)))bgCursorEl.style.display='none';if(activeEyedropperInput&&eyedropperPointerId===e.pointerId){finishEyedropperSample(canvas,e);return;}if(canvas.id==='bgPreviewCanvas'&&bgEditPointer&&bgEditPointer.id===e.pointerId){bgEndEdit(canvas,e);return;}st.pointers.delete(e.pointerId);if(st.pointers.size===1){const p=[...st.pointers.values()][0];st.lastX=p.x;st.lastY=p.y;}if(st.pointers.size===0&&st.scale===1&&Math.abs(st.x)<2&&Math.abs(st.y)<2)reset();};
+    viewport.addEventListener('pointerup',finish);viewport.addEventListener('pointercancel',finish);
+    viewport.addEventListener('dblclick',e=>{e.preventDefault();reset();});
+  }
+  let activeEyedropperInput=null, eyedropperPointerId=null, eyedropperSampleHex='#ffffff';
+  let eyeLoupe=document.getElementById('eyedropperLoupe');if(!eyeLoupe){eyeLoupe=document.createElement('div');eyeLoupe.id='eyedropperLoupe';eyeLoupe.innerHTML='<span class="eye-swatch"></span><span class="eye-hex">#FFFFFF</span>';document.body.appendChild(eyeLoupe);}
+  function eyeHexAt(canvas,e){const r=canvas.getBoundingClientRect();const x=Math.max(0,Math.min(canvas.width-1,Math.floor((e.clientX-r.left)/Math.max(1,r.width)*canvas.width))),y=Math.max(0,Math.min(canvas.height-1,Math.floor((e.clientY-r.top)/Math.max(1,r.height)*canvas.height)));const d=canvas.getContext('2d',{willReadFrequently:true}).getImageData(x,y,1,1).data;return '#'+[d[0],d[1],d[2]].map(v=>v.toString(16).padStart(2,'0')).join('');}
+  function beginEyedropperSample(canvas,e){eyedropperPointerId=e.pointerId;try{canvas.setPointerCapture?.(e.pointerId)}catch(_){}updateEyedropperSample(canvas,e);eyeLoupe.style.display='flex';}
+  function updateEyedropperSample(canvas,e){try{eyedropperSampleHex=eyeHexAt(canvas,e);eyeLoupe.querySelector('.eye-swatch').style.background=eyedropperSampleHex;eyeLoupe.querySelector('.eye-hex').textContent=eyedropperSampleHex.toUpperCase();eyeLoupe.style.left=Math.max(80,Math.min(window.innerWidth-80,e.clientX))+'px';eyeLoupe.style.top=Math.max(65,e.clientY-12)+'px';eyeLoupe.style.display='flex';}catch(_){}}
+  function finishEyedropperSample(canvas,e){if(e.pointerId!==eyedropperPointerId)return;updateEyedropperSample(canvas,e);if(activeEyedropperInput){activeEyedropperInput.value=eyedropperSampleHex;activeEyedropperInput.dispatchEvent(new Event('input',{bubbles:true}));activeEyedropperInput.dispatchEvent(new Event('change',{bubbles:true}));if(activeEyedropperInput.id==='bgRemoveColor')$('bgRemoveStatus').textContent='Color seleccionado: '+eyedropperSampleHex.toUpperCase();}activeEyedropperInput=null;eyedropperPointerId=null;eyeLoupe.style.display='none';document.querySelectorAll('.eye-active-button').forEach(b=>b.classList.remove('eye-active-button'));}
+  function attachEyedropper(input){if(!input||input.type!=='color'||input.dataset.eyedropperReady)return;input.dataset.eyedropperReady='1';const btn=document.createElement('button');btn.type='button';btn.className='btn';btn.textContent='⌖';btn.title='Cuentagotas: mantén el dedo y suéltalo para confirmar';btn.setAttribute('aria-label','Cuentagotas');btn.style.cssText='min-width:34px;padding:5px 8px;margin-left:4px;vertical-align:middle';input.insertAdjacentElement('afterend',btn);btn.addEventListener('click',async()=>{activeEyedropperInput=input;document.querySelectorAll('.eye-active-button').forEach(b=>b.classList.remove('eye-active-button'));btn.classList.add('eye-active-button');const canvas=$('bgPreviewCanvas');if(canvas&&canvas.width>1&&canvas.height>1){$('bgRemoveStatus').textContent='Cuentagotas activo: mantén el dedo sobre la vista previa, muévelo y suelta para confirmar.';canvas.parentElement?.scrollIntoView({block:'nearest',behavior:'smooth'});return;}const selected=selectedEnhanceImage();if(!selected){activeEyedropperInput=null;btn.classList.remove('eye-active-button');showToast('Selecciona una imagen para usar el cuentagotas.','info');return;}try{const im=await getLoadedImage(selected.src),cv=$('bgPreviewCanvas');cv.width=im.naturalWidth;cv.height=im.naturalHeight;const cx=cv.getContext('2d');cx.clearRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0);$('bgRemoveStatus').textContent='Cuentagotas activo: mantén el dedo sobre la vista previa, muévelo y suelta para confirmar.';cv.parentElement?.scrollIntoView({block:'nearest',behavior:'smooth'});}catch(_){activeEyedropperInput=null;btn.classList.remove('eye-active-button');}});}
+  function installEyedroppers(root=document){root.querySelectorAll('input[type="color"]').forEach(attachEyedropper);}
+  const eyeObserver=new MutationObserver(()=>installEyedroppers());eyeObserver.observe(document.body,{childList:true,subtree:true});installEyedroppers();
+  [$('srPreviewCanvas'),$('bgPreviewCanvas'),$('ocrPreviewCanvas')].forEach(canvas=>{setupPreviewViewport(canvas);});
 
   // Plantillas de póster: inserta capas de texto editables, sin reemplazar el contenido existente.
   function openPosterTemplates(){const m=$('posterTemplatesModal');m.classList.add('show');setTimeout(()=>m.classList.add('visible'),10);$('moreMenu').classList.remove('show');}
@@ -5750,7 +5959,7 @@ document.addEventListener('pointerdown', (e) => {
   /* ====== MALLA, SNAP Y GUÍAS INTELIGENTES ====== */
   const GC_KEY = 'image-editor-grid-v1';
   const GC = Object.assign({ show: false, snap: false, step: 0.5, color: '#3b82c4', width: 1, opacity: 0.4, major: 0,
-    guides: true, gEl: true, gPage: true, gMargin: false, margin: 1, gUser: true, gGap: true, gSize: true, labels: true, tol: 8,
+    guides: true, gEl: true, gPage: true, gMargin: false, margin: 1, gUser: true, gGap: true, gSize: true, labels: true, tol: 8, rotSnap: true, rotStep: 15,
     gColor: '#ff2d7a', ugColor: '#00b5d8' }, (() => { try { return JSON.parse(localStorage.getItem(GC_KEY)) || {}; } catch (e) { return {}; } })());
   const saveGC = () => { try { localStorage.setItem(GC_KEY, JSON.stringify(GC)); } catch (e) {} };
   $('showGrid').checked = !!GC.show; $('snapGrid').checked = !!GC.snap; $('snapStep').value = GC.step;
@@ -5927,6 +6136,9 @@ document.addEventListener('pointerdown', (e) => {
     <div class="row" style="align-items:center"><span style="font-size:12px;color:var(--muted);flex:1">Margen (cm)</span><input type="number" id="gp_margin" min="0" max="20" step="0.1" inputmode="decimal" style="flex:0 0 80px"></div>
     ${gSw('gp_user', 'Alinear con mis guías')}${gSw('gp_gap', 'Espaciado igual entre elementos')}${gSw('gp_size', 'Igualar tamaños al redimensionar')}${gSw('gp_labels', 'Mostrar distancias y medidas')}
     ${gRg('gp_tol', 'Fuerza de imán (px)', 2, 24, 1)}
+    <label style="color:var(--accent);font-weight:700;margin-top:10px">Rotación</label>
+    ${gSw('gp_rotSnap', 'Ajustar rotación a ángulos')}
+    <label for="gp_rotStep">Paso angular (<span id="gp_rotStepV">15</span>°)</label><input type="range" id="gp_rotStep" min="1" max="90" step="1" value="15">
     <div class="row" style="margin-top:6px"><div><label>Color guías</label><input type="color" id="gp_gcolor"></div><div><label>Color mis guías</label><input type="color" id="gp_ucolor"></div></div>
     <label style="color:var(--accent);font-weight:700;margin-top:10px">Mis guías (esta página)</label>
     <div class="row"><button class="btn full" id="gp_addV">+ Vertical</button><button class="btn full" id="gp_addH">+ Horizontal</button></div>
@@ -5941,6 +6153,7 @@ document.addEventListener('pointerdown', (e) => {
     $('gp_guides').checked = GC.guides; $('gp_el').checked = GC.gEl; $('gp_page').checked = GC.gPage; $('gp_umargin').checked = GC.gMargin; $('gp_margin').value = GC.margin;
     $('gp_user').checked = GC.gUser; $('gp_gap').checked = GC.gGap; $('gp_size').checked = GC.gSize; $('gp_labels').checked = GC.labels;
     $('gp_tol').value = GC.tol; $('gp_tolV').textContent = GC.tol; $('gp_gcolor').value = GC.gColor; $('gp_ucolor').value = GC.ugColor;
+    $('gp_rotSnap').checked = GC.rotSnap !== false; $('gp_rotStep').value = GC.rotStep || 15; $('gp_rotStepV').textContent = GC.rotStep || 15;
     gridModal.querySelectorAll('#gp_chips button').forEach(b => b.classList.toggle('active', Math.abs(parseFloat(b.dataset.s) - stepCm()) < 1e-6));
     gpList();
   }
@@ -5967,6 +6180,8 @@ document.addEventListener('pointerdown', (e) => {
     else if (id === 'gp_umargin') GC.gMargin = t.checked; else if (id === 'gp_margin') GC.margin = Math.max(0, num || 0); else if (id === 'gp_user') GC.gUser = t.checked;
     else if (id === 'gp_gap') GC.gGap = t.checked; else if (id === 'gp_size') GC.gSize = t.checked; else if (id === 'gp_labels') GC.labels = t.checked;
     else if (id === 'gp_tol') { GC.tol = num; $('gp_tolV').textContent = num; }
+    else if (id === 'gp_rotSnap') GC.rotSnap = t.checked;
+    else if (id === 'gp_rotStep') { GC.rotStep = Math.max(1, Math.min(90, Math.round(num) || 15)); $('gp_rotStepV').textContent = GC.rotStep; }
     else if (id === 'gp_gcolor') GC.gColor = t.value; else if (id === 'gp_ucolor') { GC.ugColor = t.value; renderAll(); }
     saveGC();
   });
