@@ -751,15 +751,15 @@
     <main class="sidebar" id="mainSidebar">
       <div class="panel" data-tag="Papel">
         <select id="paperType">
-          <option value="carta">Carta (21.6 × 27.9)</option>
-          <option value="oficio">Oficio (21.6 × 33)</option>
+          <option value="carta">Carta (21.2 × 27.6)</option>
+          <option value="oficio">Oficio (21.2 × 32.5)</option>
           <option value="legal">Legal (21.6 × 35.6)</option>
           <option value="a4">A4 (21 × 29.7)</option><option value="a3">A3 (29.7 × 42)</option><option value="a2">A2 (42 × 59.4)</option><option value="tabloide">Tabloide (27.9 × 43.2)</option><option value="10x15">10 × 15</option>
           <option value="custom">Personalizado</option>
         </select>
         <div class="row" id="customPaperRow" style="display: none; margin-top: 6px">
-          <div><label>Ancho (cm)</label><input type="number" id="paperW" value="21.6" step="0.1" /></div>
-          <div><label>Alto (cm)</label><input type="number" id="paperH" value="27.9" step="0.1" /></div>
+          <div><label>Ancho (cm)</label><input type="number" id="paperW" value="21.2" step="0.1" /></div>
+          <div><label>Alto (cm)</label><input type="number" id="paperH" value="27.6" step="0.1" /></div>
         </div>
         <label>Orientación</label>
         <div class="toggle">
@@ -1242,7 +1242,7 @@
 <script>
 (function () {
   const $ = (id) => document.getElementById(id);
-  const PAPERS = { carta: [21.6, 27.9], oficio: [21.6, 33], legal: [21.6, 35.6], a4: [21, 29.7], a3: [29.7, 42], a2: [42, 59.4], tabloide: [27.9, 43.2], "10x15": [10, 15] };
+  const PAPERS = { carta: [21.2, 27.6], oficio: [21.2, 32.5], legal: [21.6, 35.6], a4: [21, 29.7], a3: [29.7, 42], a2: [42, 59.4], tabloide: [27.9, 43.2], "10x15": [10, 15] };
   if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   }
@@ -1324,7 +1324,7 @@
     currentPageIndex: 0,
     orientation: "vertical",
     paperType: "carta",
-    customW: 21.6, customH: 27.9,
+    customW: 21.2, customH: 27.6,
     thumbsVisible: true,
     sidebarOpen: false,
     inspectorExpanded: false,
@@ -1482,8 +1482,8 @@
       state.currentPageIndex = data.currentPageIndex || 0;
       state.orientation = data.orientation || "vertical";
       state.paperType = data.paperType || "carta";
-      state.customW = data.customW || 21.6;
-      state.customH = data.customH || 27.9;
+      state.customW = data.customW || 21.2;
+      state.customH = data.customH || 27.6;
       state.thumbsVisible = data.thumbsVisible !== false;
       state.sidebarOpen = !!data.sidebarOpen;
       state.inspectorExpanded = !!data.inspectorExpanded;
@@ -6513,7 +6513,7 @@ document.addEventListener('pointerdown', (e) => {
     </div>
     <div class="ps-tab" data-tab="1">
       <label>Hoja de impresión</label>
-      <select id="psPaper"><option value="carta">Carta (21.6 × 27.9)</option><option value="oficio">Oficio (21.6 × 33)</option><option value="legal">Legal (21.6 × 35.6)</option><option value="a4">A4 (21 × 29.7)</option><option value="a3">A3 (29.7 × 42)</option><option value="a2">A2 (42 × 59.4)</option><option value="tabloide">Tabloide (27.9 × 43.2)</option><option value="10x15">10 × 15</option><option value="custom">Personalizado</option></select><div class="row" id="psCustomPaper" style="display:none"><div><label>Ancho hoja (cm)</label><input type="number" id="psPaperW" min="5" max="100" step="0.1" value="21.6"></div><div><label>Alto hoja (cm)</label><input type="number" id="psPaperH" min="5" max="150" step="0.1" value="27.9"></div></div>
+      <select id="psPaper"><option value="carta">Carta (21.2 × 27.6)</option><option value="oficio">Oficio (21.2 × 32.5)</option><option value="legal">Legal (21.6 × 35.6)</option><option value="a4">A4 (21 × 29.7)</option><option value="a3">A3 (29.7 × 42)</option><option value="a2">A2 (42 × 59.4)</option><option value="tabloide">Tabloide (27.9 × 43.2)</option><option value="10x15">10 × 15</option><option value="custom">Personalizado</option></select><div class="row" id="psCustomPaper" style="display:none"><div><label>Ancho hoja (cm)</label><input type="number" id="psPaperW" min="5" max="100" step="0.1" value="21.2"></div><div><label>Alto hoja (cm)</label><input type="number" id="psPaperH" min="5" max="150" step="0.1" value="27.6"></div></div>
       <div class="toggle"><button type="button" id="psOA">Auto</button><button type="button" id="psOV">Vertical</button><button type="button" id="psOH">Horizontal</button></div>
       <label style="margin-top:8px">Tamaño total del póster</label>${psTg('mode', [['size', 'Por tamaño'], ['grid', 'Por hojas'], ['optimal', 'Optimizar hojas'], ['exact', 'Hojas exactas']])}
       <div id="psSizeBox"><label>Medidas predefinidas</label><select data-ps="preset">${PS_PRESETS.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select>
@@ -6612,8 +6612,8 @@ document.addEventListener('pointerdown', (e) => {
   });
   async function psHandleFileInput(e) { const f = e.target.files && e.target.files[0]; if (!f) return; const url = URL.createObjectURL(f); try { await psLoadImage(url, f.name); } catch (err) { $('psInfo').textContent = 'No se pudo abrir esa imagen.'; $('psInfo').classList.add('warn'); } finally { URL.revokeObjectURL(url); e.target.value = ''; } }
   $('psFile').addEventListener('change', psHandleFileInput); $('psCamera').addEventListener('change', psHandleFileInput);
-  $('psPaper').addEventListener('change', (e) => { state.paperType = e.target.value; $('paperType').value = e.target.value; $('customPaperRow').style.display = state.paperType === 'custom' ? 'flex' : 'none'; $('psCustomPaper').style.display = state.paperType === 'custom' ? 'flex' : 'none'; if (state.paperType === 'custom') { state.customW = parseFloat($('psPaperW').value) || 21.6; state.customH = parseFloat($('psPaperH').value) || 27.9; $('paperW').value = state.customW; $('paperH').value = state.customH; } saveState(); renderAll(); psChange('paper'); });
-  function psUpdateCustomPaper() { state.customW = Math.max(5, Math.min(100, parseFloat($('psPaperW').value) || 21.6)); state.customH = Math.max(5, Math.min(150, parseFloat($('psPaperH').value) || 27.9)); $('paperW').value = state.customW; $('paperH').value = state.customH; saveState(); renderAll(); psChange('paper'); }
+  $('psPaper').addEventListener('change', (e) => { state.paperType = e.target.value; $('paperType').value = e.target.value; $('customPaperRow').style.display = state.paperType === 'custom' ? 'flex' : 'none'; $('psCustomPaper').style.display = state.paperType === 'custom' ? 'flex' : 'none'; if (state.paperType === 'custom') { state.customW = parseFloat($('psPaperW').value) || 21.2; state.customH = parseFloat($('psPaperH').value) || 27.6; $('paperW').value = state.customW; $('paperH').value = state.customH; } saveState(); renderAll(); psChange('paper'); });
+  function psUpdateCustomPaper() { state.customW = Math.max(5, Math.min(100, parseFloat($('psPaperW').value) || 21.2)); state.customH = Math.max(5, Math.min(150, parseFloat($('psPaperH').value) || 27.6)); $('paperW').value = state.customW; $('paperH').value = state.customH; saveState(); renderAll(); psChange('paper'); }
   $('psPaperW').addEventListener('change', psUpdateCustomPaper); $('psPaperH').addEventListener('change', psUpdateCustomPaper);
   $('psOA').addEventListener('click', () => {
     const original = state.orientation;
