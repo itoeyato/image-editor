@@ -1139,8 +1139,8 @@
       <div id="arWarn"></div>
       <div class="ar-body">
         <div class="ar-grid">
-          <div><label>Columnas</label><input type="number" id="arCols" value="3" min="1" max="50" step="1" inputmode="numeric" /></div>
-          <div><label>Filas</label><input type="number" id="arRows" value="2" min="1" max="50" step="1" inputmode="numeric" /></div>
+          <div><label>Columnas</label><input type="number" id="arCols" value="3" min="1" step="1" inputmode="numeric" /></div>
+          <div><label>Filas</label><input type="number" id="arRows" value="2" min="1" step="1" inputmode="numeric" /></div>
           <div><label>Sep. X (cm)</label><input type="number" id="arGapX" value="0.5" step="0.1" inputmode="decimal" /></div>
           <div><label>Sep. Y (cm)</label><input type="number" id="arGapY" value="0.5" step="0.1" inputmode="decimal" /></div>
         </div>
@@ -3298,7 +3298,7 @@ function updateThumbnails() {
             if (!wasSelected && !multiSelectMode) {
               clearTimeout(gesture.selTimer);
               gesture.selTimer = setTimeout(() => selectSingle(elId), 150);
-             }
+            }
             const pos = getStageCoords(e.clientX, e.clientY);
             const group = isSelected(elId) && selectedIds.size > 1 ? getSelectedEls() : [el];
             gesture.drag.active = wasSelected;
@@ -5991,7 +5991,7 @@ ctx.restore();
     if (!els.length) return null;
     const minX = Math.min(...els.map(e => e.xCm)), minY = Math.min(...els.map(e => e.yCm));
     const bw = Math.max(0.01, Math.max(...els.map(e => e.xCm + e.wCm)) - minX), bh = Math.max(0.01, Math.max(...els.map(e => e.yCm + e.hCm)) - minY);
-    const cols = Math.max(1, Math.min(50, Math.round(arN('arCols', 1)))), rows = Math.max(1, Math.min(50, Math.round(arN('arRows', 1))));
+    const cols = Math.max(1, Math.round(arN('arCols', 1))), rows = Math.max(1, Math.round(arN('arRows', 1)));
     const gx = arN('arGapX', 0), gy = arN('arGapY', 0), pitch = $('arMode').value === 'pitch';
     const dx = +$('arDirX').value || 1, dy = +$('arDirY').value || 1, shift = arN('arShift', 0), rot = arN('arRot', 0);
     const stepX = (pitch ? gx : bw + gx) * dx, stepY = (pitch ? gy : bh + gy) * dy;
@@ -6035,9 +6035,6 @@ ctx.restore();
   function applyArray() {
     const c = arCalc(); if (!c) { closeArray(); return; }
     if (c.total <= 1 && !c.cx && !c.cy) { $('arWarn').textContent = 'Con 1 columna y 1 fila no hay copias que crear.'; return; }
-    if (c.total > 400) { $('arWarn').textContent = 'Máximo 400 posiciones (columnas × filas).'; return; }
-    const weight = JSON.stringify(c.els).length * (c.total - 1);
-    if (weight > 40000000) { $('arWarn').textContent = 'Demasiado pesado: reduce las copias o usa imágenes más ligeras.'; return; }
     const P = currentPage(), grp = $('arGroup').checked, newIds = [];
     const orig = c.els.slice();
     orig.forEach(el => { el.xCm += c.cx; el.yCm += c.cy; });
