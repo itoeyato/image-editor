@@ -661,7 +661,17 @@
   #imageEnhancerModal .image-tool-panel[hidden], #imageEnhancerModal [hidden] { display:none !important; }
   #imageEnhancerModal .image-preview-viewport { position:relative;width:100%;height:clamp(170px,30vh,320px);margin:7px 0 10px;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:9px;background-color:#fff;background-image:linear-gradient(45deg,#d7dbe3 25%,transparent 25%),linear-gradient(-45deg,#d7dbe3 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#d7dbe3 75%),linear-gradient(-45deg,transparent 75%,#d7dbe3 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0;touch-action:none;overscroll-behavior:contain; }
 
-  #imageEnhancerModal #bgPreviewViewport{position:relative}
+  #imageEnhancerModal #bgPreviewViewport{position:sticky;top:0;z-index:6;height:clamp(200px,38vh,380px);margin:0 0 6px}
+  #imageEnhancerModal .bg-tools{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:2px}
+  #imageEnhancerModal .bg-tools .btn{flex-direction:column;gap:1px;min-height:44px;padding:4px 2px;font-size:10px;white-space:normal;line-height:1.1}
+  #imageEnhancerModal .bg-tools .btn b{font-size:16px;font-weight:600;line-height:1}
+  #imageEnhancerModal .bg-tools .btn.active,#imageEnhancerModal .bg-actions .btn.active{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important}
+  #imageEnhancerModal .bg-ctl{margin-top:4px}
+  #imageEnhancerModal .bg-ctl .row{align-items:end;gap:8px}
+  #imageEnhancerModal .bg-chk{display:flex;align-items:center;gap:6px;font-size:11px;margin-top:6px}
+  #imageEnhancerModal .bg-chk input{width:auto;min-height:0}
+  #imageEnhancerModal .bg-actions{display:grid;grid-template-columns:44px 44px 1fr 1fr;gap:4px;margin-top:8px}
+  #imageEnhancerModal .bg-actions .btn{min-height:34px;padding:4px 6px;font-size:12px}
   #imageEnhancerModal #bgBrushCursor{will-change:left,top,width,height}
   #imageEnhancerModal #bgZoneMode,#imageEnhancerModal #bgRemoveMode{font-size:11px}
   #imageEnhancerModal #bgZoneIntensity,#imageEnhancerModal #bgClosedIntensity,#imageEnhancerModal #bgBrushSize,#imageEnhancerModal #bgEraserSize{min-width:0}
@@ -680,13 +690,23 @@
 
   /* ===== Protección de texto / Array ===== */
   .icon-btn.on { border-color: var(--accent); color: var(--accent); background: var(--toggle-active-bg); }
-  #arrayModal { background: transparent; backdrop-filter: none; align-items: flex-end; padding: 0 6px 6px; }
-  #arrayModal .modalbox { margin-bottom: 0; max-height: 58vh; overflow-y: auto; padding: 12px; }
-  #arrayModal .row { margin-top: 4px; }
-  #arrayModal .arr-chk { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 6px; }
-  #arrayModal .arr-chk input { width: auto; }
-  #arrayModal #arInfo { font-size: 11px; color: var(--muted); margin: 0 0 4px; }
-  #arrayModal #arWarn { font-size: 11px; color: var(--danger); margin-top: 4px; min-height: 14px; }
+  #arrayModal { background: transparent; backdrop-filter: none; align-items: flex-end; padding: 0 6px calc(6px + env(safe-area-inset-bottom)); pointer-events: none; overflow: visible; }
+  #arrayModal .modalbox { pointer-events: auto; margin: 0 auto; max-width: 420px; max-height: 30vh; overflow-y: auto; padding: 6px 8px; border-radius: 12px; opacity: .97; }
+  #arrayModal .ar-head { display: flex; align-items: center; gap: 6px; }
+  #arrayModal .ar-head b { font-size: 13px; color: var(--text); }
+  #arrayModal #arInfo { flex: 1; min-width: 0; font-size: 10px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
+  #arrayModal .ar-head .btn { min-height: 28px; padding: 3px 10px; font-size: 12px; margin: 0; }
+  #arrayModal .closebtn { position: static; width: 28px; height: 28px; flex: none; font-size: 14px; border-color: var(--btn-border); }
+  #arrayModal .ar-body { margin-top: 5px; }
+  #arrayModal .modalbox.ar-collapsed .ar-body { display: none; }
+  #arrayModal .ar-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-top: 3px; }
+  #arrayModal .ar-grid label { font-size: 9px; margin: 0 0 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #arrayModal input[type="number"], #arrayModal select { min-height: 28px; height: 28px; padding: 2px 4px; font-size: 12px; }
+  #arrayModal .ar-more summary { font-size: 11px; color: var(--muted); cursor: pointer; margin-top: 5px; }
+  #arrayModal .arr-chk { display: flex; align-items: center; gap: 6px; font-size: 11px; margin-top: 5px; }
+  #arrayModal .arr-chk input { width: auto; min-height: 0; height: auto; }
+  #arrayModal #arWarn { font-size: 10px; color: var(--danger); margin: 2px 0 0; }
+  #arrayModal #arWarn:empty { display: none; }
   .arr-ghost { position: absolute; pointer-events: none; z-index: 9999; box-sizing: border-box; border: 2px dashed var(--accent); background: rgba(59,130,196,0.14); }
   .arr-ghost.orig { border-style: solid; background: transparent; }
 
@@ -1109,19 +1129,33 @@
   </div>
 
   <div class="modal" id="arrayModal">
-    <div class="modalbox" style="position:relative">
-      <button class="closebtn" id="closeArray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      <h2>Array</h2>
-      <p id="arInfo"></p>
-      <div class="row"><div><label>Columnas (X)</label><input type="number" id="arCols" value="3" min="1" max="50" step="1" inputmode="numeric" /></div><div><label>Filas (Y)</label><input type="number" id="arRows" value="2" min="1" max="50" step="1" inputmode="numeric" /></div></div>
-      <div class="row"><div><label>Separación X (cm)</label><input type="number" id="arGapX" value="0.5" step="0.1" inputmode="decimal" /></div><div><label>Separación Y (cm)</label><input type="number" id="arGapY" value="0.5" step="0.1" inputmode="decimal" /></div></div>
-      <div class="row"><div><label>Dirección X</label><select id="arDirX"><option value="1">→ Derecha</option><option value="-1">← Izquierda</option></select></div><div><label>Dirección Y</label><select id="arDirY"><option value="1">↓ Abajo</option><option value="-1">↑ Arriba</option></select></div></div>
-      <div class="row"><div><label>La separación se mide…</label><select id="arMode"><option value="gap">Entre bordes</option><option value="pitch">Entre centros</option></select></div><div><label>Giro por copia (°)</label><input type="number" id="arRot" value="0" step="5" inputmode="decimal" /></div></div>
-      <div class="row"><div><label>Desfasar filas impares (cm)</label><input type="number" id="arShift" value="0" step="0.1" inputmode="decimal" /></div></div>
-      <label class="arr-chk"><input type="checkbox" id="arCenter" /> Centrar el conjunto en la hoja (mueve también el original)</label>
-      <label class="arr-chk"><input type="checkbox" id="arGroup" /> Agrupar los objetos de cada copia</label>
+    <div class="modalbox" id="arrayBox">
+      <div class="ar-head">
+        <b>Array</b><span id="arInfo"></span>
+        <button class="btn cyan" id="arApply" type="button">Aplicar</button>
+        <button class="closebtn" id="arCollapse" type="button" title="Minimizar" aria-label="Minimizar">▾</button>
+        <button class="closebtn" id="closeArray" type="button" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
       <div id="arWarn"></div>
-      <div class="row" style="margin-top:8px"><button class="btn full" id="arApply">Aplicar</button><button class="btn full" id="arCancel">Cancelar</button></div>
+      <div class="ar-body">
+        <div class="ar-grid">
+          <div><label>Columnas</label><input type="number" id="arCols" value="3" min="1" max="50" step="1" inputmode="numeric" /></div>
+          <div><label>Filas</label><input type="number" id="arRows" value="2" min="1" max="50" step="1" inputmode="numeric" /></div>
+          <div><label>Sep. X (cm)</label><input type="number" id="arGapX" value="0.5" step="0.1" inputmode="decimal" /></div>
+          <div><label>Sep. Y (cm)</label><input type="number" id="arGapY" value="0.5" step="0.1" inputmode="decimal" /></div>
+        </div>
+        <div class="ar-grid">
+          <div><label>Dir. X</label><select id="arDirX"><option value="1">→ Der.</option><option value="-1">← Izq.</option></select></div>
+          <div><label>Dir. Y</label><select id="arDirY"><option value="1">↓ Abajo</option><option value="-1">↑ Arriba</option></select></div>
+          <div><label>Medir</label><select id="arMode"><option value="gap">Bordes</option><option value="pitch">Centros</option></select></div>
+          <div><label>Giro (°)</label><input type="number" id="arRot" value="0" step="5" inputmode="decimal" /></div>
+        </div>
+        <details class="ar-more"><summary>Más opciones</summary>
+          <div class="ar-grid" style="grid-template-columns:1fr"><div><label>Desfasar filas impares (cm)</label><input type="number" id="arShift" value="0" step="0.1" inputmode="decimal" /></div></div>
+          <label class="arr-chk"><input type="checkbox" id="arCenter" /> Centrar el conjunto en la hoja (mueve también el original)</label>
+          <label class="arr-chk"><input type="checkbox" id="arGroup" /> Agrupar los objetos de cada copia</label>
+        </details>
+      </div>
     </div>
   </div>
 
@@ -1182,24 +1216,40 @@
       <canvas id="srPreviewCanvas" class="image-tool-preview" aria-label="Vista previa de superresolución"></canvas>
       </section>
       <section id="toolPanelBackground" class="image-tool-panel" role="tabpanel" hidden>
-      <div class="image-preview-viewport" id="bgPreviewViewport" aria-label="Vista previa ampliable: arrastra para mover, pellizca para zoom"><canvas id="bgPreviewCanvas" class="image-tool-preview" aria-label="Vista previa de eliminación de fondo"></canvas></div>
-      <div style="margin-top:4px;padding:10px;border:1px solid var(--line);border-radius:10px">
-        <strong style="font-size:12px">Eliminar fondo · máscara con bordes suaves</strong>
-        <div style="font-size:11px;color:var(--muted);margin-top:3px">Arrastra para mover la vista; pellizca para ampliar; doble toque restablece el encuadre. El resultado se mantiene como PNG transparente.</div>
-        
-        <div class="row" style="align-items:end"><div><label for="bgRemoveColor">Color del fondo</label><input type="color" id="bgRemoveColor" value="#ffffff" /></div><div><label for="bgRemoveTolerance">Sensibilidad <span id="bgRemoveToleranceVal">35</span></label><input type="range" id="bgRemoveTolerance" min="5" max="120" value="35" step="5" /></div></div><div class="row" style="align-items:end;margin-top:6px"><div><label for="bgRemoveMode">Método de base</label><select id="bgRemoveMode"><option value="connected" selected>Fondo conectado (bordes)</option><option value="intelligent">Inteligente (color + bordes)</option><option value="closed">Solo zonas cerradas (manual)</option><option value="global">Todo el color similar (riesgo alto)</option></select></div><div><label for="bgRemoveFeather">Suavizar borde <span id="bgRemoveFeatherVal">2 px</span></label><input type="range" id="bgRemoveFeather" min="0" max="6" value="2" step="1" /></div></div>
-        <div class="row" style="align-items:end;margin-top:6px"><div style="flex:1"><label for="bgZoneMode">Selección de zona</label><select id="bgZoneMode"><option value="connected" selected>Región conectada</option><option value="closed">Solo zona cerrada</option><option value="intelligent">Inteligente: respeta bordes</option></select></div></div>
-        <div class="row" style="align-items:end;margin-top:4px"><div style="flex:1"><label for="bgZoneIntensity">Intensidad de selección <span id="bgZoneIntensityVal">50%</span></label><input id="bgZoneIntensity" type="range" min="10" max="100" value="50" step="5" style="width:100%" /></div><div style="flex:1"><label for="bgClosedIntensity">Intensidad zona cerrada <span id="bgClosedIntensityVal">45%</span></label><input id="bgClosedIntensity" type="range" min="5" max="100" value="45" step="5" style="width:100%" /></div></div>
-        <div class="enhance-actions"><button class="btn" id="bgSampleCornerBtn" type="button">Tomar color de esquina</button><button class="btn cyan" id="bgRemoveApplyBtn" type="button">Generar base</button></div>
-        <div class="bg-edit-tools" role="group" aria-label="Herramientas de máscara"><button class="btn active" type="button" data-bg-tool="pan">✋ Mover / zoom</button><button class="btn" type="button" data-bg-tool="zone">▧ Seleccionar zona</button><button class="btn" type="button" data-bg-tool="brush">✎ Pincel para quitar</button><button class="btn" type="button" data-bg-tool="eraser">⌫ Proteger / borrar</button></div>
-        <div class="row" style="align-items:center;margin-top:6px"><div style="flex:1"><label for="bgBrushSize">Tamaño del pincel <span id="bgBrushSizeVal">28 px</span></label><input type="range" id="bgBrushSize" min="4" max="180" value="28" step="2" style="width:100%" /></div><div style="flex:1"><label for="bgEraserSize">Tamaño del borrador <span id="bgEraserSizeVal">36 px</span></label><input type="range" id="bgEraserSize" min="4" max="180" value="36" step="2" style="width:100%" /></div></div>
-        <div style="font-size:10px;color:var(--muted);margin-top:3px">Las zonas retocadas se muestran con una superposición translúcida: rojo = quitar, azul = proteger. El indicador circular muestra el radio real del pincel.</div>
-        <div class="row" style="align-items:center;margin-top:6px"><button class="btn" id="bgEditUndoBtn" type="button" disabled>↶ Deshacer acción</button><button class="btn" id="bgEditRedoBtn" type="button" disabled>↷ Rehacer acción</button></div>
-        <div class="enhance-actions" style="margin-top:7px"><button class="btn" id="bgRemoveUndoPreviewBtn" type="button" disabled>Descartar vista previa</button><button class="btn cyan" id="bgRemoveCommitBtn" type="button" disabled>Aplicar recorte</button></div>
+      <div class="image-preview-viewport" id="bgPreviewViewport" aria-label="Vista previa en vivo: un dedo mueve, dos dedos amplían"><canvas id="bgPreviewCanvas" class="image-tool-preview" aria-label="Vista previa de eliminación de fondo"></canvas></div>
+      <div class="bg-tools" role="group" aria-label="Herramientas de fondo">
+        <button class="btn active" type="button" data-bg-tool="pan"><b>✋</b>Mover</button>
+        <button class="btn" type="button" data-bg-tool="auto"><b>✨</b>Auto</button>
+        <button class="btn" type="button" data-bg-tool="erase"><b>⌫</b>Borrar</button>
+        <button class="btn" type="button" data-bg-tool="restore"><b>↺</b>Restaurar</button>
+        <button class="btn" type="button" data-bg-tool="wand"><b>✦</b>Varita</button>
+      </div>
+      <div class="bg-ctl" id="bgCtlAuto" hidden>
+        <div class="row"><div><label for="bgRemoveColor">Color del fondo</label><input type="color" id="bgRemoveColor" value="#ffffff" /></div><div><button class="btn cyan" id="bgSampleCornerBtn" type="button" style="width:100%">✨ Quitar fondo</button></div></div>
+        <label for="bgRemoveTolerance">Sensibilidad <span id="bgRemoveToleranceVal">35</span></label><input type="range" id="bgRemoveTolerance" min="5" max="120" value="35" step="1" style="width:100%" />
+        <div class="row"><div><label for="bgRemoveFeather">Suavizado <span id="bgRemoveFeatherVal">2 px</span></label><input type="range" id="bgRemoveFeather" min="0" max="6" value="2" step="1" style="width:100%" /></div><div><label for="bgRemoveEdge">Borde <span id="bgRemoveEdgeVal">0</span></label><input type="range" id="bgRemoveEdge" min="-4" max="4" value="0" step="1" style="width:100%" /></div></div>
+        <label class="bg-chk"><input type="checkbox" id="bgGlobalChk" /> Quitar también huecos interiores del mismo color</label>
+      </div>
+      <div class="bg-ctl" id="bgCtlBrush" hidden>
+        <div class="row"><div><label for="bgBrushSize">Tamaño <span id="bgBrushSizeVal">28 px</span></label><input type="range" id="bgBrushSize" min="6" max="120" value="28" step="2" style="width:100%" /></div><div><label for="bgBrushHard">Dureza <span id="bgBrushHardVal">70%</span></label><input type="range" id="bgBrushHard" min="0" max="100" value="70" step="5" style="width:100%" /></div></div>
+      </div>
+      <div class="bg-ctl" id="bgCtlWand" hidden>
+        <div class="row"><div><label for="bgWandTol">Tolerancia <span id="bgWandTolVal">30</span></label><input type="range" id="bgWandTol" min="3" max="120" value="30" step="1" style="width:100%" /></div><div><label for="bgWandMode">Acción</label><select id="bgWandMode"><option value="erase">Quitar</option><option value="restore">Restaurar</option></select></div></div>
+        <label class="bg-chk"><input type="checkbox" id="bgWandContig" checked /> Solo zona contigua</label>
+      </div>
+      <div class="bg-actions">
+        <button class="btn" id="bgEditUndoBtn" type="button" disabled aria-label="Deshacer">↶</button>
+        <button class="btn" id="bgEditRedoBtn" type="button" disabled aria-label="Rehacer">↷</button>
+        <button class="btn" id="bgMaskViewBtn" type="button">Ver máscara</button>
+        <button class="btn" id="bgRemoveUndoPreviewBtn" type="button" disabled>Reiniciar</button>
+      </div>
+      <button class="btn cyan full" id="bgRemoveCommitBtn" type="button" disabled>Aplicar recorte</button>
+      <div id="bgRemoveStatus" role="status" style="font-size:11px;color:var(--muted);margin-top:6px">Selecciona una imagen. Lo que borres o restaures se ve al instante; «Aplicar recorte» lo guarda como PNG transparente.</div>
+      <details style="margin-top:8px"><summary style="font-size:11px;color:var(--muted);cursor:pointer">Historial de la imagen</summary>
         <label for="enhanceHistoryTarget" style="margin-top:8px">Historial independiente de la imagen</label><select id="enhanceHistoryTarget" aria-label="Imagen cuyo historial se va a deshacer o rehacer"></select>
         <div class="enhance-actions" style="margin-top:7px"><button class="btn" id="enhanceToolUndoBtn" type="button" disabled>↶ Deshacer</button><button class="btn" id="enhanceToolRedoBtn" type="button" disabled>↷ Rehacer</button></div>
-        <div id="bgRemoveStatus" role="status" style="font-size:11px;color:var(--muted);margin-top:6px">Selecciona una imagen. El resultado conserva transparencia y puede deshacerse con Deshacer.</div>
-      </div>
+        
+      </details>
       </section>
       <section id="toolPanelOcr" class="image-tool-panel" role="tabpanel" hidden>
       <div class="divider" style="margin:10px 0;border-top:1px solid var(--line)"></div>
@@ -3880,17 +3930,17 @@ ctx.restore();
     const selected=getSelectedEls().find(el=>el.src && /^data:image\//i.test(el.src));
     enhanceSourceElId=selected?selected.id:null;
     $('enhanceScope').value=selected?'selected':'page';
-    enhanceWorkingCanvas=null; enhanceAiPendingDataUrl=null; $('enhanceAiApplyBtn').disabled=true; $('enhanceApplyBtn').disabled=true; $('enhanceInsertTextBtn').disabled=true;
+    bgFreeSession(); enhanceWorkingCanvas=null; enhanceAiPendingDataUrl=null; $('enhanceAiApplyBtn').disabled=true; $('enhanceApplyBtn').disabled=true; $('enhanceInsertTextBtn').disabled=true;
     $('enhanceOcrText').value=''; $('enhanceOcrStatus').textContent='El OCR analizará las imágenes incluidas en “Aplicar a”.';
     const previewCanvas=$('srPreviewCanvas'); previewCanvas.width=1; previewCanvas.height=1; const bgCanvas=$('bgPreviewCanvas'); bgCanvas.width=1; bgCanvas.height=1; const ocrCanvas=$('ocrPreviewCanvas'); ocrCanvas.width=1; ocrCanvas.height=1;
     updateEnhanceTargetInfo();
     // Mostrar inmediatamente la imagen elegida para que los controles de color puedan muestrear desde el inicio.
     const initialTarget=selectedEnhanceImage()||enhancerTargets()[0]?.el;
-    if(initialTarget){getLoadedImage(initialTarget.src).then(im=>{[previewCanvas,bgCanvas,ocrCanvas].forEach(cv=>{cv.width=im.naturalWidth;cv.height=im.naturalHeight;const cx=cv.getContext('2d');cx.clearRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0);});enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=im.naturalWidth;enhanceWorkingCanvas.height=im.naturalHeight;enhanceWorkingCanvas.getContext('2d').drawImage(im,0,0);updateEnhanceTargetInfo();}).catch(()=>{});}
+    if(initialTarget){getLoadedImage(initialTarget.src).then(im=>{[previewCanvas,ocrCanvas].forEach(cv=>{cv.width=im.naturalWidth;cv.height=im.naturalHeight;const cx=cv.getContext('2d');cx.clearRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0);});enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=im.naturalWidth;enhanceWorkingCanvas.height=im.naturalHeight;enhanceWorkingCanvas.getContext('2d').drawImage(im,0,0);bgInitFromImage(im,initialTarget);updateEnhanceTargetInfo();}).catch(()=>{});}
     refreshHistoryTargetOptions();
     $('imageEnhancerModal').classList.add('show'); setTimeout(()=>$('imageEnhancerModal').classList.add('visible'),10);
   }
-  function closeImageEnhancer() { const m=$('imageEnhancerModal'); m.classList.remove('visible'); setTimeout(()=>m.classList.remove('show'),250); }
+  function closeImageEnhancer() { const m=$('imageEnhancerModal'); m.classList.remove('visible'); setTimeout(()=>{m.classList.remove('show'); if(typeof bgFreeSession==='function')bgFreeSession();},250); }
   function selectedEnhanceImage() { return enhanceSourceElId ? findEl(enhanceSourceElId) : (enhancerTargets()[0]?.el || null); }
   $('openImageEnhancerBtn').addEventListener('click',()=>{$('moreMenu').classList.remove('show');openImageEnhancer();});
   $('closeImageEnhancer').addEventListener('click',closeImageEnhancer);
@@ -4121,12 +4171,11 @@ ctx.restore();
   }
   async function syncImageToolPreview(target,src){
     try{
-      const im=await getLoadedImage(src),canvases=[$('srPreviewCanvas'),$('bgPreviewCanvas'),$('ocrPreviewCanvas')];
+      const im=await getLoadedImage(src),canvases=[$('srPreviewCanvas'),$('ocrPreviewCanvas')];
       canvases.forEach(cv=>{cv.width=im.naturalWidth;cv.height=im.naturalHeight;const ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);ctx.drawImage(im,0,0);});
       enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=im.naturalWidth;enhanceWorkingCanvas.height=im.naturalHeight;
       enhanceWorkingCanvas.getContext('2d').drawImage(im,0,0);
-      bgRemovePendingDataUrl=null;bgRemovePendingMap.clear();window.__bgRemoveBefore=null;window.__bgRemoveTargetId=null;$('bgRemoveCommitBtn').disabled=true;if($('bgRemoveUndoPreviewBtn'))$('bgRemoveUndoPreviewBtn').disabled=true;
-      $('bgRemoveStatus').textContent='Vista previa sincronizada con la imagen y su historial.';
+      bgInitFromImage(im,target);
     }catch(e){}
   }
   async function refreshAllImageToolPreviews(){
@@ -4193,160 +4242,338 @@ ctx.restore();
   });
 
 
-  // Fase 4: eliminación de fondo por similitud de color (sin servicio externo).
-  $('bgRemoveTolerance').addEventListener('input', e => $('bgRemoveToleranceVal').textContent=e.target.value);
-  $('bgRemoveMode').addEventListener('change',()=>{const m=$('bgRemoveMode').value;if(m==='closed')$('bgRemoveStatus').textContent='Modo de base «Solo zonas cerradas»: no elimina automáticamente el perímetro. Genera la base y selecciona las regiones interiores que quieres quitar.';else if(m==='global')$('bgRemoveStatus').textContent='Aviso: «Todo el color similar» puede quitar píxeles del mismo color en cualquier parte de la imagen.';});
-  $('bgRemoveFeather').addEventListener('input',e=>$('bgRemoveFeatherVal').textContent=e.target.value+' px');
+  // ===== Quitar fondo · editor en vivo =====
+  // Todo se calcula sobre una máscara viva: lo que borras, restauras o ajustas se ve al instante
+  // y «Aplicar recorte» solo confirma el resultado (sin pasos intermedios de «generar base»).
+  const BG_MAX_PX = 4000000;          // por encima de esto se edita a menor resolución y se exporta a tamaño original
+  let bgS = null;                     // sesión de edición actual
+  let bgPending = null;               // imagen lista para abrir cuando se muestre la pestaña
+  let bgStamp = 0, bgAutoTimer = 0, bgShowMask = false;
+  let bgEditTool = 'pan', bgCursorEl = null, bgEditPointer = null;
+  let bgUndo = [], bgRedo = [];
+
   function parseHexColor(hex) { const h=String(hex||'#ffffff').replace('#',''); return [parseInt(h.slice(0,2),16)||0,parseInt(h.slice(2,4),16)||0,parseInt(h.slice(4,6),16)||0]; }
-  function sampleCornerColor(img) {
-    const c=document.createElement('canvas'); c.width=Math.min(64,img.naturalWidth); c.height=Math.min(64,img.naturalHeight);
-    const x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(img,0,0,c.width,c.height);
-    const d=x.getImageData(0,0,c.width,c.height).data, points=[[1,1],[c.width-2,1],[1,c.height-2],[c.width-2,c.height-2]];
-    const rgb=points.map(([px,py])=>{const i=(Math.max(0,py)*c.width+Math.max(0,px))*4;return [d[i],d[i+1],d[i+2]];});
-    return rgb[0].map((_,k)=>Math.round(rgb.reduce((n,v)=>n+v[k],0)/rgb.length));
+  const bgHex = rgb => '#'+rgb.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+  const bgIsPaintTool = () => bgEditTool==='erase'||bgEditTool==='restore'||bgEditTool==='wand';
+  const bgIsBrushTool = () => bgEditTool==='erase'||bgEditTool==='restore';
+  const bgStatus = t => { const el=$('bgRemoveStatus'); if(el) el.textContent=t; };
+
+  // Distancia de color (YCbCr ponderada): la luminosidad pesa menos que el tono.
+  function bgYcc(r,g,b){return [.299*r+.587*g+.114*b,128-.168736*r-.331264*g+.5*b,128+.5*r-.418688*g-.081312*b];}
+  function bgMakeDist(d,rgb){
+    const [py,pcb,pcr]=bgYcc(rgb[0],rgb[1],rgb[2]);
+    return i=>{const r=d[i],g=d[i+1],b=d[i+2],y=.299*r+.587*g+.114*b-py,cb=128-.168736*r-.331264*g+.5*b-pcb,cr=128+.5*r-.418688*g-.081312*b-pcr;return y*y*.65+cb*cb*1.35+cr*cr*1.35;};
   }
-  $('bgSampleCornerBtn').addEventListener('click',async()=>{
-    const target=selectedEnhanceImage()||enhancerTargets()[0]?.el;
-    if(!target){$('bgRemoveStatus').textContent='Selecciona una imagen primero.';return;}
-    try{const img=await getLoadedImage(target.src),rgb=sampleCornerColor(img);$('bgRemoveColor').value='#'+rgb.map(v=>v.toString(16).padStart(2,'0')).join('');$('bgRemoveStatus').textContent='Color aproximado de las cuatro esquinas seleccionado. Revisa el color antes de quitar el fondo.';}
-    catch(e){$('bgRemoveStatus').textContent='No se pudo leer la imagen.';}
-  });
-  let bgRemovePendingDataUrl=null;
-  let bgRemovePendingMap=new Map();
-  async function buildBackgroundRemoval(target){
-    const sourceBefore=target.src,img=await getLoadedImage(sourceBefore);
-    if(img.naturalWidth*img.naturalHeight>8000000)throw new Error('Imagen de más de 8 megapíxeles: reduce su tamaño para evitar agotar la memoria del móvil');
-    const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
-    const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,c.width,c.height);
-    const im=ctx.getImageData(0,0,c.width,c.height),d=im.data,w=c.width,h=c.height,total=w*h;
-    const picked=parseHexColor($('bgRemoveColor').value),tol=Number($('bgRemoveTolerance').value)||35,mode=$('bgRemoveMode')?.value||'connected',feather=Number($('bgRemoveFeather')?.value||0);
-    // Distancia perceptual aproximada en YCbCr: evita que diferencias de luminancia
-    // pequeñas pesen igual que diferencias de tono y reduce el borrado accidental.
-    const dist2=(i)=>{const r=d[i],g=d[i+1],b=d[i+2];const y=.299*r+.587*g+.114*b, cb=128-.168736*r-.331264*g+.5*b, cr=128+.5*r-.418688*g-.081312*b;const py=.299*picked[0]+.587*picked[1]+.114*picked[2], pcb=128-.168736*picked[0]-.331264*picked[1]+.5*picked[2], pcr=128+.5*picked[0]-.418688*picked[1]-.081312*picked[2];return (y-py)*(y-py)*.65+(cb-pcb)*(cb-pcb)*1.35+(cr-pcr)*(cr-pcr)*1.35;};
-    const threshold=tol*tol, hard=new Uint8Array(total), alpha=new Uint8Array(total), queue=new Int32Array(total);let head=0,tail=0,removed=0;
-    // Un poco más estricto en los bordes: un píxel solo entra al fondo conectado
-    // si su color coincide y existe una ruta continua desde el perímetro.
-    const similar=px=>dist2(px*4)<=threshold;
-    if(mode==='global') {
-      for(let px=0;px<total;px++) if(similar(px)) hard[px]=1;
-    } else if(mode==='closed') {
-      // Modo manual: no borra nada automáticamente. El usuario elige solo las regiones cerradas.
-    } else {
-      const intelligent=mode==='intelligent';
-      const seed=px=>{if(px<0||px>=total||hard[px]||!similar(px))return;hard[px]=1;queue[tail++]=px;};
-      for(let x=0;x<w;x++){seed(x);if(h>1)seed((h-1)*w+x);}for(let y=1;y<h-1;y++){seed(y*w);if(w>1)seed(y*w+w-1);}
-      while(head<tail){const px=queue[head++],x=px%w,y=(px/w)|0,pi=px*4;
-        const visit=n=>{if(n<0||n>=total||hard[n]||!similar(n))return;
-          if(intelligent){const ni=n*4,dr=d[ni]-d[pi],dg=d[ni+1]-d[pi+1],db=d[ni+2]-d[pi+2];const edge=Math.sqrt(.22*dr*dr+.60*dg*dg+.18*db*db);if(edge>Math.max(16,tol*(0.48+Number($('bgZoneIntensity')?.value||50)/180)))return;}
-          seed(n);
-        };
-        if(x>0)visit(px-1);if(x+1<w)visit(px+1);if(y>0)visit(px-w);if(y+1<h)visit(px+w);
+  function bgBorderColor(orig,w,h){
+    const d=orig.data,rs=[],gs=[],bs=[],step=Math.max(1,Math.floor((w+h)/500));
+    const add=(x,y)=>{const i=(y*w+x)*4;if(d[i+3]<16)return;rs.push(d[i]);gs.push(d[i+1]);bs.push(d[i+2]);};
+    for(let x=0;x<w;x+=step){add(x,0);add(x,h-1);}for(let y=0;y<h;y+=step){add(0,y);add(w-1,y);}
+    if(!rs.length)return [255,255,255];
+    const med=a=>{a.sort((p,q)=>p-q);return a[a.length>>1];};
+    return [med(rs),med(gs),med(bs)];
+  }
+  function bgMorph(src,w,h,grow,iters){
+    let a=src,total=w*h;
+    for(let n=0;n<iters;n++){
+      const b=new Uint8Array(a);
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const px=y*w+x,v=a[px];
+        if(grow){ if(v)continue; if((x>0&&a[px-1])||(x+1<w&&a[px+1])||(y>0&&a[px-w])||(y+1<h&&a[px+w]))b[px]=1; }
+        else{ if(!v)continue; if((x>0&&!a[px-1])||(x+1<w&&!a[px+1])||(y>0&&!a[px-w])||(y+1<h&&!a[px+w]))b[px]=0; }
+      }
+      a=b;
+    }
+    return a;
+  }
+  function bgBoxBlur(src,w,h,r){
+    const tmp=new Uint8Array(src.length),out=new Uint8Array(src.length),win=2*r+1,half=win>>1;
+    for(let y=0;y<h;y++){const row=y*w;let sum=0;
+      for(let x=-r;x<=r;x++)sum+=src[row+Math.min(w-1,Math.max(0,x))];
+      for(let x=0;x<w;x++){tmp[row+x]=((sum+half)/win)|0;sum+=src[row+Math.min(w-1,x+r+1)]-src[row+Math.max(0,x-r)];}}
+    for(let x=0;x<w;x++){let sum=0;
+      for(let y=-r;y<=r;y++)sum+=tmp[Math.min(h-1,Math.max(0,y))*w+x];
+      for(let y=0;y<h;y++){out[y*w+x]=((sum+half)/win)|0;sum+=tmp[Math.min(h-1,y+r+1)*w+x]-tmp[Math.max(0,y-r)*w+x];}}
+    return out;
+  }
+  // Detección automática del fondo: devuelve el factor de opacidad 0-255 de cada píxel.
+  function bgAutoCompute(orig,w,h,P){
+    const d=orig.data,total=w*h,dist2=bgMakeDist(d,P.B),thr=P.tol*P.tol;
+    const similar=px=>{const i=px*4;return d[i+3]<16||dist2(i)<=thr;};
+    let hard=new Uint8Array(total);
+    if(P.global){for(let px=0;px<total;px++)if(similar(px))hard[px]=1;}
+    else{
+      const q=new Int32Array(total);let head=0,tail=0;
+      const seed=px=>{if(hard[px]||!similar(px))return;hard[px]=1;q[tail++]=px;};
+      for(let x=0;x<w;x++){seed(x);seed((h-1)*w+x);}
+      for(let y=1;y<h-1;y++){seed(y*w);seed(y*w+w-1);}
+      while(head<tail){const px=q[head++],x=px%w;if(x>0)seed(px-1);if(x+1<w)seed(px+1);if(px>=w)seed(px-w);if(px+w<total)seed(px+w);}
+    }
+    if(P.edge>0)hard=bgMorph(hard,w,h,true,P.edge);else if(P.edge<0)hard=bgMorph(hard,w,h,false,-P.edge);
+    let A=new Uint8Array(total);
+    for(let px=0;px<total;px++)A[px]=hard[px]?0:255;
+    if(P.feather>=1){
+      // Anillo de 1 px: la opacidad sale de qué tan lejos está su color del fondo (antialias real del borde).
+      const tol=Math.max(1,P.tol);
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const px=y*w+x;if(hard[px])continue;
+        if(!((x>0&&hard[px-1])||(x+1<w&&hard[px+1])||(y>0&&hard[px-w])||(y+1<h&&hard[px+w])))continue;
+        const t=Math.max(0,Math.min(1,(Math.sqrt(dist2(px*4))/tol-1)/1.2));
+        A[px]=Math.round(255*t*t*(3-2*t));
+      }
+      const r=P.feather>=2?Math.round(P.feather/2):0;
+      if(r>0){A=bgBoxBlur(A,w,h,r);A=bgBoxBlur(A,w,h,r);}
+    }
+    return A;
+  }
+  // Compone la imagen final (o la vista con máscara roja) para un rectángulo.
+  function bgCompose(st,img,x0,y0,x1,y1,mask){
+    const o=st.orig.data,d=img.data,w=st.w,man=st.man,aA=st.autoA,B=st.B;
+    for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){
+      const px=y*w+x,i=px*4,m=man?man[px]:0,a=m?m-1:aA[px],oa=o[i+3];
+      let r=o[i],g=o[i+1],b=o[i+2];
+      if(mask){
+        const t=(255-a)/255*.55;
+        d[i]=r+(255-r)*t;d[i+1]=g+(60-g)*t;d[i+2]=b+(75-b)*t;d[i+3]=oa;
+      }else{
+        if(!m&&a>0&&a<255){ // quita el tinte del fondo en los píxeles semitransparentes del borde
+          const al=Math.max(.2,a/255),ib=1-a/255;
+          r=(r-ib*B[0])/al;g=(g-ib*B[1])/al;b=(b-ib*B[2])/al;
+        }
+        d[i]=r;d[i+1]=g;d[i+2]=b;d[i+3]=a===255?oa:Math.round(a*oa/255);
       }
     }
-    // El suavizado solo se permite en el borde inmediato de la máscara detectada.
-    // Esto evita borrar por accidente otros objetos de color parecido en otra zona.
-    for(let px=0;px<total;px++){
-      const i=px*4,dd=Math.sqrt(dist2(i)),dist=dd/Math.max(1,tol);let a=hard[px]?0:255;
-      if(!hard[px]&&feather>0&&dist<1.65){const x=px%w,y=(px/w)|0;let near=false;if(x>0)near=near||hard[px-1]===1;if(x+1<w)near=near||hard[px+1]===1;if(y>0)near=near||hard[px-w]===1;if(y+1<h)near=near||hard[px+w]===1;if(near){const t=Math.max(0,Math.min(1,(dist-.45)/1.2));a=Math.round(255*(t*t*(3-2*t)));}}
-      if(hard[px])removed++;
-      if(a>0&&a<255){const blend=Math.min(.82,(255-a)/255*.9);d[i]=Math.round(d[i]*(1-blend)+picked[0]*blend);d[i+1]=Math.round(d[i+1]*(1-blend)+picked[1]*blend);d[i+2]=Math.round(d[i+2]*(1-blend)+picked[2]*blend);}
-      d[i+3]=Math.round(d[i+3]*a/255);
-    }
-    ctx.putImageData(im,0,0);
-    const dataUrl=await new Promise((resolve,reject)=>c.toBlob(b=>{if(!b){reject(new Error('No se pudo crear PNG'));return;}const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(b);},'image/png'));
-    return {target,sourceBefore,canvas:c,originalImage:img,dataUrl,removed,mode};
   }
-  // Edición manual de máscara: selección de regiones conectadas, pincel de eliminación y borrador protector.
-  let bgEditTool='pan', bgEditBase=null, bgEditOriginal=null, bgEditMask=null, bgEditTargetId=null;
-  let bgEditUndo=[], bgEditRedo=[], bgEditPointer=null;
-  function setBgEditTool(tool){bgEditTool=tool;document.querySelectorAll('[data-bg-tool]').forEach(b=>b.classList.toggle('active',b.dataset.bgTool===tool));const cv=$('bgPreviewCanvas');if(cv)cv.style.cursor=tool==='brush'||tool==='eraser'?'none':tool==='zone'?'copy':tool==='pan'?'grab':'default';const er=$('bgEraserSize')?.closest('div'),br=$('bgBrushSize')?.closest('div');if(br)br.style.opacity=tool==='eraser'?'.65':'1';if(er)er.style.opacity=tool==='eraser'?'1':'.65';if(bgCursorEl)bgCursorEl.style.display=(tool==='brush'||tool==='eraser')?'block':'none';$('bgRemoveStatus').textContent=({pan:'Mover / zoom: arrastra para desplazar y pellizca para ampliar.',zone:'Toca una zona. El método y la intensidad determinan si selecciona región conectada, cerrada o si respeta mejor los bordes.',brush:'Pincel para quitar: pinta la máscara roja translúcida. El tamaño y el radio se muestran en la vista previa.',eraser:'Borrador protector: recupera la imagen original en la zona azul translúcida.'})[tool]||'';}
+  function bgRenderRect(x0,y0,x1,y1){
+    const s=bgS;if(!s)return;
+    x0=Math.max(0,x0|0);y0=Math.max(0,y0|0);x1=Math.min(s.w,x1|0);y1=Math.min(s.h,y1|0);
+    if(x1<=x0||y1<=y0)return;
+    bgCompose(s,s.disp,x0,y0,x1,y1,bgShowMask);
+    s.ctx.putImageData(s.disp,0,0,x0,y0,x1-x0,y1-y0);
+  }
+  function bgMakeState(im,full){
+    let w=im.naturalWidth,h=im.naturalHeight,k=1;
+    if(w*h>BG_MAX_PX){k=Math.sqrt(BG_MAX_PX/(w*h));w=Math.max(1,Math.round(w*k));h=Math.max(1,Math.round(h*k));}
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    const cx=c.getContext('2d',{willReadFrequently:true});cx.imageSmoothingQuality='high';cx.drawImage(im,0,0,w,h);
+    const total=w*h,st={im,w,h,k,total,orig:cx.getImageData(0,0,w,h),autoA:new Uint8Array(total).fill(255),man:null,B:[255,255,255],autoOn:false};
+    if(full){st.man=new Uint16Array(total);st.disp=new ImageData(w,h);st.cov=new Uint8Array(total);st.baseMan=new Uint16Array(total);st.touched=[];}
+    return st;
+  }
+  function bgInitFromImage(im,target){bgPending={im,target,stamp:++bgStamp};if(!$('toolPanelBackground').hidden)bgEnsureSession();}
+  function bgEnsureSession(){
+    if(!bgPending||(bgS&&bgS.stamp===bgPending.stamp))return;
+    bgInitSession(bgPending.im,bgPending.target,bgPending.stamp);
+  }
+  function bgFreeSession(){bgS=null;bgPending=null;bgUndo=[];bgRedo=[];bgEditPointer=null;}
+  function bgInitSession(im,target,stamp){
+    const cv=$('bgPreviewCanvas');
+    try{
+      const s=bgMakeState(im,true);s.target=target;s.targetId=target.id;s.stamp=stamp;
+      cv.width=s.w;cv.height=s.h;s.ctx=cv.getContext('2d');
+      s.B=bgBorderColor(s.orig,s.w,s.h);$('bgRemoveColor').value=bgHex(s.B);
+      bgS=s;bgUndo=[];bgRedo=[];bgEditPointer=null;
+      const st=previewViewState.get(cv);if(st){st.scale=1;st.x=0;st.y=0;st.pointers.clear();cv.style.transform='';}
+      bgRenderRect(0,0,s.w,s.h);
+      bgStatus(s.k<1?`Imagen grande: se edita a ${s.w}×${s.h}px y el resultado final se exporta a tamaño original.`:'Listo. Pulsa «Quitar fondo» o retoca con Borrar, Restaurar y Varita. Todo se ve al instante.');
+    }catch(err){bgS=null;bgStatus('No se pudo preparar la imagen: '+(err&&err.message?err.message:'poca memoria.'));}
+    updateBgUi();
+  }
+  function updateBgUi(){
+    const s=bgS,dirty=!!s&&(bgUndo.length>0||s.autoOn);
+    $('bgEditUndoBtn').disabled=!bgUndo.length;$('bgEditRedoBtn').disabled=!bgRedo.length;
+    $('bgRemoveCommitBtn').disabled=!dirty;$('bgRemoveUndoPreviewBtn').disabled=!dirty;
+  }
+  const updateBgEditHistoryButtons=updateBgUi;
+  function bgPushUndoEntry(e){bgUndo.push(e);if(bgUndo.length>30)bgUndo.shift();bgRedo=[];updateBgUi();}
+  function bgApplyEntry(e,undo){
+    const s=bgS;if(!s)return;
+    if(e.type==='patch'){const src=undo?e.old:e.nw;for(let k=0;k<e.idx.length;k++)s.man[e.idx[k]]=src[k];bgRenderRect(e.box[0],e.box[1],e.box[2],e.box[3]);}
+    else{
+      if(undo){e.newA=s.autoA;e.newB=s.B;e.newOn=s.autoOn;s.autoA=e.prevA;s.B=e.prevB;s.autoOn=e.prevOn;}
+      else{s.autoA=e.newA;s.B=e.newB;s.autoOn=e.newOn;}
+      bgRenderRect(0,0,s.w,s.h);
+    }
+  }
+  $('bgEditUndoBtn').addEventListener('click',()=>{if(!bgUndo.length||!bgS)return;const e=bgUndo.pop();bgApplyEntry(e,true);bgRedo.push(e);updateBgUi();bgStatus('Cambio deshecho.');});
+  $('bgEditRedoBtn').addEventListener('click',()=>{if(!bgRedo.length||!bgS)return;const e=bgRedo.pop();bgApplyEntry(e,false);bgUndo.push(e);updateBgUi();bgStatus('Cambio rehecho.');});
+
+  // ---- Quitar fondo automático (se recalcula en vivo al mover los controles) ----
+  function bgGetAutoParams(){return {B:parseHexColor($('bgRemoveColor').value),tol:Number($('bgRemoveTolerance').value)||35,feather:Number($('bgRemoveFeather').value)||0,edge:Number($('bgRemoveEdge').value)||0,global:$('bgGlobalChk').checked};}
+  function bgRunAuto(){
+    const s=bgS;if(!s){bgStatus('Selecciona una imagen primero.');return;}
+    const P=bgGetAutoParams();
+    if(!s.autoOn)bgPushUndoEntry({type:'auto',prevA:s.autoA,prevB:s.B.slice(),prevOn:false});
+    try{
+      s.autoA=bgAutoCompute(s.orig,s.w,s.h,P);s.B=P.B;s.autoOn=true;
+      bgRenderRect(0,0,s.w,s.h);updateBgUi();
+      bgStatus('Fondo quitado. Mueve Sensibilidad, Suavizado o Borde para afinar al instante; retoca con Borrar y Restaurar.');
+    }catch(err){bgStatus('No se pudo quitar el fondo: '+(err&&err.message?err.message:'poca memoria.'));}
+  }
+  function bgScheduleAuto(){if(!bgS)return;clearTimeout(bgAutoTimer);bgAutoTimer=setTimeout(bgRunAuto,90);}
+  $('bgSampleCornerBtn').addEventListener('click',()=>{
+    if(!bgS){bgStatus('Selecciona una imagen primero.');return;}
+    $('bgRemoveColor').value=bgHex(bgBorderColor(bgS.orig,bgS.w,bgS.h));bgRunAuto();
+  });
+  $('bgRemoveTolerance').addEventListener('input',e=>{$('bgRemoveToleranceVal').textContent=e.target.value;bgScheduleAuto();});
+  $('bgRemoveFeather').addEventListener('input',e=>{$('bgRemoveFeatherVal').textContent=e.target.value+' px';bgScheduleAuto();});
+  $('bgRemoveEdge').addEventListener('input',e=>{const v=Number(e.target.value);$('bgRemoveEdgeVal').textContent=(v>0?'+':'')+v;bgScheduleAuto();});
+  $('bgRemoveColor').addEventListener('input',bgScheduleAuto);
+  $('bgGlobalChk').addEventListener('change',bgScheduleAuto);
+
+  // ---- Pincel (borrar / restaurar) y varita: escriben directamente en la máscara ----
+  function bgBrushRadius(){const cv=$('bgPreviewCanvas'),r=cv.getBoundingClientRect(),sz=Number($('bgBrushSize').value)||28;return Math.max(.8,sz/2*cv.width/Math.max(1,r.width));}
+  function bgDab(cx,cy,r,hard,erase){
+    const s=bgS,w=s.w,h=s.h,x0=Math.max(0,Math.floor(cx-r)),x1=Math.min(w-1,Math.ceil(cx+r)),y0=Math.max(0,Math.floor(cy-r)),y1=Math.min(h-1,Math.ceil(cy+r));
+    const inner=Math.min(hard/100,1-Math.min(.5,1.5/r));
+    for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+      const dx=x-cx,dy=y-cy,t=Math.sqrt(dx*dx+dy*dy)/r;if(t>1)continue;
+      let f=1;if(t>inner){const u=(t-inner)/Math.max(1e-6,1-inner);f=1-u*u*(3-2*u);}
+      const cov=Math.round(f*255);if(cov<=0)continue;
+      const px=y*w+x,prev=s.cov[px];if(cov<=prev)continue; // el trazo no acumula: el borde suave se mantiene suave
+      if(!prev){s.baseMan[px]=s.man[px];s.touched.push(px);}
+      s.cov[px]=cov;
+      const bm=s.baseMan[px],baseA=bm?bm-1:s.autoA[px];
+      s.man[px]=Math.round(erase?baseA*(1-f):baseA+(255-baseA)*f)+1;
+    }
+  }
+  function bgStrokeSeg(a,b){
+    const s=bgS,r=bgBrushRadius(),hard=Number($('bgBrushHard').value),erase=bgEditTool==='erase';
+    const n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.y-a.y)/Math.max(1,r*.25)));
+    for(let i=0;i<=n;i++){const t=i/n;bgDab(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t,r,hard,erase);}
+    bgRenderRect(Math.floor(Math.min(a.x,b.x)-r)-1,Math.floor(Math.min(a.y,b.y)-r)-1,Math.ceil(Math.max(a.x,b.x)+r)+2,Math.ceil(Math.max(a.y,b.y)+r)+2);
+  }
+  function bgSetMan(px,a){const s=bgS;if(!s.cov[px]){s.cov[px]=255;s.baseMan[px]=s.man[px];s.touched.push(px);}s.man[px]=Math.max(0,Math.min(255,Math.round(a)))+1;}
+  function bgCurA(px){const s=bgS,m=s.man[px];return m?m-1:s.autoA[px];}
+  function bgStrokeEnd(){
+    const s=bgS;if(!s||!s.touched.length){if(s)s.touched=[];return;}
+    const n=s.touched.length,idx=new Int32Array(n),old=new Uint16Array(n),nw=new Uint16Array(n);
+    let x0=s.w,y0=s.h,x1=0,y1=0;
+    for(let k=0;k<n;k++){const px=s.touched[k],x=px%s.w,y=(px/s.w)|0;idx[k]=px;old[k]=s.baseMan[px];nw[k]=s.man[px];s.cov[px]=0;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
+    s.touched=[];
+    bgPushUndoEntry({type:'patch',idx,old,nw,box:[x0,y0,x1+1,y1+1]});
+  }
+  function bgWand(x,y){
+    const s=bgS,w=s.w,h=s.h,total=s.total,d=s.orig.data,tol=Number($('bgWandTol').value)||30,restore=$('bgWandMode').value==='restore',contig=$('bgWandContig').checked;
+    const si=(y*w+x)*4,dist2=bgMakeDist(d,[d[si],d[si+1],d[si+2]]),thr=tol*tol;
+    const sel=new Uint8Array(total),q=new Int32Array(total);let head=0,tail=0;
+    if(contig){
+      const add=px=>{if(sel[px]||dist2(px*4)>thr)return;sel[px]=1;q[tail++]=px;};
+      add(y*w+x);
+      while(head<tail){const px=q[head++],xx=px%w;if(xx>0)add(px-1);if(xx+1<w)add(px+1);if(px>=w)add(px-w);if(px+w<total)add(px+w);}
+    }else{for(let px=0;px<total;px++)if(dist2(px*4)<=thr){sel[px]=1;q[tail++]=px;}}
+    if(!tail){bgStatus('No se encontró una zona parecida. Sube la tolerancia o toca otro punto.');return;}
+    s.touched=[];
+    let x0=w,y0=h,x1=0,y1=0;
+    for(let k=0;k<tail;k++){const px=q[k];bgSetMan(px,restore?255:0);const xx=px%w,yy=(px/w)|0;if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(yy<y0)y0=yy;if(yy>y1)y1=yy;}
+    // borde de 1 px a media opacidad para que el corte no quede dentado
+    const ring=n=>{if(sel[n])return;sel[n]=2;const a=bgCurA(n);bgSetMan(n,restore?a+(255-a)*.5:a*.5);};
+    for(let k=0;k<tail;k++){const px=q[k],xx=px%w;if(xx>0)ring(px-1);if(xx+1<w)ring(px+1);if(px>=w)ring(px-w);if(px+w<total)ring(px+w);}
+    bgStrokeEnd();
+    bgRenderRect(x0-1,y0-1,x1+2,y1+2);
+    bgStatus(`${restore?'Restaurados':'Quitados'} ${tail.toLocaleString()} píxeles. Puedes seguir tocando o deshacer.`);
+  }
+
+  // ---- Interacción sobre la vista previa ----
+  function bgPoint(canvas,e){const r=canvas.getBoundingClientRect();return {x:Math.max(0,Math.min(canvas.width-1,(e.clientX-r.left)*canvas.width/Math.max(1,r.width))),y:Math.max(0,Math.min(canvas.height-1,(e.clientY-r.top)*canvas.height/Math.max(1,r.height)))};}
+  function bgStartEdit(canvas,e){
+    if(!bgS){bgStatus('Selecciona una imagen primero.');return false;}
+    const pt=bgPoint(canvas,e);
+    bgEditPointer={id:e.pointerId,last:pt,start:pt,cx:e.clientX,cy:e.clientY,tool:bgEditTool,moved:false};
+    if(bgIsBrushTool()){bgS.touched=[];bgStrokeSeg(pt,pt);}
+    return true;
+  }
+  function bgMoveEdit(canvas,e){
+    const ed=bgEditPointer;if(!ed||ed.id!==e.pointerId)return;
+    const evs=e.getCoalescedEvents?e.getCoalescedEvents():[],list=evs.length?evs:[e];
+    for(const ev of list){
+      if(Math.hypot(ev.clientX-ed.cx,ev.clientY-ed.cy)>8)ed.moved=true;
+      if(ed.tool==='erase'||ed.tool==='restore'){const pt=bgPoint(canvas,ev);bgStrokeSeg(ed.last,pt);ed.last=pt;}
+    }
+  }
+  function bgEndEdit(canvas,e){
+    const ed=bgEditPointer;if(!ed||ed.id!==e.pointerId)return;bgEditPointer=null;
+    if(ed.tool==='wand'){if(!ed.moved&&bgS)bgWand(Math.floor(ed.start.x),Math.floor(ed.start.y));}
+    else bgStrokeEnd();
+    updateBgUi();
+  }
+  function bgAbortEdit(){const ed=bgEditPointer;bgEditPointer=null;if(ed&&(ed.tool==='erase'||ed.tool==='restore'))bgStrokeEnd();updateBgUi();}
+  function updateBgBrushCursor(e){
+    const vp=$('bgPreviewViewport');if(!vp||!bgCursorEl)return;
+    if(!bgIsBrushTool()){bgCursorEl.style.display='none';return;}
+    const v=vp.getBoundingClientRect();
+    if(e.clientX<v.left||e.clientX>v.right||e.clientY<v.top||e.clientY>v.bottom){bgCursorEl.style.display='none';return;}
+    const dia=Math.max(5,Number($('bgBrushSize').value)||28);
+    bgCursorEl.style.display='block';bgCursorEl.style.width=dia+'px';bgCursorEl.style.height=dia+'px';
+    bgCursorEl.style.left=(e.clientX-v.left)+'px';bgCursorEl.style.top=(e.clientY-v.top)+'px';
+    bgCursorEl.style.borderColor=bgEditTool==='restore'?'#26c6da':'#ff4b5c';
+  }
+  const bgCursorViewport=$('bgPreviewViewport');
+  if(bgCursorViewport&&!bgCursorEl){bgCursorEl=document.createElement('div');bgCursorEl.id='bgBrushCursor';bgCursorEl.style.cssText='position:absolute;z-index:8;pointer-events:none;display:none;border:2px solid #ff4b5c;border-radius:50%;box-shadow:0 0 0 1px #0007;transform:translate(-50%,-50%);box-sizing:border-box';bgCursorViewport.appendChild(bgCursorEl);}
+
+  function setBgEditTool(tool){
+    bgEditTool=tool;
+    document.querySelectorAll('[data-bg-tool]').forEach(b=>b.classList.toggle('active',b.dataset.bgTool===tool));
+    $('bgCtlAuto').hidden=tool!=='auto';$('bgCtlBrush').hidden=!bgIsBrushTool();$('bgCtlWand').hidden=tool!=='wand';
+    const cv=$('bgPreviewCanvas');if(cv)cv.style.cursor=bgIsBrushTool()?'none':tool==='wand'?'crosshair':'grab';
+    if(bgCursorEl&&!bgIsBrushTool())bgCursorEl.style.display='none';
+    bgStatus(({pan:'Mover: arrastra con un dedo y pellizca para ampliar. En Borrar, Restaurar y Varita mueve la vista con dos dedos.',auto:'Auto: pulsa «Quitar fondo». Después ajusta Sensibilidad, Suavizado y Borde: el resultado cambia en vivo.',erase:'Borrar: pasa el dedo por lo que sobra. El resultado se actualiza mientras pintas.',restore:'Restaurar: pasa el dedo por lo que borraste de más para recuperarlo.',wand:'Varita: toca una zona y se quita (o se restaura) al instante, según la acción elegida.'})[tool]||'');
+  }
   document.querySelectorAll('[data-bg-tool]').forEach(b=>b.addEventListener('click',()=>setBgEditTool(b.dataset.bgTool)));
   $('bgBrushSize').addEventListener('input',e=>{$('bgBrushSizeVal').textContent=e.target.value+' px';});
-  $('bgEraserSize').addEventListener('input',e=>{$('bgEraserSizeVal').textContent=e.target.value+' px';});
-  $('bgZoneIntensity').addEventListener('input',e=>$('bgZoneIntensityVal').textContent=e.target.value+'%');
-  $('bgClosedIntensity').addEventListener('input',e=>$('bgClosedIntensityVal').textContent=e.target.value+'%');
-  let bgCursorEl=null;
-  const bgCursorViewport=$('bgPreviewViewport');if(bgCursorViewport&&!bgCursorEl){bgCursorEl=document.createElement('div');bgCursorEl.id='bgBrushCursor';bgCursorEl.style.cssText='position:absolute;z-index:8;pointer-events:none;display:none;border:2px solid #ff4b5c;border-radius:50%;box-shadow:0 0 0 1px #0007;transform:translate(-50%,-50%);box-sizing:border-box';bgCursorViewport.appendChild(bgCursorEl);}
-  function updateBgBrushCursor(e){const cv=$('bgPreviewCanvas'),vp=$('bgPreviewViewport');if(!cv||!vp||!bgCursorEl)return;const r=cv.getBoundingClientRect(),v=vp.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){bgCursorEl.style.display='none';return;}const size=Number((bgEditTool==='eraser'?$('bgEraserSize'):$('bgBrushSize'))?.value||28);const dia=Math.max(5,size*r.width/Math.max(1,cv.width));bgCursorEl.style.display='block';bgCursorEl.style.width=dia+'px';bgCursorEl.style.height=dia+'px';bgCursorEl.style.left=(e.clientX-v.left)+'px';bgCursorEl.style.top=(e.clientY-v.top)+'px';bgCursorEl.style.borderColor=bgEditTool==='eraser'?'#26c6da':'#ff4b5c';}
-  function bgSnapshot(){return bgEditMask?new Uint8Array(bgEditMask):null;}
-  function bgPushUndo(){if(!bgEditMask)return;bgEditUndo.push(bgSnapshot());if(bgEditUndo.length>24)bgEditUndo.shift();bgEditRedo=[];updateBgEditHistoryButtons();}
-  function updateBgEditHistoryButtons(){$('bgEditUndoBtn').disabled=!bgEditUndo.length;$('bgEditRedoBtn').disabled=!bgEditRedo.length;}
-  function bgPoint(canvas,e){const r=canvas.getBoundingClientRect();return {x:Math.max(0,Math.min(canvas.width-1,Math.floor((e.clientX-r.left)*canvas.width/Math.max(1,r.width)))),y:Math.max(0,Math.min(canvas.height-1,Math.floor((e.clientY-r.top)*canvas.height/Math.max(1,r.height))))};}
-  function bgColorDistance(data,i,rgb){const r=data[i],g=data[i+1],b=data[i+2],dr=r-rgb[0],dg=g-rgb[1],db=b-rgb[2];return .22*dr*dr+.60*dg*dg+.18*db*db;}
-  function bgSelectConnected(x,y){
-    if(!bgEditOriginal||!bgEditMask)return 0;
-    const w=$('bgPreviewCanvas').width,h=$('bgPreviewCanvas').height,d=bgEditOriginal.data,total=w*h;
-    const start=Math.max(0,Math.min(total-1,y*w+x)),si=start*4,rgb=[d[si],d[si+1],d[si+2]],mode=$('bgZoneMode')?.value||'connected';
-    const raw=mode==='closed'?Number($('bgClosedIntensity').value||45):Number($('bgZoneIntensity').value||50);
-    const tol=Number($('bgRemoveTolerance').value)||35,limit=Math.max(24,tol*tol*(raw/50)*(mode==='intelligent'?.85:1.25));
-    const seen=new Uint8Array(total),q=new Int32Array(total);let head=0,tail=0,touchesEdge=false;
-    const near=(i,seed)=>bgColorDistance(d,i,seed);
-    const add=(px,from)=>{if(px<0||px>=total||seen[px])return;seen[px]=1;const i=px*4;if(near(i,rgb)>limit)return;if(mode==='intelligent'&&from>=0){const fi=from*4;if(bgColorDistance(d,i,[d[fi],d[fi+1],d[fi+2]])>Math.max(18,limit*.42))return;}q[tail++]=px;};
-    add(start,-1);
-    while(head<tail){const px=q[head++],xx=px%w,yy=(px/w)|0;if(xx===0||yy===0||xx===w-1||yy===h-1)touchesEdge=true;if(xx>0)add(px-1,px);if(xx+1<w)add(px+1,px);if(yy>0)add(px-w,px);if(yy+1<h)add(px+w,px);}
-    if(mode==='closed'&&touchesEdge){$('bgRemoveStatus').textContent='Esa región llega al borde de la imagen; el modo «Solo zona cerrada» no la selecciona. Toca una región completamente encerrada o cambia el método.';return 0;}
-    let changed=0;for(let i=0;i<tail;i++){const px=q[i];if(bgEditMask[px]!==2){bgEditMask[px]=1;changed++;}}
-    return changed;
+  $('bgBrushHard').addEventListener('input',e=>{$('bgBrushHardVal').textContent=e.target.value+'%';});
+  $('bgWandTol').addEventListener('input',e=>{$('bgWandTolVal').textContent=e.target.value;});
+  $('bgMaskViewBtn').addEventListener('click',()=>{bgShowMask=!bgShowMask;$('bgMaskViewBtn').classList.toggle('active',bgShowMask);if(bgS)bgRenderRect(0,0,bgS.w,bgS.h);});
+  $('bgRemoveUndoPreviewBtn').addEventListener('click',()=>{ // Reiniciar
+    const s=bgS;if(!s)return;bgInitSession(s.im,s.target,s.stamp);bgStatus('Restablecido: se muestra de nuevo la imagen original.');
+  });
+
+  // ---- Exportar / aplicar ----
+  async function bgExport(st){
+    const w0=st.im.naturalWidth,h0=st.im.naturalHeight,out=document.createElement('canvas');
+    if(st.k===1){
+      out.width=st.w;out.height=st.h;const img=new ImageData(st.w,st.h);bgCompose(st,img,0,0,st.w,st.h,false);out.getContext('2d').putImageData(img,0,0);
+    }else{
+      // Imagen grande: la máscara se amplía suavemente y se aplica sobre los píxeles originales.
+      out.width=w0;out.height=h0;const cx=out.getContext('2d');cx.drawImage(st.im,0,0,w0,h0);
+      const mc=document.createElement('canvas');mc.width=st.w;mc.height=st.h;const md=new ImageData(st.w,st.h),dd=md.data;
+      for(let px=0;px<st.total;px++){const m=st.man?st.man[px]:0;dd[px*4+3]=m?m-1:st.autoA[px];}
+      mc.getContext('2d').putImageData(md,0,0);
+      cx.globalCompositeOperation='destination-in';cx.imageSmoothingEnabled=true;cx.imageSmoothingQuality='high';cx.drawImage(mc,0,0,w0,h0);cx.globalCompositeOperation='source-over';
+    }
+    return new Promise((resolve,reject)=>out.toBlob(b=>{if(!b){reject(new Error('No se pudo crear el PNG'));return;}const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(b);},'image/png'));
   }
-  function bgPaintStroke(a,b,mode){if(!bgEditMask||!bgEditOriginal)return;const w=$('bgPreviewCanvas').width,h=$('bgPreviewCanvas').height,r=Math.max(2,Number((mode==='protect' ? $('bgEraserSize') : $('bgBrushSize')).value)||(mode==='protect'?36:28))/2;const steps=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.y-a.y)/Math.max(1,r*.35)));for(let s=0;s<=steps;s++){const t=s/steps,cx=a.x+(b.x-a.x)*t,cy=a.y+(b.y-a.y)*t,x0=Math.max(0,Math.floor(cx-r)),x1=Math.min(w-1,Math.ceil(cx+r)),y0=Math.max(0,Math.floor(cy-r)),y1=Math.min(h-1,Math.ceil(cy+r));for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){const dx=x-cx,dy=y-cy;const dist=Math.hypot(dx,dy);if(dist>r)continue;const px=y*w+x;if(mode==='remove'){const edge=Math.max(0,Math.min(1,(dist/r-.82)/.18));const alpha=Math.round(255*(edge*edge*(3-2*edge)));bgEditMask[px]=alpha<=2?1:Math.min(255,alpha+3);}else if(dist<=r*.92)bgEditMask[px]=2;}}}
-  function bgBuildCleanImageData(){if(!bgEditBase||!bgEditOriginal||!bgEditMask)return null;const cv=$('bgPreviewCanvas'),out=new ImageData(cv.width,cv.height),d=out.data,base=bgEditBase.data,orig=bgEditOriginal.data;for(let px=0;px<bgEditMask.length;px++){const i=px*4,m=bgEditMask[px];d[i]=m===2?orig[i]:base[i];d[i+1]=m===2?orig[i+1]:base[i+1];d[i+2]=m===2?orig[i+2]:base[i+2];d[i+3]=m===1?0:(m===2?orig[i+3]:(m>=3?Math.min(base[i+3],m-3):base[i+3]));}return out;}
-  function bgRenderMask(){if(!bgEditBase||!bgEditOriginal||!bgEditMask)return;const cv=$('bgPreviewCanvas'),ctx=cv.getContext('2d'),out=bgBuildCleanImageData(),d=out.data;for(let px=0;px<bgEditMask.length;px++){const i=px*4,m=bgEditMask[px];if(m===1){d[i]=Math.round(d[i]*.72+255*.28);d[i+1]=Math.round(d[i+1]*.72+65*.28);d[i+2]=Math.round(d[i+2]*.72+85*.28);d[i+3]=Math.max(d[i+3],65);}else if(m===2){d[i]=Math.round(d[i]*.72+25*.28);d[i+1]=Math.round(d[i+1]*.72+210*.28);d[i+2]=Math.round(d[i+2]*.72+230*.28);}}ctx.putImageData(out,0,0);const clean=bgBuildCleanImageData();enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=cv.width;enhanceWorkingCanvas.height=cv.height;enhanceWorkingCanvas.getContext('2d').putImageData(clean,0,0);cv.dataset.maskEdited='1';}
-  function bgStartEdit(canvas,e){if(!bgEditBase||!bgEditMask||bgEditTargetId!==String(window.__bgRemoveTargetId||'')){ $('bgRemoveStatus').textContent='Primero pulsa «Generar base» para crear la vista previa.';return false;}const pt=bgPoint(canvas,e);bgEditPointer={id:e.pointerId,last:pt,start:pt,tool:bgEditTool,moved:false};if(bgEditTool==='brush'||bgEditTool==='eraser'){bgPushUndo();bgPaintStroke(pt,pt,bgEditTool==='brush'?'remove':'protect');bgRenderMask();}try{canvas.parentElement.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault();return true;}
-  function bgMoveEdit(canvas,e){if(!bgEditPointer||bgEditPointer.id!==e.pointerId)return;const pt=bgPoint(canvas,e);if(Math.hypot(pt.x-bgEditPointer.start.x,pt.y-bgEditPointer.start.y)>3)bgEditPointer.moved=true;if(bgEditPointer.tool==='brush'||bgEditPointer.tool==='eraser'){bgPaintStroke(bgEditPointer.last,pt,bgEditPointer.tool==='brush'?'remove':'protect');bgEditPointer.last=pt;bgRenderMask();}e.preventDefault();}
-  function bgEndEdit(canvas,e){if(!bgEditPointer||bgEditPointer.id!==e.pointerId)return;const edit=bgEditPointer;bgEditPointer=null;if(edit.tool==='zone'&&!edit.moved){bgPushUndo();const n=bgSelectConnected(edit.start.x,edit.start.y);if(n>0){bgRenderMask();const zm=$('bgZoneMode').value;$('bgRemoveStatus').textContent=`${zm==='closed'?'Zona cerrada':zm==='intelligent'?'Zona inteligente':'Zona conectada'} seleccionada (${n.toLocaleString()} píxeles). Puedes seguir seleccionando, pintar para quitar o proteger partes.`;}else if(!/llega al borde/.test($('bgRemoveStatus').textContent)){ $('bgRemoveStatus').textContent='No se encontró una región con suficiente similitud. Aumenta la intensidad o toca otra zona.';}}else if(edit.tool==='brush'||edit.tool==='eraser')$('bgRemoveStatus').textContent=edit.tool==='brush'?'Trazo aplicado a la vista previa. Puedes deshacerlo o seguir retocando.':'Zona protegida desde la imagen original. Puedes deshacerlo o seguir retocando.';updateBgEditHistoryButtons();}
-  $('bgEditUndoBtn').addEventListener('click',()=>{if(!bgEditUndo.length||!bgEditMask)return;bgEditRedo.push(bgSnapshot());bgEditMask=bgEditUndo.pop();bgRenderMask();updateBgEditHistoryButtons();$('bgRemoveStatus').textContent='Último retoque deshecho.';});
-  $('bgEditRedoBtn').addEventListener('click',()=>{if(!bgEditRedo.length||!bgEditMask)return;bgEditUndo.push(bgSnapshot());bgEditMask=bgEditRedo.pop();bgRenderMask();updateBgEditHistoryButtons();$('bgRemoveStatus').textContent='Retoque rehecho.';});
-
-  $('bgRemoveApplyBtn').addEventListener('click',async()=>{
-    const targets=enhancerTargets();if(!targets.length){$('bgRemoveStatus').textContent='No hay imágenes objetivo. Selecciona una imagen o cambia el alcance.';return;}
-    const target=selectedEnhanceImage()||targets[0].el;
-    if(!target||!targets.some(x=>x.el.id===target.id)){$('bgRemoveStatus').textContent='La imagen seleccionada no está incluida en el alcance. Cambia el alcance o elige una imagen incluida.';return;}
-    const btn=$('bgRemoveApplyBtn');btn.disabled=true;
-    try{showLoading('Analizando fondo…');const result=await buildBackgroundRemoval(target);
-      const preview=$('bgPreviewCanvas');delete preview.dataset.maskEdited;preview.width=result.canvas.width;preview.height=result.canvas.height;const px=preview.getContext('2d');px.clearRect(0,0,preview.width,preview.height);px.drawImage(result.canvas,0,0);
-      enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=result.canvas.width;enhanceWorkingCanvas.height=result.canvas.height;enhanceWorkingCanvas.getContext('2d').drawImage(result.canvas,0,0);
-      bgRemovePendingDataUrl=result.dataUrl;bgRemovePendingMap=new Map([[String(target.id),result.dataUrl]]);window.__bgRemoveBefore=result.sourceBefore;window.__bgRemoveTargetId=target.id;bgEditTargetId=String(target.id);bgEditBase=result.canvas.getContext('2d',{willReadFrequently:true}).getImageData(0,0,result.canvas.width,result.canvas.height);const origCv=document.createElement('canvas');origCv.width=result.canvas.width;origCv.height=result.canvas.height;origCv.getContext('2d').drawImage(result.originalImage,0,0);bgEditOriginal=origCv.getContext('2d',{willReadFrequently:true}).getImageData(0,0,origCv.width,origCv.height);bgEditMask=new Uint8Array(origCv.width*origCv.height);bgEditUndo=[];bgEditRedo=[];updateBgEditHistoryButtons();setBgEditTool('pan');$('bgRemoveCommitBtn').disabled=false;$('bgRemoveUndoPreviewBtn').disabled=false;
-      $('bgRemoveStatus').textContent=result.mode==='closed'?`Base lista sin eliminación automática. Selecciona «Solo zona cerrada» y toca un hueco completamente encerrado; no se borrará nada que llegue al borde. El original sigue intacto.`:`Vista previa lista (${result.canvas.width} × ${result.canvas.height}px). Se detectaron ${result.removed.toLocaleString()} píxeles de fondo. El original sigue intacto. ${targets.length>1?`Al aplicar se procesarán las ${targets.length} imágenes del alcance.`:''}`;
-    }catch(err){$('bgRemoveStatus').textContent=err.message||'No se pudo quitar el fondo. Prueba una imagen de menos de 12 megapíxeles o con un fondo uniforme.';}
-    finally{hideLoading();btn.disabled=false;}
-  });
-  // Descartar una vista previa solo revierte la previsualización; nunca modifica el original.
-  $('bgRemoveUndoPreviewBtn').addEventListener('click',async()=>{
-    const id=Number(window.__bgRemoveTargetId||0),target=findEl(id)||selectedEnhanceImage()||enhancerTargets()[0]?.el;
-    bgRemovePendingDataUrl=null;bgRemovePendingMap.clear();window.__bgRemoveBefore=null;window.__bgRemoveTargetId=null;bgEditBase=null;bgEditOriginal=null;bgEditMask=null;bgEditTargetId=null;bgEditUndo=[];bgEditRedo=[];updateBgEditHistoryButtons();
-    $('bgRemoveCommitBtn').disabled=true;$('bgRemoveUndoPreviewBtn').disabled=true;
-    if(target){try{const im=await getLoadedImage(target.src),cv=$('bgPreviewCanvas');delete cv.dataset.maskEdited;cv.width=im.naturalWidth;cv.height=im.naturalHeight;const cx=cv.getContext('2d');cx.clearRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0);enhanceWorkingCanvas=document.createElement('canvas');enhanceWorkingCanvas.width=im.naturalWidth;enhanceWorkingCanvas.height=im.naturalHeight;enhanceWorkingCanvas.getContext('2d').drawImage(im,0,0);$('bgRemoveStatus').textContent='Vista previa descartada. Se muestra de nuevo la imagen original; no se modificó el diseño.';}catch(e){$('bgRemoveStatus').textContent='Vista previa descartada. Genera otra para volver a comparar.';}}
-    else{$('bgPreviewCanvas').getContext('2d').clearRect(0,0,$('bgPreviewCanvas').width,$('bgPreviewCanvas').height);$('bgRemoveStatus').textContent='Vista previa descartada.';}
-  });
-
   $('bgRemoveCommitBtn').addEventListener('click',async()=>{
-    const targets=enhancerTargets(),previewTargetId=Number(window.__bgRemoveTargetId||0);
-    if(bgEditMask&&$('bgPreviewCanvas').dataset.maskEdited==='1'){const cv=$('bgPreviewCanvas'),clean=bgBuildCleanImageData(),exportCanvas=document.createElement('canvas');exportCanvas.width=cv.width;exportCanvas.height=cv.height;exportCanvas.getContext('2d').putImageData(clean,0,0);bgRemovePendingDataUrl=await new Promise((resolve,reject)=>exportCanvas.toBlob(b=>{if(!b){reject(new Error('No se pudo codificar la máscara'));return;}const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(b);},'image/png'));bgRemovePendingMap=new Map([[String(previewTargetId),bgRemovePendingDataUrl]]);}
-    if(!targets.length||!bgRemovePendingDataUrl||!targets.some(x=>x.el.id===previewTargetId)){$('bgRemoveStatus').textContent='Genera una vista previa para una imagen incluida en el alcance.';return;}
-    const ok=targets.length<2||await confirmAction('Aplicar eliminación de fondo',`Se procesarán ${targets.length} imágenes con los mismos ajustes de color. ¿Continuar?`);if(!ok)return;
+    const s=bgS;if(!s||!(bgUndo.length||s.autoOn)){bgStatus('Todavía no hay cambios que aplicar.');return;}
+    const primary=findEl(s.targetId);if(!primary){bgStatus('La imagen ya no existe en el documento.');return;}
+    const others=s.autoOn?enhancerTargets().filter(x=>x.el.id!==s.targetId):[];
+    if(others.length){const ok=await confirmAction('Aplicar eliminación de fondo',`Se aplicará tu recorte a esta imagen y el quitado automático con los mismos ajustes a otras ${others.length} imagen(es) del alcance. ¿Continuar?`);if(!ok)return;}
     const btn=$('bgRemoveCommitBtn');btn.disabled=true;let done=0,failed=0;
+    const jobs=[{el:primary,st:s},...others.map(o=>({el:o.el}))];
     try{showLoading('Aplicando recorte transparente…');
-      for(let i=0;i<targets.length;i++){
-        const target=targets[i].el;try{
-          let result;
-          if(target.id===previewTargetId)result={sourceBefore:window.__bgRemoveBefore||target.src,dataUrl:bgRemovePendingDataUrl};
-          else result=await buildBackgroundRemoval(target);
-          recordEnhanceToolChange(target,result.sourceBefore||target.src,result.dataUrl,'eliminación de fondo');target.src=result.dataUrl;imgCache.delete(result.sourceBefore||target.src);done++;
+      for(let i=0;i<jobs.length;i++){
+        const el=jobs[i].el;
+        try{
+          let st=jobs[i].st;
+          if(!st){const im=await getLoadedImage(el.src);st=bgMakeState(im,false);const P=bgGetAutoParams();st.autoA=bgAutoCompute(st.orig,st.w,st.h,P);st.B=P.B;st.autoOn=true;}
+          const dataUrl=await bgExport(st),before=el.src;
+          recordEnhanceToolChange(el,before,dataUrl,'eliminación de fondo');el.src=dataUrl;imgCache.delete(before);done++;
         }catch(e){failed++;}
-        $('loading-label').textContent=`Eliminando fondo ${i+1} de ${targets.length}…`;await new Promise(r=>setTimeout(r,0));
+        $('loading-label').textContent=`Eliminando fondo ${i+1} de ${jobs.length}…`;await new Promise(r=>setTimeout(r,0));
       }
-      thumbCache.clear();saveState();renderAll();saveToLocalStorage();bgRemovePendingDataUrl=null;bgRemovePendingMap.clear();window.__bgRemoveBefore=null;window.__bgRemoveTargetId=null;$('bgRemoveUndoPreviewBtn').disabled=true;$('bgRemoveStatus').textContent=`Fondo eliminado en ${done} de ${targets.length} imágenes${failed?`; ${failed} no se pudieron procesar`:''}. El PNG conserva transparencia real.`;sfx.success();
-      const historyTarget=findEl(Number($('enhanceHistoryTarget').value))||selectedEnhanceImage();if(historyTarget)await syncImageToolPreview(historyTarget,historyTarget.src);updateToolHistoryButtons();
-    }catch(err){$('bgRemoveStatus').textContent='No se pudo aplicar el resultado.';}
-    finally{hideLoading();btn.disabled=!bgRemovePendingDataUrl;}
+      thumbCache.clear();saveState();renderAll();saveToLocalStorage();sfx.success();
+      const ht=findEl(Number($('enhanceHistoryTarget').value))||selectedEnhanceImage();if(ht)await syncImageToolPreview(ht,ht.src);updateToolHistoryButtons();
+      bgStatus(`Fondo eliminado en ${done} de ${jobs.length} imágenes${failed?`; ${failed} no se pudieron procesar`:''}. El PNG conserva transparencia real.`);
+    }catch(err){bgStatus('No se pudo aplicar el resultado.');}
+    finally{hideLoading();updateBgUi();}
   });
+  setBgEditTool('auto');
 
   // Pestañas independientes: cada herramienta conserva su propia vista previa.
   function setImageToolTab(name){
     const names={superres:'toolPanelSuperres',background:'toolPanelBackground',ocr:'toolPanelOcr'};
     Object.entries(names).forEach(([key,id])=>{const panel=$(id);if(panel)panel.hidden=key!==name;});
     document.querySelectorAll('[data-tool-tab]').forEach(btn=>{const active=btn.dataset.toolTab===name;btn.classList.toggle('active',active);btn.setAttribute('aria-selected',active?'true':'false');});
-    if(name==='background')updateToolHistoryButtons();
+    if(name==='background'){updateToolHistoryButtons();if(typeof bgEnsureSession==='function')bgEnsureSession();}
   }
   document.querySelectorAll('[data-tool-tab]').forEach(btn=>btn.addEventListener('click',()=>setImageToolTab(btn.dataset.toolTab)));
   setImageToolTab('superres');
@@ -4355,33 +4582,52 @@ ctx.restore();
   const previewViewState = new Map();
   function setupPreviewViewport(canvas){
     const viewport=canvas?.parentElement;if(!viewport?.classList.contains('image-preview-viewport')||viewport.dataset.gesturesReady)return;
-    viewport.dataset.gesturesReady='1';const st={scale:1,x:0,y:0,pointers:new Map(),startDist:0,startScale:1,startX:0,startY:0,lastX:0,lastY:0};previewViewState.set(canvas,st);
-    const apply=()=>{canvas.style.transform=`translate(${st.x}px,${st.y}px) scale(${st.scale})`;};
+    viewport.dataset.gesturesReady='1';
+    const isBg=canvas.id==='bgPreviewCanvas';
+    const st={scale:1,x:0,y:0,pointers:new Map(),startDist:0,startScale:1,startX:0,startY:0,midX:0,midY:0,lastX:0,lastY:0};previewViewState.set(canvas,st);
+    const apply=()=>{canvas.style.transform=(st.scale===1&&!st.x&&!st.y)?'':`translate(${st.x}px,${st.y}px) scale(${st.scale})`;};
     const reset=()=>{st.scale=1;st.x=0;st.y=0;apply();};
+    const startGesture=()=>{const p=[...st.pointers.values()];st.startDist=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y)||1;st.startScale=st.scale;st.startX=st.x;st.startY=st.y;st.midX=(p[0].x+p[1].x)/2;st.midY=(p[0].y+p[1].y)/2;};
     viewport.addEventListener('pointerdown',e=>{
-      if(canvas.id==='bgPreviewCanvas')updateBgBrushCursor(e);
+      if(isBg)updateBgBrushCursor(e);
       if(activeEyedropperInput){beginEyedropperSample(canvas,e);e.preventDefault();e.stopPropagation();try{viewport.setPointerCapture(e.pointerId)}catch(_){}return;}
-      if(canvas.id==='bgPreviewCanvas'&&['zone','brush','eraser'].includes(bgEditTool)){if(canvas.width<2||canvas.height<2)return;bgStartEdit(canvas,e);return;}
-      if(canvas.width<2||canvas.height<2)return;viewport.setPointerCapture?.(e.pointerId);st.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-      if(st.pointers.size===1){st.lastX=e.clientX;st.lastY=e.clientY;}else if(st.pointers.size===2){const pts=[...st.pointers.values()];st.startDist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)||1;st.startScale=st.scale;st.startX=st.x;st.startY=st.y;}
+      if(canvas.width<2||canvas.height<2)return;
+      try{viewport.setPointerCapture?.(e.pointerId)}catch(_){}
+      st.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      if(st.pointers.size>=2){if(isBg&&bgEditPointer)bgAbortEdit();startGesture();}
+      else{st.lastX=e.clientX;st.lastY=e.clientY;if(isBg&&bgIsPaintTool())bgStartEdit(canvas,e);}
       e.preventDefault();
     },{passive:false});
     viewport.addEventListener('pointermove',e=>{
-      if(canvas.id==='bgPreviewCanvas')updateBgBrushCursor(e);
+      if(isBg)updateBgBrushCursor(e);
       if(activeEyedropperInput&&eyedropperPointerId===e.pointerId){updateEyedropperSample(canvas,e);e.preventDefault();return;}
-      if(canvas.id==='bgPreviewCanvas'&&bgEditPointer&&bgEditPointer.id===e.pointerId){bgMoveEdit(canvas,e);return;}
-      if(!st.pointers.has(e.pointerId))return;st.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-      if(st.pointers.size===1){st.x+=e.clientX-st.lastX;st.y+=e.clientY-st.lastY;st.lastX=e.clientX;st.lastY=e.clientY;}
-      else if(st.pointers.size>=2){const pts=[...st.pointers.values()],dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)||1;st.scale=Math.max(1,Math.min(8,st.startScale*dist/st.startDist));st.x=st.startX;st.y=st.startY;}
+      if(!st.pointers.has(e.pointerId))return;
+      st.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      if(st.pointers.size===1){
+        if(isBg&&bgEditPointer&&bgEditPointer.id===e.pointerId){bgMoveEdit(canvas,e);e.preventDefault();return;}
+        if(isBg&&bgIsPaintTool()){e.preventDefault();return;}
+        st.x+=e.clientX-st.lastX;st.y+=e.clientY-st.lastY;st.lastX=e.clientX;st.lastY=e.clientY;
+      }else{
+        const p=[...st.pointers.values()],dist=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y)||1,mx=(p[0].x+p[1].x)/2,my=(p[0].y+p[1].y)/2;
+        st.scale=Math.max(1,Math.min(12,st.startScale*dist/st.startDist));st.x=st.startX+(mx-st.midX);st.y=st.startY+(my-st.midY);
+      }
       apply();e.preventDefault();
     },{passive:false});
-    const finish=e=>{if(canvas.id==='bgPreviewCanvas'&&bgCursorEl&&(!['brush','eraser'].includes(bgEditTool)))bgCursorEl.style.display='none';if(activeEyedropperInput&&eyedropperPointerId===e.pointerId){finishEyedropperSample(canvas,e);return;}if(canvas.id==='bgPreviewCanvas'&&bgEditPointer&&bgEditPointer.id===e.pointerId){bgEndEdit(canvas,e);return;}st.pointers.delete(e.pointerId);if(st.pointers.size===1){const p=[...st.pointers.values()][0];st.lastX=p.x;st.lastY=p.y;}if(st.pointers.size===0&&st.scale===1&&Math.abs(st.x)<2&&Math.abs(st.y)<2)reset();};
+    const finish=e=>{
+      if(isBg&&bgCursorEl&&(!bgIsBrushTool()||e.pointerType==='touch'))bgCursorEl.style.display='none';
+      if(activeEyedropperInput&&eyedropperPointerId===e.pointerId){finishEyedropperSample(canvas,e);return;}
+      if(isBg&&bgEditPointer&&bgEditPointer.id===e.pointerId)bgEndEdit(canvas,e);
+      st.pointers.delete(e.pointerId);
+      if(st.pointers.size===1){const p=[...st.pointers.values()][0];st.lastX=p.x;st.lastY=p.y;}
+      if(st.pointers.size===0&&st.scale===1&&Math.abs(st.x)<2&&Math.abs(st.y)<2)reset();
+    };
     viewport.addEventListener('pointerup',finish);viewport.addEventListener('pointercancel',finish);
+    viewport.addEventListener('wheel',e=>{if(canvas.width<2)return;e.preventDefault();st.scale=Math.max(1,Math.min(12,st.scale*(e.deltaY<0?1.15:1/1.15)));apply();},{passive:false});
     viewport.addEventListener('dblclick',e=>{e.preventDefault();reset();});
   }
   let activeEyedropperInput=null, eyedropperPointerId=null, eyedropperSampleHex='#ffffff';
   let eyeLoupe=document.getElementById('eyedropperLoupe');if(!eyeLoupe){eyeLoupe=document.createElement('div');eyeLoupe.id='eyedropperLoupe';eyeLoupe.innerHTML='<span class="eye-swatch"></span><span class="eye-hex">#FFFFFF</span>';document.body.appendChild(eyeLoupe);}
-  function eyeHexAt(canvas,e){const r=canvas.getBoundingClientRect();const x=Math.max(0,Math.min(canvas.width-1,Math.floor((e.clientX-r.left)/Math.max(1,r.width)*canvas.width))),y=Math.max(0,Math.min(canvas.height-1,Math.floor((e.clientY-r.top)/Math.max(1,r.height)*canvas.height)));const d=canvas.getContext('2d',{willReadFrequently:true}).getImageData(x,y,1,1).data;return '#'+[d[0],d[1],d[2]].map(v=>v.toString(16).padStart(2,'0')).join('');}
+  function eyeHexAt(canvas,e){if(canvas.id==='bgPreviewCanvas'&&bgS){const rr=canvas.getBoundingClientRect(),bx=Math.max(0,Math.min(bgS.w-1,Math.floor((e.clientX-rr.left)/Math.max(1,rr.width)*bgS.w))),by=Math.max(0,Math.min(bgS.h-1,Math.floor((e.clientY-rr.top)/Math.max(1,rr.height)*bgS.h))),od=bgS.orig.data,oi=(by*bgS.w+bx)*4;return '#'+[od[oi],od[oi+1],od[oi+2]].map(v=>v.toString(16).padStart(2,'0')).join('');}const r=canvas.getBoundingClientRect();const x=Math.max(0,Math.min(canvas.width-1,Math.floor((e.clientX-r.left)/Math.max(1,r.width)*canvas.width))),y=Math.max(0,Math.min(canvas.height-1,Math.floor((e.clientY-r.top)/Math.max(1,r.height)*canvas.height)));const d=canvas.getContext('2d',{willReadFrequently:true}).getImageData(x,y,1,1).data;return '#'+[d[0],d[1],d[2]].map(v=>v.toString(16).padStart(2,'0')).join('');}
   function beginEyedropperSample(canvas,e){eyedropperPointerId=e.pointerId;try{canvas.setPointerCapture?.(e.pointerId)}catch(_){}updateEyedropperSample(canvas,e);eyeLoupe.style.display='flex';}
   function updateEyedropperSample(canvas,e){try{eyedropperSampleHex=eyeHexAt(canvas,e);eyeLoupe.querySelector('.eye-swatch').style.background=eyedropperSampleHex;eyeLoupe.querySelector('.eye-hex').textContent=eyedropperSampleHex.toUpperCase();eyeLoupe.style.left=Math.max(80,Math.min(window.innerWidth-80,e.clientX))+'px';eyeLoupe.style.top=Math.max(65,e.clientY-12)+'px';eyeLoupe.style.display='flex';}catch(_){}}
   function finishEyedropperSample(canvas,e){if(e.pointerId!==eyedropperPointerId)return;updateEyedropperSample(canvas,e);if(activeEyedropperInput){activeEyedropperInput.value=eyedropperSampleHex;activeEyedropperInput.dispatchEvent(new Event('input',{bubbles:true}));activeEyedropperInput.dispatchEvent(new Event('change',{bubbles:true}));if(activeEyedropperInput.id==='bgRemoveColor')$('bgRemoveStatus').textContent='Color seleccionado: '+eyedropperSampleHex.toUpperCase();}activeEyedropperInput=null;eyedropperPointerId=null;eyeLoupe.style.display='none';document.querySelectorAll('.eye-active-button').forEach(b=>b.classList.remove('eye-active-button'));}
@@ -5759,7 +6005,7 @@ ctx.restore();
     arClearGhost();
     const c = arCalc(); if (!c) return;
     $('arWarn').textContent = c.outside ? 'Algunas copias quedan fuera de la hoja.' : '';
-    $('arInfo').textContent = `${c.els.length} objeto(s) como un bloque de ${c.bw.toFixed(1)} × ${c.bh.toFixed(1)} cm → ${c.total - 1} copia(s) nueva(s).`;
+    $('arInfo').textContent = `${c.els.length} obj. · ${c.bw.toFixed(1)}×${c.bh.toFixed(1)} cm → ${c.total - 1} copia(s)`;
     const pageDiv = $('stage').querySelector('.page'); if (!pageDiv || c.total > 400) return;
     c.cells.forEach(cell => {
       const d = document.createElement('div'); d.className = 'arr-ghost' + (cell.k === 0 ? ' orig' : '');
@@ -5773,6 +6019,7 @@ ctx.restore();
     const els = getSelectedEls().filter(e => !e.flow);
     if (!els.length) { alert('Primero selecciona uno o más objetos o imágenes.'); return; }
     arSrc = els.slice();
+    $('arrayBox').classList.remove('ar-collapsed'); $('arCollapse').textContent = '▾';
     $('moreMenu').classList.remove('show');
     const m = $('arrayModal'); m.classList.add('show'); setTimeout(() => m.classList.add('visible'), 10);
     arPreview();
@@ -5816,7 +6063,7 @@ ctx.restore();
   ['arCols', 'arRows', 'arGapX', 'arGapY', 'arRot', 'arShift'].forEach(id => $(id).addEventListener('input', arPreview));
   ['arDirX', 'arDirY', 'arMode', 'arCenter'].forEach(id => $(id).addEventListener('change', arPreview));
   $('arApply').addEventListener('click', applyArray);
-  $('arCancel').addEventListener('click', () => { sfx.tap(); closeArray(); });
+  $('arCollapse').addEventListener('click', () => { sfx.tap(); const bx = $('arrayBox'); const c = bx.classList.toggle('ar-collapsed'); $('arCollapse').textContent = c ? '▴' : '▾'; });
   $('closeArray').addEventListener('click', () => { sfx.tap(); closeArray(); });
   $('openArrayBtn').addEventListener('click', () => { sfx.click(); openArray(); });
 
