@@ -677,6 +677,27 @@
   html, body { overflow-x: hidden; }
   .topbar button, .toolbar button, .header-actions button { touch-action: manipulation; }
 }
+
+  /* ===== Protección de texto / Array ===== */
+  .icon-btn.on { border-color: var(--accent); color: var(--accent); background: var(--toggle-active-bg); }
+  #arrayModal { background: transparent; backdrop-filter: none; align-items: flex-end; padding: 0 6px 6px; }
+  #arrayModal .modalbox { margin-bottom: 0; max-height: 58vh; overflow-y: auto; padding: 12px; }
+  #arrayModal .row { margin-top: 4px; }
+  #arrayModal .arr-chk { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 6px; }
+  #arrayModal .arr-chk input { width: auto; }
+  #arrayModal #arInfo { font-size: 11px; color: var(--muted); margin: 0 0 4px; }
+  #arrayModal #arWarn { font-size: 11px; color: var(--danger); margin-top: 4px; min-height: 14px; }
+  .arr-ghost { position: absolute; pointer-events: none; z-index: 9999; box-sizing: border-box; border: 2px dashed var(--accent); background: rgba(59,130,196,0.14); }
+  .arr-ghost.orig { border-style: solid; background: transparent; }
+
+  /* ===== Encabezado / pie / número de página ===== */
+  .hf-layer { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  #hfModal { background: transparent; backdrop-filter: none; align-items: flex-end; padding: 0 6px 6px; pointer-events: none; }
+  #hfModal .modalbox { pointer-events: auto; margin-bottom: 0; max-height: 52vh; overflow-y: auto; padding: 12px; }
+  #hfModal .hf-h { font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 2px; }
+  #hfModal .hf-note { font-size: 11px; color: var(--muted); margin: 0 0 6px; line-height: 1.35; }
+  #hfModal .adjust-box { margin-top: 8px; }
+  #hfModal .row { margin-top: 4px; }
 </style>
 <meta name="editor-build" content="2026-10-15-tools-separated-history-v2">
 </head>
@@ -717,6 +738,8 @@
   <button id="duplicatePageBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Duplicar página</button>
   <button id="delPageBtn" style="color: var(--danger);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Eliminar página</button>
   <button id="resetAllBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L3 8"/></svg>Reiniciar todo</button>
+  <button id="openHFBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 8h16M4 16h16"/></svg>Encabezado, pie y número</button>
+  <button id="openArrayBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="5" height="5"/><rect x="10" y="3" width="5" height="5"/><rect x="17" y="3" width="4" height="5"/><rect x="3" y="10" width="5" height="5"/><rect x="10" y="10" width="5" height="5"/><rect x="17" y="10" width="4" height="5"/></svg>Array (repetir selección)</button>
   <button id="openCollageBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Plantillas collage</button>
   <button id="openLineDetectBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L3 21M9 3h12v12"/></svg>Detectar líneas</button>
   <button id="openPosterTemplatesBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10M7 12h7M7 16h4"/></svg>Plantillas de póster</button>
@@ -744,6 +767,10 @@
         <button class="icon-btn xs" id="gridCfgBtn" title="Malla y guías"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></button>
       </div>
       <div class="group">
+        <span class="compact-label">Texto</span>
+        <button class="icon-btn xs" id="textProtectBtn" title="Protección de texto: evita que al tocar la hoja se abra el teclado"><svg id="textProtectIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg></button>
+      </div>
+      <div class="group">
         <button class="icon-btn xs" id="zoomResetQuickBtn" title="Zoom 1:1">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M21 16v3a2 2 0 0 1-2 2h-3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/></svg>
         </button>
@@ -765,7 +792,8 @@
         <div class="rb-row"><select data-mp style="width:104px"><option value="">Márgenes…</option><option value="2.54,2.54,2.54,2.54">Normal (2.54)</option><option value="1.27,1.27,1.27,1.27">Estrecho (1.27)</option><option value="2.54,2.54,1.91,1.91">Moderado</option><option value="2.54,2.54,5.08,5.08">Ancho</option><option value="2.54,2.54,3,2.5">Icontec</option></select>
           <select data-dpp style="width:74px"><option value="carta">Carta</option><option value="oficio">Oficio</option><option value="legal">Legal</option><option value="a4">A4</option><option value="a3">A3</option><option value="a2">A2</option><option value="tabloide">Tabloide</option><option value="10x15">10×15</option><option value="custom">Personal.</option></select>
           <button data-dor="vertical">Vert.</button><button data-dor="horizontal">Horiz.</button></div>
-        <div class="rb-row"><label class="rb-f">Todos<input type="number" data-dm="all" step="0.1" min="0"></label><label class="rb-f">Sup.<input type="number" data-dm="t" step="0.1" min="0"></label><label class="rb-f">Inf.<input type="number" data-dm="b" step="0.1" min="0"></label><label class="rb-f">Izq.<input type="number" data-dm="l" step="0.1" min="0"></label><label class="rb-f">Der.<input type="number" data-dm="r" step="0.1" min="0"></label></div>
+        <div class="rb-row" data-cprow style="display:none"><label class="rb-f">Ancho hoja (cm)<input type="number" data-cw step="0.1" min="5" max="100" inputmode="decimal"></label><label class="rb-f">Alto hoja (cm)<input type="number" data-ch step="0.1" min="5" max="150" inputmode="decimal"></label></div>
+        <div class="rb-row"><label class="rb-f">Todos<input type="number" data-dm="all" step="0.1" min="0"></label><label class="rb-f">Sup.<input type="number" data-dm="t" step="0.1" min="0"></label><label class="rb-f">Inf.<input type="number" data-dm="b" step="0.1" min="0"></label><label class="rb-f">Izq.<input type="number" data-dm="l" step="0.1" min="0"></label><label class="rb-f">Der.<input type="number" data-dm="r" step="0.1" min="0"></label><button id="hfRibbonBtn" title="Encabezado, pie y número de página">Enc./Pie</button></div>
       </div>
       <div class="rb-pane" data-rp="bg" style="display:none">
         <div class="rb-row"><label class="rb-f">Color<input type="color" data-dg="c1" value="#ffffff"></label><label class="rb-f">Color 2<input type="color" data-dg="c2" value="#dbeafe"></label><label class="rb-f">Áng.<input type="number" data-dg="ang" value="180" step="15"></label><label class="rb-f" style="flex-direction:row;align-items:center;gap:3px;font-size:10px"><input type="checkbox" data-dg="on"> Degradado</label><button id="dgNone">Sin fondo</button></div>
@@ -1080,6 +1108,23 @@
     </div>
   </div>
 
+  <div class="modal" id="arrayModal">
+    <div class="modalbox" style="position:relative">
+      <button class="closebtn" id="closeArray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <h2>Array</h2>
+      <p id="arInfo"></p>
+      <div class="row"><div><label>Columnas (X)</label><input type="number" id="arCols" value="3" min="1" max="50" step="1" inputmode="numeric" /></div><div><label>Filas (Y)</label><input type="number" id="arRows" value="2" min="1" max="50" step="1" inputmode="numeric" /></div></div>
+      <div class="row"><div><label>Separación X (cm)</label><input type="number" id="arGapX" value="0.5" step="0.1" inputmode="decimal" /></div><div><label>Separación Y (cm)</label><input type="number" id="arGapY" value="0.5" step="0.1" inputmode="decimal" /></div></div>
+      <div class="row"><div><label>Dirección X</label><select id="arDirX"><option value="1">→ Derecha</option><option value="-1">← Izquierda</option></select></div><div><label>Dirección Y</label><select id="arDirY"><option value="1">↓ Abajo</option><option value="-1">↑ Arriba</option></select></div></div>
+      <div class="row"><div><label>La separación se mide…</label><select id="arMode"><option value="gap">Entre bordes</option><option value="pitch">Entre centros</option></select></div><div><label>Giro por copia (°)</label><input type="number" id="arRot" value="0" step="5" inputmode="decimal" /></div></div>
+      <div class="row"><div><label>Desfasar filas impares (cm)</label><input type="number" id="arShift" value="0" step="0.1" inputmode="decimal" /></div></div>
+      <label class="arr-chk"><input type="checkbox" id="arCenter" /> Centrar el conjunto en la hoja (mueve también el original)</label>
+      <label class="arr-chk"><input type="checkbox" id="arGroup" /> Agrupar los objetos de cada copia</label>
+      <div id="arWarn"></div>
+      <div class="row" style="margin-top:8px"><button class="btn full" id="arApply">Aplicar</button><button class="btn full" id="arCancel">Cancelar</button></div>
+    </div>
+  </div>
+
   <div class="modal" id="lineDetectModal">
     <div class="modalbox">
       <button class="closebtn" id="closeLineDetect"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
@@ -1343,12 +1388,30 @@
     orientation: "vertical",
     paperType: "carta",
     customW: 21.2, customH: 27.6,
+    textProtect: false,
+    hf: hfDefaults(),
     thumbsVisible: true,
     sidebarOpen: false,
     inspectorExpanded: false,
     inspectorHeight: null,
     inspectorLocked: false,
   };
+
+  /* ====== ENCABEZADO, PIE Y NÚMERO DE PÁGINA ====== */
+  function hfDefaults() {
+    const blk = (o) => Object.assign({ on: false, align: 'center', size: 10, color: '#555555', bold: false, italic: false, edge: 1.25, from: 1, to: 0 }, o || {});
+    return { font: 'Arial', mirror: false, inner: 2.54, outer: 2.54,
+      header: blk({ text: '' }), footer: blk({ text: '' }),
+      num: blk({ where: 'footer', fmt: '{n}', style: '1', first: 1, last: 0 }) };
+  }
+  function hfNorm(h) {
+    const d = hfDefaults(); h = (h && typeof h === 'object') ? h : {};
+    const out = { font: typeof h.font === 'string' ? h.font : d.font, mirror: !!h.mirror,
+      inner: Number.isFinite(+h.inner) && h.inner !== '' && h.inner !== null ? Math.max(0, +h.inner) : d.inner,
+      outer: Number.isFinite(+h.outer) && h.outer !== '' && h.outer !== null ? Math.max(0, +h.outer) : d.outer };
+    ['header', 'footer', 'num'].forEach(k => { out[k] = Object.assign({}, d[k], (h[k] && typeof h[k] === 'object') ? h[k] : {}); });
+    return out;
+  }
   let selectedIds = new Set();
   let multiSelectMode = false;
   let elCounter = 1, pageCounter = 1;
@@ -1502,6 +1565,8 @@
       state.paperType = data.paperType || "carta";
       state.customW = data.customW || 21.2;
       state.customH = data.customH || 27.6;
+      state.textProtect = !!data.textProtect;
+      state.hf = hfNorm(data.hf);
       state.thumbsVisible = data.thumbsVisible !== false;
       state.sidebarOpen = !!data.sidebarOpen;
       state.inspectorExpanded = !!data.inspectorExpanded;
@@ -1531,7 +1596,7 @@
     thumbCache.delete(currentPage().id);
     updateThumbnails();
   }
-  const UI_ONLY_FIELDS = ['sidebarOpen', 'thumbsVisible', 'inspectorExpanded', 'inspectorHeight', 'inspectorLocked', 'currentPageIndex'];
+  const UI_ONLY_FIELDS = ['hf', 'textProtect', 'sidebarOpen', 'thumbsVisible', 'inspectorExpanded', 'inspectorHeight', 'inspectorLocked', 'currentPageIndex'];
 
 function undo() {
   if (undoStack.length <= 1) return;
@@ -1857,6 +1922,7 @@ function undo() {
     const contentLayer = document.createElement("div");
     contentLayer.className = "content-layer";
     pageDiv.appendChild(contentLayer);
+    { const hl = buildHFLayer(state.currentPageIndex); if (hl) pageDiv.insertBefore(hl, contentLayer); }
     addGridAndGuides(pageDiv, paper, cp);
 
     cp.els.forEach(el => {
@@ -2462,27 +2528,34 @@ function updateThumbnails() {
     saveState(); syncInspector(); renderAll(); sfx.success();
     showToast(`Valores pegados en ${els.length} imagen(es)`, 'success');
   }
-  function doDuplicate() {
-    const els = getSelectedEls(); if (els.length === 0) return;
-    const el = els[0];
-    const newEl = JSON.parse(JSON.stringify(el));
-    newEl.id = ++elCounter; newEl.xCm += 0.5; newEl.yCm += 0.5;
-    if (newEl.groupId) newEl.groupId = null;
-    currentPage().els.push(newEl);
-    selectedIds = new Set([newEl.id]); sfx.success();
-    saveState(); renderAll(); showToast('Duplicado', 'success'); checkMultiSelectState();
-  }
-  function doDuplicateAll() {
-    const els = getSelectedEls(); if (els.length === 0) return;
-    const newIds = [];
+  function duplicateEls(els) {
+    els = els.filter(el => el && !el.flow); if (els.length === 0) return [];
+    const gmap = {}, newIds = [], P = currentPage();
     els.forEach(el => {
       const newEl = JSON.parse(JSON.stringify(el));
       newEl.id = ++elCounter; newEl.xCm += 0.5; newEl.yCm += 0.5;
-      if (newEl.groupId) newEl.groupId = null;
-      currentPage().els.push(newEl); newIds.push(newEl.id);
+      if (newEl.groupId) {
+        if (!gmap[newEl.groupId]) {
+          const ng = 'g' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+          state.groups[ng] = Object.assign({ opacity: 100 }, state.groups[newEl.groupId] || {});
+          gmap[newEl.groupId] = ng;
+        }
+        newEl.groupId = gmap[newEl.groupId];
+      }
+      P.els.push(newEl); newIds.push(newEl.id);
     });
-    selectedIds = new Set(newIds); sfx.success();
-    saveState(); renderAll(); showToast(`${els.length} duplicadas`, 'success'); checkMultiSelectState();
+    selectedIds = new Set(newIds);
+    return newIds;
+  }
+  function doDuplicate() {
+    const els = getSelectedEls(); if (els.length === 0) return;
+    const ids = duplicateEls([els[0]]); if (!ids.length) return;
+    sfx.success(); saveState(); renderAll(); showToast('Duplicado', 'success'); checkMultiSelectState();
+  }
+  function doDuplicateAll() {
+    const els = getSelectedEls(); if (els.length === 0) return;
+    const ids = duplicateEls(els); if (!ids.length) return;
+    sfx.success(); saveState(); renderAll(); showToast(`${ids.length} duplicadas`, 'success'); checkMultiSelectState();
   }
   async function doDelete() {
     const els = getSelectedEls(); if (els.length === 0) return;
@@ -3380,7 +3453,9 @@ function updateThumbnails() {
       if (target === 'handle') return;
       if (target === 'element' && elId !== null) {
         if (gesture.tap.lastTapElId === elId && now - gesture.tap.lastTapTime < 350 && findEl(elId) && findEl(elId).type === 'text') {
-          gesture.tap.lastTapTime = 0; gesture.tap.lastTapElId = null; startInlineEdit(elId, false); return;
+          gesture.tap.lastTapTime = 0; gesture.tap.lastTapElId = null;
+          if (state.textProtect) { showToast('Protección de texto activa', 'info', 900); return; }
+          startInlineEdit(elId, false); return;
         }
         if (gesture.tap.lastTapElId === elId && now - gesture.tap.lastTapTime < 350) {
           const el = findEl(elId);
@@ -3458,6 +3533,17 @@ function updateThumbnails() {
     const p = state.pages[pageIndex];
     pageFill(ctx, p && p.bg, canvas.width, canvas.height);
     if (!p) return canvas;
+    try {
+      let hfi = hfItems(pageIndex);
+      for (const el of hfi) await fontsReady(el);
+      hfi = hfItems(pageIndex);
+      for (const el of hfi) {
+        const him = genCanvas(el, pxPerCm);
+        ctx.save(); ctx.globalAlpha = 1; ctx.filter = 'none';
+        ctx.drawImage(him, el.xCm * pxPerCm, el.yCm * pxPerCm, el.wCm * pxPerCm, el.hCm * pxPerCm);
+        ctx.restore();
+      }
+    } catch (hfErr) {}
     ctx.save();
 ctx.globalCompositeOperation = p.bg ? 'source-over' : 'darken';
 for (const el of p.els) {
@@ -3581,7 +3667,7 @@ ctx.restore();
         }
       } catch (err) {}
     }
-    if (pageNum !== null && totalPages !== null) {
+    if (pageNum !== null && totalPages !== null && !(state.hf && state.hf.num && state.hf.num.on)) {
       ctx.save();
       ctx.filter = 'none'; ctx.globalAlpha = 1;
       ctx.fillStyle = "#666";
@@ -5454,6 +5540,7 @@ ctx.restore();
     dm.querySelectorAll('[data-dl]').forEach(b => b.classList.toggle('active', (E.tx.list || 'none') === b.dataset.dl));
     dm.querySelectorAll('[data-dor]').forEach(b => b.classList.toggle('active', state.orientation === b.dataset.dor));
     const pp = dm.querySelector('[data-dpp]'); if (pp) pp.value = state.paperType;
+    const cpr = dm.querySelector('[data-cprow]'); if (cpr) { cpr.style.display = state.paperType === 'custom' ? '' : 'none'; dm.querySelectorAll('[data-cw]').forEach(c => { if (document.activeElement !== c) c.value = state.customW; }); dm.querySelectorAll('[data-ch]').forEach(c => { if (document.activeElement !== c) c.value = state.customH; }); }
     dm.classList.toggle('open', !!dcTab); dm.querySelectorAll('[data-rt]').forEach(b => b.classList.toggle('active', b.dataset.rt === dcTab)); dm.querySelectorAll('[data-rp]').forEach(p => p.style.display = p.dataset.rp === dcTab ? '' : 'none');
     dm.querySelectorAll('[data-dm]').forEach(c => { if (document.activeElement !== c) c.value = c.dataset.dm === 'all' ? '' : E.m[c.dataset.dm]; });
     dm.querySelectorAll('[data-db]').forEach(b => b.classList.toggle('active', !!E.tx[b.dataset.db]));
@@ -5487,6 +5574,13 @@ ctx.restore();
     const c = e.target;
     if (c.dataset.mp !== undefined && c.value) { const [t, b, l, r] = c.value.split(',').map(Number); setDoc('m', 't', t); setDoc('m', 'b', b); setDoc('m', 'l', l); setDoc('m', 'r', r); }
     else if (c.dataset.dpp !== undefined) { $('paperType').value = c.value; $('paperType').dispatchEvent(new Event('change')); if (state.doc) { reflowDoc(0); renderAll(); } }
+    else if (c.dataset.cw !== undefined || c.dataset.ch !== undefined) {
+      const w = Math.max(5, Math.min(100, parseFloat(dm.querySelector('[data-cw]').value) || state.customW)), h = Math.max(5, Math.min(150, parseFloat(dm.querySelector('[data-ch]').value) || state.customH));
+      $('paperType').value = 'custom'; $('paperType').dispatchEvent(new Event('change'));
+      $('paperW').value = w; $('paperW').dispatchEvent(new Event('change'));
+      $('paperH').value = h; $('paperH').dispatchEvent(new Event('change'));
+      if (state.doc) { reflowDoc(0); renderAll(); }
+    }
     saveState(); syncDoc();
   });
   dm.addEventListener('click', (e) => {
@@ -5509,7 +5603,7 @@ ctx.restore();
   let tapX = 0, tapY = 0, tapT0 = 0, tapEl = null; const swp = $('stage-wrapper');
   swp.addEventListener('pointerdown', (e) => { tapX = e.clientX; tapY = e.clientY; tapT0 = Date.now(); tapEl = e.target; });
   swp.addEventListener('pointerup', (e) => {
-    if (!e.isPrimary || edTA || Math.hypot(e.clientX - tapX, e.clientY - tapY) > 10 || Date.now() - tapT0 > 400) return;
+    if (!e.isPrimary || edTA || state.textProtect || document.querySelector('#hfModal.show') || Math.hypot(e.clientX - tapX, e.clientY - tapY) > 10 || Date.now() - tapT0 > 400) return;
     const t = tapEl; if (!t || !t.closest || !t.closest('.page')) return;
     const onEl = t.closest('.el'); if (onEl && !onEl.dataset.flow) return;
     if (isDocPage(currentPage())) docEdit(state.doc.pids.indexOf(currentPage().id));
@@ -5586,7 +5680,7 @@ ctx.restore();
       else if (f.type === 'shape') h += '<input type="color" data-qc="sh.fill"><input type="color" data-qc="sh.stroke">' + qaSep;
       else if (!multi) h += qaB('replace', 'Cambiar') + qaSep;
       if (multi) h += qaB('group', 'Agrupar') + qaB('ungroup', 'Desagrupar') + qaB('al:l', 'Izq') + qaB('al:c', 'Centro') + qaB('al:r', 'Der') + qaSep;
-      h += qaB('rot', 'Girar') + qaB('flipX', 'Voltear', f.flipX) + qaB('dup', 'Duplicar') + qaB('front', 'Frente') + qaB('back', 'Fondo') + qaB('del', 'Eliminar');
+      h += qaB('rot', 'Girar') + qaB('flipX', 'Voltear', f.flipX) + qaB('dup', 'Duplicar') + qaB('array', 'Array') + qaB('front', 'Frente') + qaB('back', 'Fondo') + qaB('del', 'Eliminar');
       qa.innerHTML = h;
     }
     qa.querySelectorAll('[data-qc]').forEach(c => { const [g, k] = c.dataset.qc.split('.'); const o = f[g]; if (o && document.activeElement !== c) c.value = o[k]; });
@@ -5605,6 +5699,7 @@ ctx.restore();
     else if (a === 'flipX') { const v = !f.flipX; els.forEach(x => x.flipX = v); commit(); }
     else if (a === 'replace') { const i = $('replaceImageInput'); i.dataset.targetId = f.id; i.click(); }
     else if (a === 'dup') els.length > 1 ? doDuplicateAll() : doDuplicate();
+    else if (a === 'array') openArray();
     else if (a === 'front') els.length > 1 ? bringToFrontAll() : bringToFront(f.id);
     else if (a === 'back') els.length > 1 ? sendToBackAll() : sendToBack(f.id);
     else if (a === 'del') doDelete();
@@ -5618,6 +5713,244 @@ ctx.restore();
   });
   qa.addEventListener('change', (e) => { if (e.target.dataset.qc) saveState(); });
   window.addEventListener('resize', () => { if (qa.classList.contains('show')) qa.style.top = ($('stage-wrapper').getBoundingClientRect().top + 6) + 'px'; });
+
+  /* ====== PROTECCIÓN DE TEXTO ====== */
+  const TP_ON = '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>';
+  const TP_OFF = '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/>';
+  function syncTextProtect() {
+    const b = $('textProtectBtn'); if (!b) return;
+    b.classList.toggle('on', !!state.textProtect);
+    $('textProtectIco').innerHTML = state.textProtect ? TP_ON : TP_OFF;
+    b.title = state.textProtect ? 'Protección de texto ACTIVA (toca para desactivar)' : 'Protección de texto desactivada (toca para activar)';
+  }
+  $('textProtectBtn').addEventListener('click', () => {
+    sfx.tap(); state.textProtect = !state.textProtect;
+    if (state.textProtect) endEditSafe();
+    syncTextProtect(); saveToLocalStorage();
+    showToast(state.textProtect ? 'Protección de texto activada: tocar la hoja no abre el teclado' : 'Protección de texto desactivada', 'info', 1600);
+  });
+  window.addEventListener('load', () => setTimeout(syncTextProtect, 80));
+  syncTextProtect();
+
+  /* ====== ARRAY ====== */
+  let arSrc = [];
+  const arN = (id, d) => { const v = parseFloat($(id).value); return isFinite(v) ? v : d; };
+  function arClearGhost() { document.querySelectorAll('.arr-ghost').forEach(n => n.remove()); }
+  function arCalc() {
+    const els = arSrc.filter(e => findEl(e.id));
+    if (!els.length) return null;
+    const minX = Math.min(...els.map(e => e.xCm)), minY = Math.min(...els.map(e => e.yCm));
+    const bw = Math.max(0.01, Math.max(...els.map(e => e.xCm + e.wCm)) - minX), bh = Math.max(0.01, Math.max(...els.map(e => e.yCm + e.hCm)) - minY);
+    const cols = Math.max(1, Math.min(50, Math.round(arN('arCols', 1)))), rows = Math.max(1, Math.min(50, Math.round(arN('arRows', 1))));
+    const gx = arN('arGapX', 0), gy = arN('arGapY', 0), pitch = $('arMode').value === 'pitch';
+    const dx = +$('arDirX').value || 1, dy = +$('arDirY').value || 1, shift = arN('arShift', 0), rot = arN('arRot', 0);
+    const stepX = (pitch ? gx : bw + gx) * dx, stepY = (pitch ? gy : bh + gy) * dy;
+    const cells = [];
+    for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) cells.push({ i, j, k: j * cols + i, ox: i * stepX + (j % 2 ? shift * dx : 0), oy: j * stepY });
+    let cx = 0, cy = 0;
+    const P = getPaperCm();
+    const ux0 = Math.min(...cells.map(c => minX + c.ox)), ux1 = Math.max(...cells.map(c => minX + c.ox + bw));
+    const uy0 = Math.min(...cells.map(c => minY + c.oy)), uy1 = Math.max(...cells.map(c => minY + c.oy + bh));
+    if ($('arCenter').checked) { cx = (P.w - (ux1 - ux0)) / 2 - ux0; cy = (P.h - (uy1 - uy0)) / 2 - uy0; }
+    const outside = cells.some(c => minX + c.ox + cx < -0.001 || minY + c.oy + cy < -0.001 || minX + c.ox + cx + bw > P.w + 0.001 || minY + c.oy + cy + bh > P.h + 0.001);
+    return { els, minX, minY, bw, bh, cols, rows, cells, cx, cy, rot, outside, total: cols * rows };
+  }
+  function arPreview() {
+    arClearGhost();
+    const c = arCalc(); if (!c) return;
+    $('arWarn').textContent = c.outside ? 'Algunas copias quedan fuera de la hoja.' : '';
+    $('arInfo').textContent = `${c.els.length} objeto(s) como un bloque de ${c.bw.toFixed(1)} × ${c.bh.toFixed(1)} cm → ${c.total - 1} copia(s) nueva(s).`;
+    const pageDiv = $('stage').querySelector('.page'); if (!pageDiv || c.total > 400) return;
+    c.cells.forEach(cell => {
+      const d = document.createElement('div'); d.className = 'arr-ghost' + (cell.k === 0 ? ' orig' : '');
+      d.style.left = ((c.minX + cell.ox + c.cx) * PX_PER_CM) + 'px'; d.style.top = ((c.minY + cell.oy + c.cy) * PX_PER_CM) + 'px';
+      d.style.width = (c.bw * PX_PER_CM) + 'px'; d.style.height = (c.bh * PX_PER_CM) + 'px';
+      pageDiv.appendChild(d);
+    });
+  }
+  function openArray() {
+    endEditSafe();
+    const els = getSelectedEls().filter(e => !e.flow);
+    if (!els.length) { alert('Primero selecciona uno o más objetos o imágenes.'); return; }
+    arSrc = els.slice();
+    $('moreMenu').classList.remove('show');
+    const m = $('arrayModal'); m.classList.add('show'); setTimeout(() => m.classList.add('visible'), 10);
+    arPreview();
+  }
+  function closeArray() {
+    const m = $('arrayModal'); m.classList.remove('visible'); setTimeout(() => m.classList.remove('show'), 250);
+    arClearGhost(); arSrc = [];
+  }
+  function applyArray() {
+    const c = arCalc(); if (!c) { closeArray(); return; }
+    if (c.total <= 1 && !c.cx && !c.cy) { $('arWarn').textContent = 'Con 1 columna y 1 fila no hay copias que crear.'; return; }
+    if (c.total > 400) { $('arWarn').textContent = 'Máximo 400 posiciones (columnas × filas).'; return; }
+    const weight = JSON.stringify(c.els).length * (c.total - 1);
+    if (weight > 40000000) { $('arWarn').textContent = 'Demasiado pesado: reduce las copias o usa imágenes más ligeras.'; return; }
+    const P = currentPage(), grp = $('arGroup').checked, newIds = [];
+    const orig = c.els.slice();
+    orig.forEach(el => { el.xCm += c.cx; el.yCm += c.cy; });
+    c.cells.forEach(cell => {
+      if (cell.k === 0) return;
+      const gmap = {}, copies = [];
+      orig.forEach(el => {
+        const n = JSON.parse(JSON.stringify(el));
+        n.id = ++elCounter; n.xCm = el.xCm + cell.ox; n.yCm = el.yCm + cell.oy;
+        if (c.rot) { let r = ((el.rot || 0) + c.rot * cell.k) % 360; if (r > 180) r -= 360; if (r < -180) r += 360; n.rot = r; }
+        if (n.groupId) {
+          if (!gmap[n.groupId]) { const ng = 'g' + Date.now() + '_' + Math.random().toString(36).slice(2, 6); state.groups[ng] = Object.assign({ opacity: 100 }, state.groups[n.groupId] || {}); gmap[n.groupId] = ng; }
+          n.groupId = gmap[n.groupId];
+        }
+        copies.push(n); P.els.push(n); newIds.push(n.id);
+      });
+      if (grp && copies.length > 1 && !copies.some(n => n.groupId)) {
+        const ng = 'g' + Date.now() + '_' + Math.random().toString(36).slice(2, 6); state.groups[ng] = { opacity: 100 };
+        copies.forEach(n => n.groupId = ng);
+      }
+    });
+    selectedIds = new Set([...orig.map(e => e.id), ...newIds]);
+    multiSelectMode = true; updateMultiIndicator(); document.body.classList.add('multiselect-mode');
+    arClearGhost(); closeArray();
+    sfx.success(); saveState(); renderAll(); showToast(`Array: ${newIds.length} elemento(s) creados`, 'success');
+  }
+  ['arCols', 'arRows', 'arGapX', 'arGapY', 'arRot', 'arShift'].forEach(id => $(id).addEventListener('input', arPreview));
+  ['arDirX', 'arDirY', 'arMode', 'arCenter'].forEach(id => $(id).addEventListener('change', arPreview));
+  $('arApply').addEventListener('click', applyArray);
+  $('arCancel').addEventListener('click', () => { sfx.tap(); closeArray(); });
+  $('closeArray').addEventListener('click', () => { sfx.tap(); closeArray(); });
+  $('openArrayBtn').addEventListener('click', () => { sfx.click(); openArray(); });
+
+  /* ====== ENCABEZADO / PIE / NÚMERO: lógica y panel ====== */
+  const hfRoman = (n, up) => { if (n < 1 || n > 3999) return String(n); const t = [[1000,'m'],[900,'cm'],[500,'d'],[400,'cd'],[100,'c'],[90,'xc'],[50,'l'],[40,'xl'],[10,'x'],[9,'ix'],[5,'v'],[4,'iv'],[1,'i']]; let r = ''; t.forEach(([v, g]) => { while (n >= v) { r += g; n -= v; } }); return up ? r.toUpperCase() : r; };
+  const hfLetters = (n, up) => { if (n < 1) return String(n); let r = ''; while (n > 0) { n--; r = String.fromCharCode(97 + (n % 26)) + r; n = Math.floor(n / 26); } return up ? r.toUpperCase() : r; };
+  function hfFmtNum(n, style) { return style === 'i' ? hfRoman(n, false) : style === 'I' ? hfRoman(n, true) : style === 'a' ? hfLetters(n, false) : style === 'A' ? hfLetters(n, true) : String(n); }
+  function hfNumberFor(pi) {
+    const c = state.hf.num; if (!c.on) return null;
+    const sheet = pi + 1, tot = state.pages.length, from = Math.max(1, Math.round(c.from) || 1), to = c.to > 0 ? Math.min(Math.round(c.to), tot) : tot;
+    if (sheet < from || sheet > to) return null;
+    const n = (Math.round(c.first) || 0) + (sheet - from);
+    if (c.last > 0 && n > Math.round(c.last)) return null;
+    return n;
+  }
+  function hfTotalNumber() {
+    const c = state.hf.num; if (!c.on) return state.pages.length;
+    const tot = state.pages.length, from = Math.max(1, Math.round(c.from) || 1), to = c.to > 0 ? Math.min(Math.round(c.to), tot) : tot;
+    let n = (Math.round(c.first) || 0) + Math.max(0, to - from);
+    if (c.last > 0) n = Math.min(n, Math.round(c.last));
+    return n;
+  }
+  function hfItems(pi) {
+    const h = state.hf, out = []; if (!h) return out;
+    const P = getPaperCm(), sheet = pi + 1, even = sheet % 2 === 0, flip = h.mirror && even;
+    const L = flip ? h.outer : h.inner, R = flip ? h.inner : h.outer;
+    const inRange = (b) => sheet >= Math.max(1, Math.round(b.from) || 1) && !(b.to > 0 && sheet > Math.round(b.to));
+    const nv = hfNumberFor(pi), nStr = nv !== null ? hfFmtNum(nv, h.num.style) : String(sheet);
+    const tStr = hfFmtNum(hfTotalNumber(), h.num.style);
+    const sub = (t) => String(t == null ? '' : t).replace(/\{n\}/g, nStr).replace(/\{total\}/g, tStr);
+    const add = (b, text, where) => {
+      if (!text || !text.trim()) return;
+      const a = b.align === 'inner' ? (flip ? 'right' : 'left') : b.align === 'outer' ? (flip ? 'left' : 'right') : (b.align || 'center');
+      const el = { id: 'hf', type: 'text', hf: true, text, xCm: L, yCm: 0, wCm: Math.max(1, P.w - L - R), hCm: 1, rot: 0, mode: 'stretch',
+        tx: { font: h.font, size: Math.max(4, +b.size || 10), color: b.color || '#555555', bold: !!b.bold, italic: !!b.italic, align: a, valign: 'top', pad: 0, fit: 'grow', lh: 1.2 } };
+      sanitizeGen(el);
+      const edge = Math.max(0, +b.edge || 0);
+      el.yCm = where === 'top' ? edge : Math.max(0, P.h - edge - el.hCm);
+      out.push(el);
+    };
+    if (h.header.on && inRange(h.header)) add(h.header, sub(h.header.text), 'top');
+    if (h.footer.on && inRange(h.footer)) add(h.footer, sub(h.footer.text), 'bottom');
+    if (nv !== null) add(h.num, sub(h.num.fmt || '{n}'), h.num.where === 'header' ? 'top' : 'bottom');
+    return out;
+  }
+  function buildHFLayer(pi) {
+    const items = hfItems(pi); if (!items.length) return null;
+    const d = document.createElement('div'); d.className = 'hf-layer';
+    items.forEach(el => {
+      ensureFont(el);
+      const im = document.createElement('img'); im.src = genURL(el); im.draggable = false; im.alt = '';
+      im.style.cssText = `position:absolute;left:${el.xCm * PX_PER_CM}px;top:${el.yCm * PX_PER_CM}px;width:${el.wCm * PX_PER_CM}px;height:${el.hCm * PX_PER_CM}px;pointer-events:none;`;
+      d.appendChild(im);
+    });
+    return d;
+  }
+  let hfTimer = null;
+  function hfChanged() {
+    clearTimeout(hfTimer);
+    hfTimer = setTimeout(() => { thumbCache.clear(); lastThumbsSignature = ''; renderAll(); saveToLocalStorage(); }, 180);
+  }
+  const hfSw = (path, t) => `<div class="switch-row"><span>${t}</span><label class="switch"><input type="checkbox" data-hf="${path}"><span class="switch-slider"></span></label></div>`;
+  const hfNumIn = (path, t, o) => `<div><label>${t}</label><input type="number" data-hf="${path}" inputmode="decimal" ${o || ''}></div>`;
+  const hfSelIn = (path, t, opts) => `<div><label>${t}</label><select data-hf="${path}">${opts.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select></div>`;
+  const HF_ALIGN = [['left', 'Izquierda'], ['center', 'Centrado'], ['right', 'Derecha'], ['inner', 'Interior'], ['outer', 'Exterior']];
+  function hfBlock(k, title, extra) {
+    return `<div class="adjust-box"><div class="hf-h">${title}</div>${hfSw(k + '.on', 'Activar')}${extra && extra.pre ? extra.pre : ''}
+      <div class="row">${hfSelIn(k + '.align', 'Posición', HF_ALIGN)}${hfNumIn(k + '.edge', 'Distancia al borde (cm)', 'min="0" step="0.05"')}</div>
+      <div class="row">${hfNumIn(k + '.size', 'Tamaño (pt)', 'min="4" max="72" step="1"')}<div><label>Color</label><input type="color" data-hf="${k}.color"></div></div>
+      ${hfSw(k + '.bold', 'Negrita')}${hfSw(k + '.italic', 'Cursiva')}
+      <div class="row">${hfNumIn(k + '.from', 'Desde la hoja', 'min="1" step="1" data-int="1"')}${hfNumIn(k + '.to', 'Hasta la hoja (0 = última)', 'min="0" step="1" data-int="1"')}</div>
+      ${extra && extra.post ? extra.post : ''}</div>`;
+  }
+  const hfModal = mk(`<div class="modal" id="hfModal"><div class="modalbox" style="position:relative">
+    <button class="closebtn" id="closeHF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <h2>Encabezado, pie y número</h2>
+    <p class="hf-note">En los textos puedes usar {n} (número de página) y {total} (total). Los cambios se ven en la hoja al instante y se incluyen al imprimir, exportar y en las miniaturas.</p>
+    <div class="adjust-box"><div class="hf-h">General</div>
+      <div class="row">${hfSelIn('font', 'Tipo de letra', FONTS.map(f => [f, f]))}</div>
+      <div class="row">${hfNumIn('inner', 'Margen interior (cm)', 'min="0" step="0.1"')}${hfNumIn('outer', 'Margen exterior (cm)', 'min="0" step="0.1"')}</div>
+      ${hfSw('mirror', 'Páginas espejo (interior = lado del lomo)')}
+      <p class="hf-note" style="margin:4px 0 0">Interior/exterior son los márgenes laterales del encabezado y pie. Sin espejo, interior = izquierda y exterior = derecha en todas las hojas; con espejo se invierten en las hojas pares.</p>
+    </div>
+    ${hfBlock('header', 'Encabezado', { pre: '<label>Texto del encabezado</label><input type="text" data-hf="header.text" placeholder="Ej.: Mi documento">' })}
+    ${hfBlock('footer', 'Pie de página', { pre: '<label>Texto del pie</label><input type="text" data-hf="footer.text" placeholder="Ej.: Confidencial · Página {n} de {total}">' })}
+    ${hfBlock('num', 'Número de página', {
+      pre: `<div class="row">${hfSelIn('num.where', 'Colocar en', [['footer', 'Pie de página'], ['header', 'Encabezado']])}${hfSelIn('num.style', 'Estilo', [['1', '1, 2, 3'], ['i', 'i, ii, iii'], ['I', 'I, II, III'], ['a', 'a, b, c'], ['A', 'A, B, C']])}</div><label>Formato</label><input type="text" data-hf="num.fmt" placeholder="{n}"><div class="toggle" id="hfFmtChips" style="margin-top:4px"><button data-f="{n}">1</button><button data-f="Página {n}">Página 1</button><button data-f="Página {n} de {total}">Página 1 de N</button><button data-f="{n} / {total}">1 / N</button><button data-f="- {n} -">- 1 -</button></div>`,
+      post: `<div class="row">${hfNumIn('num.first', 'Empezar en el número', 'step="1" data-int="1"')}${hfNumIn('num.last', 'Terminar en el número (0 = sin límite)', 'min="0" step="1" data-int="1"')}</div>` })}
+    <div class="row" style="margin-top:8px"><button class="btn full" id="hfReset">Quitar todo</button><button class="btn full" id="hfDone">Listo</button></div>
+  </div></div>`);
+  document.body.appendChild(hfModal);
+  const hfGet = (path) => path.split('.').reduce((o, k) => (o ? o[k] : undefined), state.hf);
+  const hfSet = (path, v) => { const ks = path.split('.'), last = ks.pop(); const o = ks.reduce((a, k) => a[k], state.hf); o[last] = v; };
+  function hfSync() {
+    hfModal.querySelectorAll('[data-hf]').forEach(c => {
+      if (document.activeElement === c) return;
+      const v = hfGet(c.dataset.hf);
+      if (c.type === 'checkbox') c.checked = !!v; else c.value = v == null ? '' : v;
+    });
+    hfModal.querySelectorAll('#hfFmtChips button').forEach(b => b.classList.toggle('active', b.dataset.f === (state.hf.num.fmt || '{n}')));
+  }
+  function openHF() {
+    endEditSafe(); $('moreMenu').classList.remove('show');
+    state.hf = hfNorm(state.hf); hfSync();
+    hfModal.classList.add('show'); setTimeout(() => hfModal.classList.add('visible'), 10);
+  }
+  function closeHF() {
+    hfModal.classList.remove('visible'); setTimeout(() => hfModal.classList.remove('show'), 250);
+    thumbCache.clear(); lastThumbsSignature = ''; saveToLocalStorage(); renderAll();
+  }
+  const hfRead = (c) => {
+    if (c.type === 'checkbox') return c.checked;
+    if (c.type === 'number') { const v = parseFloat(c.value); if (!Number.isFinite(v)) return undefined; return c.dataset.int ? Math.round(v) : v; }
+    return c.value;
+  };
+  hfModal.addEventListener('input', (e) => {
+    const c = e.target; if (!c.dataset || !c.dataset.hf) return;
+    const v = hfRead(c); if (v === undefined) return;
+    hfSet(c.dataset.hf, v); hfChanged();
+  });
+  hfModal.addEventListener('change', (e) => {
+    const c = e.target; if (!c.dataset || !c.dataset.hf) return;
+    const v = hfRead(c); if (v === undefined) { hfSync(); return; }
+    hfSet(c.dataset.hf, v); state.hf = hfNorm(state.hf); hfSync(); hfChanged();
+  });
+  hfModal.addEventListener('click', (e) => {
+    const chip = e.target.closest('#hfFmtChips button');
+    if (chip) { sfx.tap(); state.hf.num.fmt = chip.dataset.f; hfSync(); hfChanged(); return; }
+    if (e.target.closest('#closeHF') || e.target.closest('#hfDone')) { sfx.tap(); closeHF(); return; }
+    if (e.target.closest('#hfReset')) { sfx.tap(); state.hf = hfDefaults(); hfSync(); hfChanged(); }
+  });
+  $('openHFBtn').addEventListener('click', () => { sfx.click(); openHF(); });
+  $('hfRibbonBtn').addEventListener('click', () => { openHF(); });
+
 
   document.addEventListener('DOMContentLoaded', () => {
     loadTheme();
@@ -6190,7 +6523,7 @@ document.addEventListener('pointerdown', (e) => {
   /* ====== MALLA, SNAP Y GUÍAS INTELIGENTES ====== */
   const GC_KEY = 'image-editor-grid-v1';
   const GC = Object.assign({ show: false, snap: false, step: 0.5, color: '#3b82c4', width: 1, opacity: 0.4, major: 0,
-    guides: true, gEl: true, gPage: true, gMargin: false, margin: 1, gUser: true, gGap: true, gSize: true, labels: true, tol: 8, rotSnap: true, rotStep: 15,
+    guides: true, gEl: true, gPage: true, gMargin: false, gPM: false, margin: 1, gUser: true, gGap: true, gSize: true, labels: true, tol: 8, rotSnap: true, rotStep: 15,
     gColor: '#ff2d7a', ugColor: '#00b5d8' }, (() => { try { return JSON.parse(localStorage.getItem(GC_KEY)) || {}; } catch (e) { return {}; } })());
   const saveGC = () => { try { localStorage.setItem(GC_KEY, JSON.stringify(GC)); } catch (e) {} };
   $('showGrid').checked = !!GC.show; $('snapGrid').checked = !!GC.snap; $('snapStep').value = GC.step;
@@ -6236,6 +6569,7 @@ document.addEventListener('pointerdown', (e) => {
     const cp = currentPage(), p = getPaperCm(), xs = [], ys = [], others = [];
     if (GC.gPage) { [0, p.w / 2, p.w].forEach(v => xs.push({ v, t: 'p' })); [0, p.h / 2, p.h].forEach(v => ys.push({ v, t: 'p' })); }
     if (GC.gMargin && GC.margin > 0) { const m = GC.margin; xs.push({ v: m, t: 'm' }, { v: p.w - m, t: 'm' }); ys.push({ v: m, t: 'm' }, { v: p.h - m, t: 'm' }); }
+    if (GC.gPM) { const M = pmMargins(); xs.push({ v: M.l, t: 'm' }, { v: M.r, t: 'm' }); ys.push({ v: M.t, t: 'm' }, { v: M.b, t: 'm' }); }
     if (GC.gUser) (cp.guides || []).forEach(g => (g.o === 'v' ? xs : ys).push({ v: g.p, t: 'u' }));
     cp.els.forEach(e => {
       if (excl.has(e.id)) return; const b = gBB(e); others.push(b);
@@ -6309,7 +6643,7 @@ document.addEventListener('pointerdown', (e) => {
     (tags || []).forEach(t => { h += tag(t.x, t.y, t.txt, t.col); });
     g.innerHTML = h;
   }
-  function guideDrag(nx, ny) {
+  function guideDrag0(nx, ny) {
     const sp = gesture.drag.startPositions, first = [...sp.keys()].map(findEl).find(Boolean), s0 = sp.get(first.id);
     const gridOn = $('snapGrid').checked;
     if (!GC.guides) { clearGuides(); return gridOn ? { x: snap(nx), y: snap(ny) } : { x: nx, y: ny }; }
@@ -6330,7 +6664,7 @@ document.addEventListener('pointerdown', (e) => {
     drawGuides(gMatches(box, T), GC.labels || GC.gGap ? gDistSegs(box, gNeighbors(box, T), eq) : [], []);
     return { x: s0.xCm + (box.x - x0), y: s0.yCm + (box.y - y0) };
   }
-  function guideResize(el, nw, nh) {
+  function guideResize0(el, nw, nh) {
     const out = { w: nw, h: nh, sw: false, sh: false };
     if (!GC.guides) { clearGuides(); return out; }
     const T = smTargets(new Set([el.id])), tol = guideTol(), box = { x: el.xCm, y: el.yCm, w: nw, h: nh };
@@ -6344,6 +6678,28 @@ document.addEventListener('pointerdown', (e) => {
     }
     box.w = out.w; box.h = out.h;
     drawGuides(gMatches(box, T), [], [{ x: box.x + box.w, y: box.y + box.h + 22 / (PX_PER_CM * zoomScale), txt: `${gFmt(box.w)} × ${gFmt(box.h)} cm${sizeTag}`, col: sizeTag ? '#10b981' : null }]);
+    return out;
+  }
+
+  /* Márgenes definidos en la hoja (Disposición → Márgenes): imán y límite */
+  function pmMargins() {
+    const m = docEff(currentPage()).m, P = getPaperCm();
+    return { l: m.l, r: P.w - m.r, t: m.t, b: P.h - m.b };
+  }
+  function guideDrag(nx, ny) {
+    const r = guideDrag0(nx, ny); if (!GC.gPM) return r;
+    const sp = gesture.drag.startPositions, first = [...sp.keys()].map(findEl).find(Boolean); if (!first) return r;
+    const s0 = sp.get(first.id); let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    sp.forEach((q, id) => { const e = findEl(id); if (!e) return; x0 = Math.min(x0, q.xCm); y0 = Math.min(y0, q.yCm); x1 = Math.max(x1, q.xCm + e.wCm); y1 = Math.max(y1, q.yCm + e.hCm); });
+    const M = pmMargins(), w = x1 - x0, h = y1 - y0, bx = x0 + (r.x - s0.xCm), by = y0 + (r.y - s0.yCm);
+    const cx = Math.max(Math.min(bx, M.r - w), M.l), cy = Math.max(Math.min(by, M.b - h), M.t);
+    return { x: r.x + (cx - bx), y: r.y + (cy - by) };
+  }
+  function guideResize(el, nw, nh) {
+    const out = guideResize0(el, nw, nh); if (!GC.gPM) return out;
+    const M = pmMargins(), maxW = M.r - el.xCm, maxH = M.b - el.yCm;
+    if (out.w > maxW && maxW > 0.5) { out.w = maxW; out.sw = true; }
+    if (out.h > maxH && maxH > 0.5) { out.h = maxH; out.sh = true; }
     return out;
   }
 
@@ -6363,7 +6719,7 @@ document.addEventListener('pointerdown', (e) => {
     ${gRg('gp_width', 'Grosor (px)', 0.5, 5, 0.5)}${gRg('gp_op', 'Opacidad (%)', 5, 100, 5)}
     <label style="color:var(--accent);font-weight:700;margin-top:10px">Guías inteligentes</label>
     ${gSw('gp_guides', 'Activar guías inteligentes')}${gSw('gp_el', 'Alinear con otros elementos')}${gSw('gp_page', 'Alinear con bordes y centro de la hoja')}
-    ${gSw('gp_umargin', 'Alinear con márgenes')}
+    ${gSw('gp_pm', 'Respetar márgenes de la hoja (imán y límite)')}${gSw('gp_umargin', 'Alinear con márgenes')}
     <div class="row" style="align-items:center"><span style="font-size:12px;color:var(--muted);flex:1">Margen (cm)</span><input type="number" id="gp_margin" min="0" max="20" step="0.1" inputmode="decimal" style="flex:0 0 80px"></div>
     ${gSw('gp_user', 'Alinear con mis guías')}${gSw('gp_gap', 'Espaciado igual entre elementos')}${gSw('gp_size', 'Igualar tamaños al redimensionar')}${gSw('gp_labels', 'Mostrar distancias y medidas')}
     ${gRg('gp_tol', 'Fuerza de imán (px)', 2, 24, 1)}
@@ -6381,7 +6737,7 @@ document.addEventListener('pointerdown', (e) => {
     $('gp_show').checked = $('showGrid').checked; $('gp_snap').checked = $('snapGrid').checked; $('gp_step').value = stepCm();
     $('gp_color').value = GC.color; $('gp_major').value = GC.major; $('gp_width').value = GC.width; $('gp_op').value = Math.round(GC.opacity * 100);
     $('gp_widthV').textContent = GC.width; $('gp_opV').textContent = Math.round(GC.opacity * 100);
-    $('gp_guides').checked = GC.guides; $('gp_el').checked = GC.gEl; $('gp_page').checked = GC.gPage; $('gp_umargin').checked = GC.gMargin; $('gp_margin').value = GC.margin;
+    $('gp_guides').checked = GC.guides; $('gp_el').checked = GC.gEl; $('gp_page').checked = GC.gPage; $('gp_pm').checked = !!GC.gPM; $('gp_umargin').checked = GC.gMargin; $('gp_margin').value = GC.margin;
     $('gp_user').checked = GC.gUser; $('gp_gap').checked = GC.gGap; $('gp_size').checked = GC.gSize; $('gp_labels').checked = GC.labels;
     $('gp_tol').value = GC.tol; $('gp_tolV').textContent = GC.tol; $('gp_gcolor').value = GC.gColor; $('gp_ucolor').value = GC.ugColor;
     $('gp_rotSnap').checked = GC.rotSnap !== false; $('gp_rotStep').value = GC.rotStep || 15; $('gp_rotStepV').textContent = GC.rotStep || 15;
@@ -6408,7 +6764,7 @@ document.addEventListener('pointerdown', (e) => {
     else if (id === 'gp_width') { GC.width = num; $('gp_widthV').textContent = num; saveGC(); renderAll(); }
     else if (id === 'gp_op') { GC.opacity = num / 100; $('gp_opV').textContent = num; saveGC(); renderAll(); }
     else if (id === 'gp_guides') GC.guides = t.checked; else if (id === 'gp_el') GC.gEl = t.checked; else if (id === 'gp_page') GC.gPage = t.checked;
-    else if (id === 'gp_umargin') GC.gMargin = t.checked; else if (id === 'gp_margin') GC.margin = Math.max(0, num || 0); else if (id === 'gp_user') GC.gUser = t.checked;
+    else if (id === 'gp_pm') GC.gPM = t.checked; else if (id === 'gp_umargin') GC.gMargin = t.checked; else if (id === 'gp_margin') GC.margin = Math.max(0, num || 0); else if (id === 'gp_user') GC.gUser = t.checked;
     else if (id === 'gp_gap') GC.gGap = t.checked; else if (id === 'gp_size') GC.gSize = t.checked; else if (id === 'gp_labels') GC.labels = t.checked;
     else if (id === 'gp_tol') { GC.tol = num; $('gp_tolV').textContent = num; }
     else if (id === 'gp_rotSnap') GC.rotSnap = t.checked;
