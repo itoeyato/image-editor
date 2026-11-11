@@ -3253,6 +3253,7 @@ function updateThumbnails() {
           e.target.closest('.pdf-reader')) return;
       gesture.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       if (gesture.pointers.size === 2) {
+        clearTimeout(gesture.selTimer);
         cancelTapTimer(); gesture.tap.fired = true; gesture.drag.active = false; gesture.resize.active = false;
         if (gesture.marquee.box) { gesture.marquee.box.remove(); gesture.marquee.box = null; }
         gesture.marquee.active = false;
@@ -3294,7 +3295,10 @@ function updateThumbnails() {
           if (el) {
             const wasSelected = isSelected(elId);
             gesture.tap.wasSelected = wasSelected;
-            if (!wasSelected && !multiSelectMode) selectSingle(elId);
+            if (!wasSelected && !multiSelectMode) {
+              clearTimeout(gesture.selTimer);
+              gesture.selTimer = setTimeout(() => selectSingle(elId), 150);
+             }
             const pos = getStageCoords(e.clientX, e.clientY);
             const group = isSelected(elId) && selectedIds.size > 1 ? getSelectedEls() : [el];
             gesture.drag.active = wasSelected;
