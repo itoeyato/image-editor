@@ -761,6 +761,28 @@
   .collage-cell-box .ce-del { font-size: 12px; }
   #collagePresetPreview, #rgPreview { margin-top: 6px; }
   #reorgModal { z-index: 105; }
+
+  /* ===== Reorganizar: botones de acción ===== */
+  .rg-actions { display: flex; gap: 8px; margin-top: 12px; width: 100%; box-sizing: border-box; }
+  .rg-actions .btn, .rg-actions .cta { flex: 1 1 0; width: auto; min-width: 0; box-sizing: border-box; min-height: 42px; }
+  #reorgModal .modalbox, #collageModal .modalbox { box-sizing: border-box; overflow-x: hidden; }
+  #reorgModal .modalbox > *, #collageModal .modalbox > * { max-width: 100%; box-sizing: border-box; }
+  #reorgModal input, #reorgModal select { max-width: 100%; box-sizing: border-box; }
+  /* ===== Recorte: zoom y paneo ===== */
+  .crop-wrap { transform-origin: 50% 50%; will-change: transform; --iz: 1; }
+  .crop-stage { position: relative; }
+  .crop-wrap .crop-rect { border-width: calc(2px * var(--iz)); }
+  .crop-wrap .crop-h[data-k="nw"], .crop-wrap .crop-h[data-k="ne"], .crop-wrap .crop-h[data-k="sw"], .crop-wrap .crop-h[data-k="se"] { transform: scale(var(--iz)); }
+  .crop-wrap .crop-h[data-k="n"], .crop-wrap .crop-h[data-k="s"] { transform: translateX(-50%) scale(var(--iz)); }
+  .crop-wrap .crop-h[data-k="e"], .crop-wrap .crop-h[data-k="w"] { transform: translateY(-50%) scale(var(--iz)); }
+  .crop-zoom { position: absolute; right: 10px; top: 54px; z-index: 5; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .crop-zoom button { width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,.35); background: rgba(20,20,20,.85); color: #fff; font: 700 20px/1 'JetBrains Mono', monospace; cursor: pointer; touch-action: manipulation; }
+  .crop-zoom button:active { background: var(--accent); }
+  .crop-zoom span { font: 600 10px 'JetBrains Mono', monospace; color: #cbd5e1; background: rgba(20,20,20,.7); padding: 2px 6px; border-radius: 8px; }
+  .crop-hint { position: absolute; left: 0; right: 0; bottom: 6px; text-align: center; font-size: 11px; color: #94a3b8; pointer-events: none; }
+  /* ===== Quitar fondo: borrar color ===== */
+  #imageEnhancerModal .bg-tools { grid-template-columns: repeat(6, minmax(0,1fr)); }
+  #eyedropperLoupe .eye-zoom { width: 63px; height: 63px; image-rendering: pixelated; border: 2px solid #fff; border-radius: 8px; flex: none; display: none; background: #000; }
 </style>
 <meta name="editor-build" content="2026-10-15-tools-separated-history-v2">
 </head>
@@ -1221,7 +1243,7 @@
         <select id="rgAlign"><option value="center">Centro</option><option value="left">Izquierda</option><option value="right">Derecha</option></select>
         <div class="switch-row"><span>Centrar verticalmente</span><label class="switch"><input type="checkbox" id="rgCenterV" checked /><span class="switch-slider"></span></label></div>
         <div class="switch-row"><span>Pasar lo que no quepa a hojas nuevas</span><label class="switch"><input type="checkbox" id="rgNewPages" checked /><span class="switch-slider"></span></label></div></div>
-      <div class="row" style="margin-top:10px"><button class="btn full" id="rgCancel">Cancelar</button><button class="cta" id="rgApply">Aplicar</button></div>
+      <div class="rg-actions"><button class="btn" id="rgCancel" type="button">Cancelar</button><button class="cta" id="rgApply" type="button">Aplicar</button></div>
     </div>
   </div>
 
@@ -1320,6 +1342,7 @@
         <button class="btn" type="button" data-bg-tool="erase"><b>⌫</b>Borrar</button>
         <button class="btn" type="button" data-bg-tool="restore"><b>↺</b>Restaurar</button>
         <button class="btn" type="button" data-bg-tool="wand"><b>✦</b>Varita</button>
+        <button class="btn" type="button" data-bg-tool="color"><b>🎯</b>Color</button>
       </div>
       <div class="bg-ctl" id="bgCtlAuto" hidden>
         <div class="row"><div><label for="bgRemoveColor">Color del fondo</label><input type="color" id="bgRemoveColor" value="#ffffff" /></div><div><button class="btn cyan" id="bgSampleCornerBtn" type="button" style="width:100%">✨ Quitar fondo</button></div></div>
@@ -1333,6 +1356,13 @@
       <div class="bg-ctl" id="bgCtlWand" hidden>
         <div class="row"><div><label for="bgWandTol">Tolerancia <span id="bgWandTolVal">30</span></label><input type="range" id="bgWandTol" min="3" max="120" value="30" step="1" style="width:100%" /></div><div><label for="bgWandMode">Acción</label><select id="bgWandMode"><option value="erase">Quitar</option><option value="restore">Restaurar</option></select></div></div>
         <label class="bg-chk"><input type="checkbox" id="bgWandContig" checked /> Solo zona contigua</label>
+      </div>
+      <div class="bg-ctl" id="bgCtlColor" hidden>
+        <div class="row"><div><label for="bgKeyColor">Color a borrar (usa ⌖ para elegirlo)</label><input type="color" id="bgKeyColor" value="#ffffff" /></div><div><label for="bgKeyAction">Acción</label><select id="bgKeyAction"><option value="erase">Borrar solo este color</option><option value="restore">Restaurar solo este color</option></select></div></div>
+        <label for="bgKeyTol">Tolerancia <span id="bgKeyTolVal">8</span> <small style="color:var(--muted)">(0 = color exacto)</small></label><input type="range" id="bgKeyTol" min="0" max="80" value="8" step="1" style="width:100%" />
+        <label class="bg-chk"><input type="checkbox" id="bgKeySoft" /> Bordes suaves (semitransparencia en colores cercanos)</label>
+        <p style="font-size:11px;color:var(--muted);margin:4px 0">Pasa el dedo con el pincel: solo se borra el color elegido, los demás colores se ignoran. Ajusta el tamaño abajo. Acerca la imagen con dos dedos para elegir un píxel exacto.</p>
+        <button class="btn cyan full" id="bgKeyAllBtn" type="button">Aplicar a toda la imagen</button>
       </div>
       <div class="bg-actions">
         <button class="btn" id="bgEditUndoBtn" type="button" disabled aria-label="Deshacer">↶</button>
@@ -1439,7 +1469,9 @@
 
   <div class="crop-modal" id="cropModal">
     <div class="crop-top"><b>Recortar imagen</b><span id="cropInfo"></span></div>
-    <div class="crop-stage">
+    <div class="crop-zoom"><button type="button" id="cropZoomIn" aria-label="Acercar">+</button><span id="cropZoomLbl">100%</span><button type="button" id="cropZoomOut" aria-label="Alejar">−</button><button type="button" id="cropZoomFit" aria-label="Ajustar vista" style="font-size:15px">⤢</button></div>
+    <div class="crop-hint">Pellizca para zoom · arrastra fuera del recuadro para mover la vista</div>
+    <div class="crop-stage" id="cropStage">
       <div class="crop-wrap" id="cropWrap">
         <img id="cropImg" alt="" draggable="false" />
         <div class="crop-rect" id="cropRect" data-k="m">
@@ -4771,8 +4803,10 @@ ctx.restore();
 
   function parseHexColor(hex) { const h=String(hex||'#ffffff').replace('#',''); return [parseInt(h.slice(0,2),16)||0,parseInt(h.slice(2,4),16)||0,parseInt(h.slice(4,6),16)||0]; }
   const bgHex = rgb => '#'+rgb.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
-  const bgIsPaintTool = () => bgEditTool==='erase'||bgEditTool==='restore'||bgEditTool==='wand';
-  const bgIsBrushTool = () => bgEditTool==='erase'||bgEditTool==='restore';
+  const bgIsPaintTool = () => bgEditTool==='erase'||bgEditTool==='restore'||bgEditTool==='wand'||bgEditTool==='color';
+  const bgIsBrushTool = () => bgEditTool==='erase'||bgEditTool==='restore'||bgEditTool==='color';
+  let bgDabFilter = null;
+  const bgIsStrokeName = t => t==='erase'||t==='restore'||t==='color';
   const bgStatus = t => { const el=$('bgRemoveStatus'); if(el) el.textContent=t; };
 
   // Distancia de color (YCbCr ponderada): la luminosidad pesa menos que el tono.
@@ -4945,8 +4979,9 @@ ctx.restore();
     for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
       const dx=x-cx,dy=y-cy,t=Math.sqrt(dx*dx+dy*dy)/r;if(t>1)continue;
       let f=1;if(t>inner){const u=(t-inner)/Math.max(1e-6,1-inner);f=1-u*u*(3-2*u);}
+      const px=y*w+x;if(bgDabFilter){const wg=bgDabFilter(px);if(wg<=0)continue;f*=wg;}
       const cov=Math.round(f*255);if(cov<=0)continue;
-      const px=y*w+x,prev=s.cov[px];if(cov<=prev)continue; // el trazo no acumula: el borde suave se mantiene suave
+      const prev=s.cov[px];if(cov<=prev)continue; // el trazo no acumula: el borde suave se mantiene suave
       if(!prev){s.baseMan[px]=s.man[px];s.touched.push(px);}
       s.cov[px]=cov;
       const bm=s.baseMan[px],baseA=bm?bm-1:s.autoA[px];
@@ -4954,10 +4989,26 @@ ctx.restore();
     }
   }
   function bgStrokeSeg(a,b){
-    const s=bgS,r=bgBrushRadius(),hard=Number($('bgBrushHard').value),erase=bgEditTool==='erase';
+    const s=bgS,r=bgBrushRadius(),hard=Number($('bgBrushHard').value),erase=bgEditTool==='color'?$('bgKeyAction').value!=='restore':bgEditTool==='erase';
+    bgDabFilter=bgEditTool==='color'?bgKeyFilter():null;
     const n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.y-a.y)/Math.max(1,r*.25)));
     for(let i=0;i<=n;i++){const t=i/n;bgDab(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t,r,hard,erase);}
+    bgDabFilter=null;
     bgRenderRect(Math.floor(Math.min(a.x,b.x)-r)-1,Math.floor(Math.min(a.y,b.y)-r)-1,Math.ceil(Math.max(a.x,b.x)+r)+2,Math.ceil(Math.max(a.y,b.y)+r)+2);
+  }
+  // Filtro de color exacto: peso 1 si el píxel coincide con el color elegido (dentro de la tolerancia), 0 si no.
+  function bgKeyFilter(){
+    const s=bgS,d=s.orig.data,key=parseHexColor($('bgKeyColor').value),tol=Number($('bgKeyTol').value)||0,soft=$('bgKeySoft').checked,dist2=bgMakeDist(d,key);
+    const t2=tol*tol,hi=soft?tol*1.6+1:tol,t2b=hi*hi;
+    return px=>{const i=px*4;if(d[i+3]<8)return 0;const q=dist2(i);if(q<=t2)return 1;if(!soft||q>=t2b)return 0;return 1-(Math.sqrt(q)-tol)/(hi-tol);};
+  }
+  function bgKeyApplyAll(){
+    const s=bgS;if(!s){bgStatus('Selecciona una imagen primero.');return;}
+    const f=bgKeyFilter(),restore=$('bgKeyAction').value==='restore',w=s.w;let x0=s.w,y0=s.h,x1=0,y1=0,n=0;s.touched=[];
+    for(let px=0;px<s.total;px++){const wg=f(px);if(wg<=0)continue;const a=bgCurA(px);bgSetMan(px,restore?a+(255-a)*wg:a*(1-wg));n++;const x=px%w,y=(px/w)|0;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
+    if(!n){bgStatus('Ningún píxel coincide con ese color. Sube la tolerancia o elige otro color.');return;}
+    bgStrokeEnd();bgRenderRect(x0,y0,x1+1,y1+1);updateBgUi();
+    bgStatus(`${restore?'Restaurados':'Borrados'} ${n.toLocaleString()} píxeles del color ${$('bgKeyColor').value.toUpperCase()}.`);
   }
   function bgSetMan(px,a){const s=bgS;if(!s.cov[px]){s.cov[px]=255;s.baseMan[px]=s.man[px];s.touched.push(px);}s.man[px]=Math.max(0,Math.min(255,Math.round(a)))+1;}
   function bgCurA(px){const s=bgS,m=s.man[px];return m?m-1:s.autoA[px];}
@@ -5004,7 +5055,7 @@ ctx.restore();
     const evs=e.getCoalescedEvents?e.getCoalescedEvents():[],list=evs.length?evs:[e];
     for(const ev of list){
       if(Math.hypot(ev.clientX-ed.cx,ev.clientY-ed.cy)>8)ed.moved=true;
-      if(ed.tool==='erase'||ed.tool==='restore'){const pt=bgPoint(canvas,ev);bgStrokeSeg(ed.last,pt);ed.last=pt;}
+      if(bgIsStrokeName(ed.tool)){const pt=bgPoint(canvas,ev);bgStrokeSeg(ed.last,pt);ed.last=pt;}
     }
   }
   function bgEndEdit(canvas,e){
@@ -5013,7 +5064,7 @@ ctx.restore();
     else bgStrokeEnd();
     updateBgUi();
   }
-  function bgAbortEdit(){const ed=bgEditPointer;bgEditPointer=null;if(ed&&(ed.tool==='erase'||ed.tool==='restore'))bgStrokeEnd();updateBgUi();}
+  function bgAbortEdit(){const ed=bgEditPointer;bgEditPointer=null;if(ed&&bgIsStrokeName(ed.tool))bgStrokeEnd();updateBgUi();}
   function updateBgBrushCursor(e){
     const vp=$('bgPreviewViewport');if(!vp||!bgCursorEl)return;
     if(!bgIsBrushTool()){bgCursorEl.style.display='none';return;}
@@ -5022,7 +5073,7 @@ ctx.restore();
     const dia=Math.max(5,Number($('bgBrushSize').value)||28);
     bgCursorEl.style.display='block';bgCursorEl.style.width=dia+'px';bgCursorEl.style.height=dia+'px';
     bgCursorEl.style.left=(e.clientX-v.left)+'px';bgCursorEl.style.top=(e.clientY-v.top)+'px';
-    bgCursorEl.style.borderColor=bgEditTool==='restore'?'#26c6da':'#ff4b5c';
+    bgCursorEl.style.borderColor=(bgEditTool==='restore'||(bgEditTool==='color'&&$('bgKeyAction').value==='restore'))?'#26c6da':'#ff4b5c';
   }
   const bgCursorViewport=$('bgPreviewViewport');
   if(bgCursorViewport&&!bgCursorEl){bgCursorEl=document.createElement('div');bgCursorEl.id='bgBrushCursor';bgCursorEl.style.cssText='position:absolute;z-index:8;pointer-events:none;display:none;border:2px solid #ff4b5c;border-radius:50%;box-shadow:0 0 0 1px #0007;transform:translate(-50%,-50%);box-sizing:border-box';bgCursorViewport.appendChild(bgCursorEl);}
@@ -5030,12 +5081,15 @@ ctx.restore();
   function setBgEditTool(tool){
     bgEditTool=tool;
     document.querySelectorAll('[data-bg-tool]').forEach(b=>b.classList.toggle('active',b.dataset.bgTool===tool));
-    $('bgCtlAuto').hidden=tool!=='auto';$('bgCtlBrush').hidden=!bgIsBrushTool();$('bgCtlWand').hidden=tool!=='wand';
+    $('bgCtlAuto').hidden=tool!=='auto';$('bgCtlBrush').hidden=!bgIsBrushTool();$('bgCtlWand').hidden=tool!=='wand';$('bgCtlColor').hidden=tool!=='color';
     const cv=$('bgPreviewCanvas');if(cv)cv.style.cursor=bgIsBrushTool()?'none':tool==='wand'?'crosshair':'grab';
     if(bgCursorEl&&!bgIsBrushTool())bgCursorEl.style.display='none';
-    bgStatus(({pan:'Mover: arrastra con un dedo y pellizca para ampliar. En Borrar, Restaurar y Varita mueve la vista con dos dedos.',auto:'Auto: pulsa «Quitar fondo». Después ajusta Sensibilidad, Suavizado y Borde: el resultado cambia en vivo.',erase:'Borrar: pasa el dedo por lo que sobra. El resultado se actualiza mientras pintas.',restore:'Restaurar: pasa el dedo por lo que borraste de más para recuperarlo.',wand:'Varita: toca una zona y se quita (o se restaura) al instante, según la acción elegida.'})[tool]||'');
+    bgStatus(({pan:'Mover: arrastra con un dedo y pellizca para ampliar. En Borrar, Restaurar y Varita mueve la vista con dos dedos.',auto:'Auto: pulsa «Quitar fondo». Después ajusta Sensibilidad, Suavizado y Borde: el resultado cambia en vivo.',erase:'Borrar: pasa el dedo por lo que sobra. El resultado se actualiza mientras pintas.',restore:'Restaurar: pasa el dedo por lo que borraste de más para recuperarlo.',wand:'Varita: toca una zona y se quita (o se restaura) al instante, según la acción elegida.',color:'Color: elige el color con ⌖ (mantén, mueve y suelta sobre la imagen) y pasa el pincel: solo se borra ese color.'})[tool]||'');
   }
-  document.querySelectorAll('[data-bg-tool]').forEach(b=>b.addEventListener('click',()=>setBgEditTool(b.dataset.bgTool)));
+  document.querySelectorAll('[data-bg-tool]').forEach(b=>b.addEventListener('click',()=>{setBgEditTool(b.dataset.bgTool);if(b.dataset.bgTool==='color'&&!$('bgKeyColor').dataset.picked){const eb=$('bgKeyColor').nextElementSibling;if(eb&&eb.tagName==='BUTTON')eb.click();}}));
+  $('bgKeyTol').addEventListener('input',e=>{$('bgKeyTolVal').textContent=e.target.value;});
+  $('bgKeyColor').addEventListener('input',()=>{$('bgKeyColor').dataset.picked='1';});
+  $('bgKeyAllBtn').addEventListener('click',bgKeyApplyAll);
   $('bgBrushSize').addEventListener('input',e=>{$('bgBrushSizeVal').textContent=e.target.value+' px';});
   $('bgBrushHard').addEventListener('input',e=>{$('bgBrushHardVal').textContent=e.target.value+'%';});
   $('bgWandTol').addEventListener('input',e=>{$('bgWandTolVal').textContent=e.target.value;});
@@ -5143,11 +5197,20 @@ ctx.restore();
     viewport.addEventListener('dblclick',e=>{e.preventDefault();reset();});
   }
   let activeEyedropperInput=null, eyedropperPointerId=null, eyedropperSampleHex='#ffffff';
-  let eyeLoupe=document.getElementById('eyedropperLoupe');if(!eyeLoupe){eyeLoupe=document.createElement('div');eyeLoupe.id='eyedropperLoupe';eyeLoupe.innerHTML='<span class="eye-swatch"></span><span class="eye-hex">#FFFFFF</span>';document.body.appendChild(eyeLoupe);}
+  let eyeLoupe=document.getElementById('eyedropperLoupe');if(!eyeLoupe){eyeLoupe=document.createElement('div');eyeLoupe.id='eyedropperLoupe';eyeLoupe.innerHTML='<canvas class="eye-zoom" width="63" height="63"></canvas><span class="eye-swatch"></span><span class="eye-hex">#FFFFFF</span>';document.body.appendChild(eyeLoupe);}
   function eyeHexAt(canvas,e){if(canvas.id==='bgPreviewCanvas'&&bgS){const rr=canvas.getBoundingClientRect(),bx=Math.max(0,Math.min(bgS.w-1,Math.floor((e.clientX-rr.left)/Math.max(1,rr.width)*bgS.w))),by=Math.max(0,Math.min(bgS.h-1,Math.floor((e.clientY-rr.top)/Math.max(1,rr.height)*bgS.h))),od=bgS.orig.data,oi=(by*bgS.w+bx)*4;return '#'+[od[oi],od[oi+1],od[oi+2]].map(v=>v.toString(16).padStart(2,'0')).join('');}const r=canvas.getBoundingClientRect();const x=Math.max(0,Math.min(canvas.width-1,Math.floor((e.clientX-r.left)/Math.max(1,r.width)*canvas.width))),y=Math.max(0,Math.min(canvas.height-1,Math.floor((e.clientY-r.top)/Math.max(1,r.height)*canvas.height)));const d=canvas.getContext('2d',{willReadFrequently:true}).getImageData(x,y,1,1).data;return '#'+[d[0],d[1],d[2]].map(v=>v.toString(16).padStart(2,'0')).join('');}
   function beginEyedropperSample(canvas,e){eyedropperPointerId=e.pointerId;try{canvas.setPointerCapture?.(e.pointerId)}catch(_){}updateEyedropperSample(canvas,e);eyeLoupe.style.display='flex';}
-  function updateEyedropperSample(canvas,e){try{eyedropperSampleHex=eyeHexAt(canvas,e);eyeLoupe.querySelector('.eye-swatch').style.background=eyedropperSampleHex;eyeLoupe.querySelector('.eye-hex').textContent=eyedropperSampleHex.toUpperCase();eyeLoupe.style.left=Math.max(80,Math.min(window.innerWidth-80,e.clientX))+'px';eyeLoupe.style.top=Math.max(65,e.clientY-12)+'px';eyeLoupe.style.display='flex';}catch(_){}}
-  function finishEyedropperSample(canvas,e){if(e.pointerId!==eyedropperPointerId)return;updateEyedropperSample(canvas,e);if(activeEyedropperInput){activeEyedropperInput.value=eyedropperSampleHex;activeEyedropperInput.dispatchEvent(new Event('input',{bubbles:true}));activeEyedropperInput.dispatchEvent(new Event('change',{bubbles:true}));if(activeEyedropperInput.id==='bgRemoveColor')$('bgRemoveStatus').textContent='Color seleccionado: '+eyedropperSampleHex.toUpperCase();}activeEyedropperInput=null;eyedropperPointerId=null;eyeLoupe.style.display='none';document.querySelectorAll('.eye-active-button').forEach(b=>b.classList.remove('eye-active-button'));}
+  function eyeDrawZoom(canvas,e){
+    const z=eyeLoupe.querySelector('.eye-zoom');if(!z)return;
+    if(!(canvas.id==='bgPreviewCanvas'&&bgS)){z.style.display='none';return;}
+    const rr=canvas.getBoundingClientRect(),W=bgS.w,H=bgS.h,cx=Math.max(0,Math.min(W-1,Math.floor((e.clientX-rr.left)/Math.max(1,rr.width)*W))),cy=Math.max(0,Math.min(H-1,Math.floor((e.clientY-rr.top)/Math.max(1,rr.height)*H))),od=bgS.orig.data,g=z.getContext('2d'),N=9,S=7;
+    g.clearRect(0,0,63,63);
+    for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=cx+i-4,y=cy+j-4;if(x<0||y<0||x>=W||y>=H){g.fillStyle='#000';}else{const o=(y*W+x)*4;g.fillStyle=`rgb(${od[o]},${od[o+1]},${od[o+2]})`;}g.fillRect(i*S,j*S,S,S);}
+    g.strokeStyle='#fff';g.lineWidth=1;g.strokeRect(4*S+.5,4*S+.5,S-1,S-1);g.strokeStyle='#000';g.strokeRect(4*S-.5,4*S-.5,S+1,S+1);
+    z.style.display='block';
+  }
+  function updateEyedropperSample(canvas,e){try{eyeDrawZoom(canvas,e);eyedropperSampleHex=eyeHexAt(canvas,e);eyeLoupe.querySelector('.eye-swatch').style.background=eyedropperSampleHex;eyeLoupe.querySelector('.eye-hex').textContent=eyedropperSampleHex.toUpperCase();eyeLoupe.style.left=Math.max(80,Math.min(window.innerWidth-80,e.clientX))+'px';eyeLoupe.style.top=Math.max(65,e.clientY-12)+'px';eyeLoupe.style.display='flex';}catch(_){}}
+  function finishEyedropperSample(canvas,e){if(e.pointerId!==eyedropperPointerId)return;updateEyedropperSample(canvas,e);if(activeEyedropperInput){activeEyedropperInput.value=eyedropperSampleHex;activeEyedropperInput.dispatchEvent(new Event('input',{bubbles:true}));activeEyedropperInput.dispatchEvent(new Event('change',{bubbles:true}));if(activeEyedropperInput.id==='bgRemoveColor'||activeEyedropperInput.id==='bgKeyColor')$('bgRemoveStatus').textContent='Color seleccionado: '+eyedropperSampleHex.toUpperCase();}activeEyedropperInput=null;eyedropperPointerId=null;eyeLoupe.style.display='none';document.querySelectorAll('.eye-active-button').forEach(b=>b.classList.remove('eye-active-button'));}
   function attachEyedropper(input){if(!input||input.type!=='color'||input.dataset.eyedropperReady)return;input.dataset.eyedropperReady='1';const btn=document.createElement('button');btn.type='button';btn.className='btn';btn.textContent='⌖';btn.title='Cuentagotas: mantén el dedo y suéltalo para confirmar';btn.setAttribute('aria-label','Cuentagotas');btn.style.cssText='min-width:34px;padding:5px 8px;margin-left:4px;vertical-align:middle';input.insertAdjacentElement('afterend',btn);btn.addEventListener('click',async()=>{activeEyedropperInput=input;document.querySelectorAll('.eye-active-button').forEach(b=>b.classList.remove('eye-active-button'));btn.classList.add('eye-active-button');const canvas=$('bgPreviewCanvas');if(canvas&&canvas.width>1&&canvas.height>1){$('bgRemoveStatus').textContent='Cuentagotas activo: mantén el dedo sobre la vista previa, muévelo y suelta para confirmar.';canvas.parentElement?.scrollIntoView({block:'nearest',behavior:'smooth'});return;}const selected=selectedEnhanceImage();if(!selected){activeEyedropperInput=null;btn.classList.remove('eye-active-button');showToast('Selecciona una imagen para usar el cuentagotas.','info');return;}try{const im=await getLoadedImage(selected.src),cv=$('bgPreviewCanvas');cv.width=im.naturalWidth;cv.height=im.naturalHeight;const cx=cv.getContext('2d');cx.clearRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0);$('bgRemoveStatus').textContent='Cuentagotas activo: mantén el dedo sobre la vista previa, muévelo y suelta para confirmar.';cv.parentElement?.scrollIntoView({block:'nearest',behavior:'smooth'});}catch(_){activeEyedropperInput=null;btn.classList.remove('eye-active-button');}});}
   function installEyedroppers(root=document){root.querySelectorAll('input[type="color"]').forEach(attachEyedropper);}
   const eyeObserver=new MutationObserver(()=>installEyedroppers());eyeObserver.observe(document.body,{childList:true,subtree:true});installEyedroppers();
@@ -8049,8 +8112,26 @@ document.addEventListener('pointerdown', (e) => {
     }
     return { l: L, t: T, w: nW, h: nH };
   }
-  let cropS = null, cropDrag = null;
+  let cropS = null, cropDrag = null, cropView = { z: 1, tx: 0, ty: 0 }, cropPtrs = new Map(), cropPinch = null, cropPan = null;
   const c01 = (v) => Math.max(0, Math.min(1, v));
+  function cropApplyView() {
+    const w = $('cropWrap'), v = cropView;
+    const bw = w.offsetWidth * v.z / 2 + 40, bh = w.offsetHeight * v.z / 2 + 40;
+    v.tx = Math.max(-bw, Math.min(bw, v.tx)); v.ty = Math.max(-bh, Math.min(bh, v.ty));
+    w.style.transform = (v.z === 1 && !v.tx && !v.ty) ? '' : `translate(${v.tx}px,${v.ty}px) scale(${v.z})`;
+    w.style.setProperty('--iz', String(1 / v.z));
+    $('cropZoomLbl').textContent = Math.round(v.z * 100) + '%';
+  }
+  function cropZoomAt(nz, fx, fy) {
+    const w = $('cropWrap'), v = cropView; nz = Math.max(1, Math.min(40, nz));
+    const r = w.getBoundingClientRect(), c0x = r.left + r.width / 2 - v.tx, c0y = r.top + r.height / 2 - v.ty;
+    if (fx == null) { const st = $('cropStage').getBoundingClientRect(); fx = st.left + st.width / 2; fy = st.top + st.height / 2; }
+    const k = nz / v.z;
+    v.tx = fx - c0x - (fx - c0x - v.tx) * k; v.ty = fy - c0y - (fy - c0y - v.ty) * k; v.z = nz;
+    if (nz === 1) { v.tx = 0; v.ty = 0; }
+    cropApplyView();
+  }
+  function cropResetView() { cropView = { z: 1, tx: 0, ty: 0 }; cropApplyView(); }
   function cropDraw() {
     const s = cropS; if (!s) return;
     const r = $('cropRect');
@@ -8072,10 +8153,11 @@ document.addEventListener('pointerdown', (e) => {
     }
     cropS = { id, im, nw, nh, init, x: init.x, y: init.y, w: init.w, h: init.h };
     $('cropImg').src = el.src;
+    cropPtrs.clear(); cropPinch = null; cropPan = null; cropDrag = null; cropResetView();
     $('cropModal').classList.add('show');
     cropDraw();
   }
-  function closeCrop() { $('cropModal').classList.remove('show'); cropS = null; cropDrag = null; $('cropImg').removeAttribute('src'); }
+  function closeCrop() { $('cropModal').classList.remove('show'); cropS = null; cropDrag = null; cropPtrs.clear(); cropPinch = null; cropPan = null; cropResetView(); $('cropImg').removeAttribute('src'); }
   (function () {
     const rect = $('cropRect');
     rect.addEventListener('pointerdown', (e) => {
@@ -8104,6 +8186,44 @@ document.addEventListener('pointerdown', (e) => {
       cropDraw(); e.preventDefault();
     });
     const end = (e) => { if (cropDrag && e.pointerId === cropDrag.pid) cropDrag = null; };
+    // --- Zoom y paneo: pellizco con dos dedos (en cualquier parte), un dedo fuera del recuadro, rueda del ratón y botones ---
+    const stage = $('cropStage');
+    const pinchStart = () => {
+      const p = [...cropPtrs.values()]; if (p.length < 2) return;
+      cropPinch = { d: Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y) || 1, z: cropView.z, mx: (p[0].x + p[1].x) / 2, my: (p[0].y + p[1].y) / 2, tx: cropView.tx, ty: cropView.ty };
+    };
+    stage.addEventListener('pointerdown', (e) => {
+      if (!cropS) return;
+      cropPtrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (cropPtrs.size >= 2) { cropDrag = null; cropPan = null; pinchStart(); e.preventDefault(); return; }
+      if (!e.target.closest('.crop-rect')) { cropPan = { pid: e.pointerId, sx: e.clientX, sy: e.clientY, tx: cropView.tx, ty: cropView.ty }; try { stage.setPointerCapture(e.pointerId); } catch (_) {} e.preventDefault(); }
+    }, true);
+    stage.addEventListener('pointermove', (e) => {
+      if (!cropS || !cropPtrs.has(e.pointerId)) return;
+      cropPtrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (cropPtrs.size >= 2 && cropPinch) {
+        const p = [...cropPtrs.values()], d = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y) || 1, mx = (p[0].x + p[1].x) / 2, my = (p[0].y + p[1].y) / 2;
+        cropView.tx = cropPinch.tx + (mx - cropPinch.mx); cropView.ty = cropPinch.ty + (my - cropPinch.my);
+        const z0 = cropView.z, nz = Math.max(1, Math.min(40, cropPinch.z * d / cropPinch.d));
+        // zoom alrededor del punto medio de los dedos
+        const w = $('cropWrap'), r = w.getBoundingClientRect(), c0x = r.left + r.width / 2 - cropView.tx, c0y = r.top + r.height / 2 - cropView.ty, k = nz / z0;
+        cropView.tx = mx - c0x - (mx - c0x - cropView.tx) * k; cropView.ty = my - c0y - (my - c0y - cropView.ty) * k; cropView.z = nz;
+        if (nz === 1) { cropView.tx = 0; cropView.ty = 0; }
+        cropApplyView(); e.preventDefault(); e.stopPropagation(); return;
+      }
+      if (cropPan && cropPan.pid === e.pointerId) { cropView.tx = cropPan.tx + (e.clientX - cropPan.sx); cropView.ty = cropPan.ty + (e.clientY - cropPan.sy); cropApplyView(); e.preventDefault(); }
+    }, true);
+    const pend = (e) => {
+      cropPtrs.delete(e.pointerId);
+      if (cropPan && cropPan.pid === e.pointerId) cropPan = null;
+      if (cropPtrs.size < 2) cropPinch = null;
+      if (cropPtrs.size === 1) { const [id, p] = [...cropPtrs.entries()][0]; cropPan = null; }
+    };
+    stage.addEventListener('pointerup', pend, true); stage.addEventListener('pointercancel', pend, true);
+    stage.addEventListener('wheel', (e) => { if (!cropS) return; e.preventDefault(); cropZoomAt(cropView.z * (e.deltaY < 0 ? 1.2 : 1 / 1.2), e.clientX, e.clientY); }, { passive: false });
+    $('cropZoomIn').addEventListener('click', () => cropZoomAt(cropView.z * 1.5));
+    $('cropZoomOut').addEventListener('click', () => cropZoomAt(cropView.z / 1.5));
+    $('cropZoomFit').addEventListener('click', cropResetView);
     rect.addEventListener('pointerup', end); rect.addEventListener('pointercancel', end);
     $('cropCancel').addEventListener('click', () => { sfx.tap(); closeCrop(); });
     $('cropReset').addEventListener('click', () => { if (!cropS) return; sfx.tap(); Object.assign(cropS, cropS.init); cropDraw(); });
