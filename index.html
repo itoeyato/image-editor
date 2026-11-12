@@ -247,7 +247,7 @@
   .handle::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; border-right: 2px solid white; border-bottom: 2px solid white; }
   .el.selected .handle { display: block; }
   .rotate-handle {
-    position: absolute; left: 50%; top: -42px; transform: translateX(-50%);
+    position: absolute; left: 50%; top: -56px; transform: translateX(-50%);
     width: 34px; height: 34px; border-radius: 50%; display: flex;
     align-items: center; justify-content: center; z-index: 12;
     background: var(--handle-bg); color: #fff; border: 2px solid var(--handle-border);
@@ -718,6 +718,36 @@
   #hfModal .hf-note { font-size: 11px; color: var(--muted); margin: 0 0 6px; line-height: 1.35; }
   #hfModal .adjust-box { margin-top: 8px; }
   #hfModal .row { margin-top: 4px; }
+
+  /* ===== Tiradores laterales (ajuste en un solo eje) ===== */
+  .handle-edge { position: absolute; display: none; z-index: 10; background: var(--handle-bg); border: 2px solid var(--handle-border); border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); pointer-events: auto; touch-action: none; }
+  .el.selected .handle-edge { display: block; }
+  .handle-edge.he-n, .handle-edge.he-s { left: 50%; width: 44px; height: 16px; transform: translateX(-50%); cursor: ns-resize; }
+  .handle-edge.he-n { top: -10px; } .handle-edge.he-s { bottom: -10px; }
+  .handle-edge.he-e, .handle-edge.he-w { top: 50%; width: 16px; height: 44px; transform: translateY(-50%); cursor: ew-resize; }
+  .handle-edge.he-e { right: -10px; } .handle-edge.he-w { left: -10px; }
+
+  /* ===== Recorte de imagen ===== */
+  .crop-modal { position: fixed; inset: 0; z-index: 10003; display: none; flex-direction: column; background: #111; touch-action: none; }
+  .crop-modal.show { display: flex; }
+  .crop-top { padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; color: #fff; font-size: 13px; flex-shrink: 0; }
+  .crop-top span { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #cbd5e1; }
+  .crop-stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 18px; overflow: hidden; touch-action: none; }
+  .crop-wrap { position: relative; line-height: 0; touch-action: none; user-select: none; -webkit-user-select: none; background-color: #fff; background-image: linear-gradient(45deg,#d7dbe3 25%,transparent 25%),linear-gradient(-45deg,#d7dbe3 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#d7dbe3 75%),linear-gradient(-45deg,transparent 75%,#d7dbe3 75%); background-size: 16px 16px; background-position: 0 0,0 8px,8px -8px,-8px 0; }
+  .crop-wrap img { display: block; max-width: calc(100vw - 36px); max-height: calc(100dvh - 200px); pointer-events: none; user-select: none; -webkit-user-select: none; }
+  .crop-rect { position: absolute; box-sizing: border-box; border: 2px solid #fff; box-shadow: 0 0 0 9999px rgba(0,0,0,0.6); cursor: move; touch-action: none;
+    background-image: linear-gradient(to right, transparent 33.2%, rgba(255,255,255,.55) 33.2%, rgba(255,255,255,.55) calc(33.2% + 1px), transparent calc(33.2% + 1px), transparent 66.4%, rgba(255,255,255,.55) 66.4%, rgba(255,255,255,.55) calc(66.4% + 1px), transparent calc(66.4% + 1px)),
+      linear-gradient(to bottom, transparent 33.2%, rgba(255,255,255,.55) 33.2%, rgba(255,255,255,.55) calc(33.2% + 1px), transparent calc(33.2% + 1px), transparent 66.4%, rgba(255,255,255,.55) 66.4%, rgba(255,255,255,.55) calc(66.4% + 1px), transparent calc(66.4% + 1px)); }
+  .crop-h { position: absolute; background: var(--accent); border: 2px solid #fff; touch-action: none; box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+  .crop-h[data-k="nw"], .crop-h[data-k="ne"], .crop-h[data-k="sw"], .crop-h[data-k="se"] { width: 26px; height: 26px; border-radius: 50%; }
+  .crop-h[data-k="nw"] { left: -14px; top: -14px; cursor: nwse-resize; } .crop-h[data-k="ne"] { right: -14px; top: -14px; cursor: nesw-resize; }
+  .crop-h[data-k="sw"] { left: -14px; bottom: -14px; cursor: nesw-resize; } .crop-h[data-k="se"] { right: -14px; bottom: -14px; cursor: nwse-resize; }
+  .crop-h[data-k="n"], .crop-h[data-k="s"] { left: 50%; width: 40px; height: 16px; border-radius: 8px; transform: translateX(-50%); cursor: ns-resize; }
+  .crop-h[data-k="n"] { top: -10px; } .crop-h[data-k="s"] { bottom: -10px; }
+  .crop-h[data-k="e"], .crop-h[data-k="w"] { top: 50%; width: 16px; height: 40px; border-radius: 8px; transform: translateY(-50%); cursor: ew-resize; }
+  .crop-h[data-k="e"] { right: -10px; } .crop-h[data-k="w"] { left: -10px; }
+  .crop-actions { padding: 12px 14px calc(12px + env(safe-area-inset-bottom)); display: flex; gap: 8px; background: rgba(20,20,20,0.95); flex-shrink: 0; }
+  .crop-actions .btn, .crop-actions .cta { flex: 1; min-height: 42px; }
 </style>
 <meta name="editor-build" content="2026-10-15-tools-separated-history-v2">
 </head>
@@ -1056,6 +1086,7 @@
           <div class="subgroup-body">
             <button class="btn full" id="replaceImageBtn">Reemplazar imagen</button>
             <input type="file" id="replaceImageInput" accept="image/*" style="display:none;" />
+            <button class="btn full" id="cropImageBtn" type="button">Recortar imagen</button>
             <div class="row" style="margin-top: 6px"><button class="btn full" id="duplicateEl">Duplicar</button></div>
           </div>
         </div>
@@ -1340,6 +1371,20 @@
     </div>
   </div>
 
+  <div class="crop-modal" id="cropModal">
+    <div class="crop-top"><b>Recortar imagen</b><span id="cropInfo"></span></div>
+    <div class="crop-stage">
+      <div class="crop-wrap" id="cropWrap">
+        <img id="cropImg" alt="" draggable="false" />
+        <div class="crop-rect" id="cropRect" data-k="m">
+          <div class="crop-h" data-k="nw"></div><div class="crop-h" data-k="ne"></div><div class="crop-h" data-k="sw"></div><div class="crop-h" data-k="se"></div>
+          <div class="crop-h" data-k="n"></div><div class="crop-h" data-k="s"></div><div class="crop-h" data-k="e"></div><div class="crop-h" data-k="w"></div>
+        </div>
+      </div>
+    </div>
+    <div class="crop-actions"><button class="btn" id="cropCancel" type="button">Cancelar</button><button class="btn" id="cropReset" type="button">Restablecer</button><button class="cta" id="cropApply" type="button">Aplicar recorte</button></div>
+  </div>
+
   <div class="confirm-modal" id="confirmModal">
     <div class="confirm-box">
       <h3 id="confirmTitle">¿Confirmar?</h3>
@@ -1378,7 +1423,8 @@
     stretch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="8" rx="2"/><path d="M7 4l-4 4 4 4M17 4l4 4-4 4"/></svg>',
     group: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
     ungroup: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><path d="M14 3h7v7M3 14v7h7" stroke-dasharray="2 2"/></svg>',
-    lockOpen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>',
+    crop: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>',
+    lockOpen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>',
     lockClosed: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
     chevronUp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>',
     chevronDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
@@ -1881,6 +1927,15 @@ function undo() {
       handle.className = "handle";
       handle.title = "Arrastrar para cambiar tamaño";
       d.appendChild(handle);
+
+      // Tiradores laterales (centro de cada lado): ajustan un solo eje.
+      ['n', 's', 'e', 'w'].forEach(k => {
+        const eh = document.createElement("div");
+        eh.className = "handle-edge he-" + k;
+        eh.dataset.edge = k;
+        eh.title = (k === 'n' || k === 's') ? "Ajustar alto" : "Ajustar ancho";
+        d.appendChild(eh);
+      });
 
       // Handle de rotación independiente del control de escala.
       const rotateHandle = document.createElement("div");
@@ -2468,6 +2523,7 @@ function updateThumbnails() {
       addCtxItem(menu, ICONS.trash, `Eliminar (${selectedIds.size})`, doDelete, true);
     } else {
       if (findEl(elId) && findEl(elId).type === 'text') addCtxItem(menu, ICONS.values, 'Editar texto', openTextEditor);
+      if (findEl(elId) && !isGen(findEl(elId))) addCtxItem(menu, ICONS.crop, 'Recortar', () => openCrop(elId));
       addCtxItem(menu, ICONS.copy, 'Copiar', doCopy);
       addCtxItem(menu, ICONS.cut, 'Cortar', doCut);
       addCtxItem(menu, ICONS.duplicate, 'Duplicar', doDuplicate);
@@ -2615,13 +2671,11 @@ function updateThumbnails() {
     saveState(); deselectAll(); sfx.success(); showToast('Eliminado', 'success'); checkMultiSelectState();
   }
   function doAddPage() {
-    endEditSafe();
     state.pages.push({ id: ++pageCounter, els: [] });
     state.currentPageIndex = state.pages.length - 1;
     saveState(); deselectAll(); renderAll(); sfx.success(); showToast('Página agregada', 'success');
   }
   function doDuplicatePage() {
-    endEditSafe();
     const srcPage = currentPage();
     const newPage = {
       id: ++pageCounter,
@@ -2633,7 +2687,6 @@ function updateThumbnails() {
   }
   async function doDeletePage() {
     if (state.pages.length <= 1) { showToast('Debe haber al menos una página', 'info'); return; }
-    endEditSafe();
     const ok = await confirmAction('¿Eliminar página?', `Se eliminará la página ${state.currentPageIndex + 1}.`);
     if (!ok) return;
     currentPage().els.forEach(el => { if (el.src && imgCache.has(el.src)) imgCache.delete(el.src); });
@@ -3268,7 +3321,7 @@ function updateThumbnails() {
       }
       if (gesture.pointers.size === 1) {
         const elDiv0 = e.target.closest('.el'), elDiv = elDiv0 && elDiv0.dataset.flow ? null : elDiv0;
-        const handleDiv = e.target.closest('.handle');
+        const handleDiv = e.target.closest('.handle, .handle-edge');
         let target = 'background'; let elId = null;
         if (handleDiv && elDiv) { target = 'handle'; elId = parseInt(elDiv.dataset.id); }
         else if (elDiv) { target = 'element'; elId = parseInt(elDiv.dataset.id); }
@@ -3288,6 +3341,8 @@ function updateThumbnails() {
             gesture.resize.active = true; gesture.resize.elId = elId;
             gesture.resize.startX = pos.x; gesture.resize.startY = pos.y;
             gesture.resize.startW = el.wCm; gesture.resize.startH = el.hCm;
+            gesture.resize.startX0 = el.xCm; gesture.resize.startY0 = el.yCm;
+            gesture.resize.edge = (handleDiv && handleDiv.dataset.edge) || null;
             e.preventDefault();
           }
         } else if (target === 'element') {
@@ -3379,14 +3434,31 @@ function updateThumbnails() {
         const el = findEl(gesture.resize.elId); if (!el) return;
         const pos = getStageCoords(e.clientX, e.clientY);
         const dxPx = pos.x - gesture.resize.startX, dyPx = pos.y - gesture.resize.startY;
-        const gr = guideResize(el, gesture.resize.startW + dxPx / PX_PER_CM, gesture.resize.startH + dyPx / PX_PER_CM);
-        el.wCm = Math.max(0.5, gr.sw ? gr.w : snap(gr.w));
-        el.hCm = Math.max(0.5, gr.sh ? gr.h : snap(gr.h));
+        const RZ = gesture.resize;
+        if (RZ.edge) {
+          // Ajuste de un solo eje: el lado opuesto queda fijo (respeta la rotación del elemento).
+          const ang = (el.rot || 0) * Math.PI / 180, ca = Math.cos(ang), sa = Math.sin(ang);
+          const ldx = (dxPx * ca + dyPx * sa) / PX_PER_CM, ldy = (-dxPx * sa + dyPx * ca) / PX_PER_CM;
+          let w = RZ.startW, h = RZ.startH, shx = 0, shy = 0;
+          if (RZ.edge === 'e') { w = Math.max(0.5, snap(RZ.startW + ldx)); shx = (w - RZ.startW) / 2; }
+          else if (RZ.edge === 'w') { w = Math.max(0.5, snap(RZ.startW - ldx)); shx = -(w - RZ.startW) / 2; }
+          else if (RZ.edge === 's') { h = Math.max(0.5, snap(RZ.startH + ldy)); shy = (h - RZ.startH) / 2; }
+          else if (RZ.edge === 'n') { h = Math.max(0.5, snap(RZ.startH - ldy)); shy = -(h - RZ.startH) / 2; }
+          const ncx = RZ.startX0 + RZ.startW / 2 + shx * ca - shy * sa;
+          const ncy = RZ.startY0 + RZ.startH / 2 + shx * sa + shy * ca;
+          el.wCm = w; el.hCm = h; el.xCm = ncx - w / 2; el.yCm = ncy - h / 2;
+        } else {
+          const gr = guideResize(el, gesture.resize.startW + dxPx / PX_PER_CM, gesture.resize.startH + dyPx / PX_PER_CM);
+          el.wCm = Math.max(0.5, gr.sw ? gr.w : snap(gr.w));
+          el.hCm = Math.max(0.5, gr.sh ? gr.h : snap(gr.h));
+        }
         if (isGen(el)) sanitizeGen(el);
         const elDiv = stage.querySelector(`.el[data-id="${gesture.resize.elId}"]`);
-        if (elDiv) { elDiv.style.width = el.wCm * PX_PER_CM + "px"; elDiv.style.height = el.hCm * PX_PER_CM + "px"; if (isGen(el)) { const im = elDiv.querySelector("img"); if (im) im.src = genURL(el); } }
+        if (elDiv) { elDiv.style.left = el.xCm * PX_PER_CM + "px"; elDiv.style.top = el.yCm * PX_PER_CM + "px"; elDiv.style.width = el.wCm * PX_PER_CM + "px"; elDiv.style.height = el.hCm * PX_PER_CM + "px"; if (isGen(el)) { const im = elDiv.querySelector("img"); if (im) im.src = genURL(el); } }
         const shadowEl = stage.querySelector(`.el-shadow[data-shadow-id="${gesture.resize.elId}"]`);
         if (shadowEl) {
+          shadowEl.style.left = el.xCm * PX_PER_CM + "px";
+          shadowEl.style.top = el.yCm * PX_PER_CM + "px";
           shadowEl.style.width = el.wCm * PX_PER_CM + "px";
           shadowEl.style.height = el.hCm * PX_PER_CM + "px";
         }
@@ -5345,6 +5417,7 @@ ctx.restore();
       if (n === 'Reemplazar' || n === 'Duplicar') g.querySelector('.subgroup-header span').textContent = (T || S) ? 'Duplicar' : 'Reemplazar'; });
     const mt = $('modeFit').parentElement; mt.style.display = (T || S) ? 'none' : ''; if (mt.previousElementSibling) mt.previousElementSibling.style.display = (T || S) ? 'none' : '';
     $('replaceImageBtn').style.display = (T || S) ? 'none' : '';
+    $('cropImageBtn').style.display = (T || S) ? 'none' : '';
     const ta = $('txtContent'); if (T && document.activeElement !== ta) ta.value = f.text;
     SIC.querySelectorAll('[data-g]').forEach(c => {
       const o = c.dataset.g === 'el' ? f : f[c.dataset.g]; if (!o) return;
@@ -5928,7 +6001,7 @@ ctx.restore();
       qaSig = sig; let h = '';
       if (f.type === 'text') h += qaB('edit', 'Editar') + qaSep + qaB('bold', '<b>N</b>', t.bold) + qaB('italic', '<i>K</i>', t.italic) + qaB('underline', '<u>S</u>', t.underline) + qaSep + qaB('sdn', 'A−') + qaB('sup', 'A+') + '<input type="color" data-qc="tx.color">' + qaB('align', { left: 'Izq', center: 'Centro', right: 'Der', justify: 'Justif.' }[t.align]) + qaB('fit', { none: 'Fijo', grow: 'Crece', shrink: 'Reduce' }[t.fit]) + qaSep;
       else if (f.type === 'shape') h += '<input type="color" data-qc="sh.fill"><input type="color" data-qc="sh.stroke">' + qaSep;
-      else if (!multi) h += qaB('replace', 'Cambiar') + qaSep;
+      else if (!multi) h += qaB('replace', 'Cambiar') + qaB('crop', 'Recortar') + qaSep;
       if (multi) h += qaB('group', 'Agrupar') + qaB('ungroup', 'Desagrupar') + qaB('al:l', 'Izq') + qaB('al:c', 'Centro') + qaB('al:r', 'Der') + qaSep;
       h += qaB('rot', 'Girar') + qaB('flipX', 'Voltear', f.flipX) + qaB('dup', 'Duplicar') + qaB('array', 'Array') + qaB('front', 'Frente') + qaB('back', 'Fondo') + qaB('del', 'Eliminar');
       qa.innerHTML = h;
@@ -5948,6 +6021,7 @@ ctx.restore();
     else if (a === 'rot') { els.forEach(x => { let n = ((x.rot || 0) + 90) % 360; if (n > 180) n -= 360; x.rot = n; }); commit(); }
     else if (a === 'flipX') { const v = !f.flipX; els.forEach(x => x.flipX = v); commit(); }
     else if (a === 'replace') { const i = $('replaceImageInput'); i.dataset.targetId = f.id; i.click(); }
+    else if (a === 'crop') openCrop(f.id);
     else if (a === 'dup') els.length > 1 ? doDuplicateAll() : doDuplicate();
     else if (a === 'array') openArray();
     else if (a === 'front') els.length > 1 ? bringToFrontAll() : bringToFront(f.id);
@@ -6019,7 +6093,6 @@ ctx.restore();
     });
   }
   function openArray() {
-    endEditSafe();
     const els = getSelectedEls().filter(e => !e.flow);
     if (!els.length) { alert('Primero selecciona uno o más objetos o imágenes.'); return; }
     arSrc = els.slice();
@@ -7508,6 +7581,119 @@ document.addEventListener('pointerdown', (e) => {
   })();
   function openPoster() { psOpen = true; psSync(); posterModal.classList.add('show'); setTimeout(() => { posterModal.classList.add('visible'); psSync(); psDraw(); }, 20); }
   function closePoster() { psOpen = false; posterModal.classList.remove('visible'); setTimeout(() => posterModal.classList.remove('show'), 200); }
+  /* ====== RECORTE DE IMAGEN ====== */
+  // Rectángulo que ocupa la imagen dentro del marco (en cm), replicando el render de exportación.
+  function imgRectCm(el, nw, nh) {
+    const x = el.xCm, y = el.yCm, w = el.wCm, h = el.hCm, zoom = (Number(el.imgZoom) || 100) / 100;
+    const posX = Number(el.imgPosX) || 0, posY = Number(el.imgPosY) || 0, mode = el.mode || 'fit';
+    const ia = nw / nh, fa = w / h, cx = x + w / 2, cy = y + h / 2;
+    let dw, dh, L, T, nW, nH;
+    if (mode === 'fill') {
+      if (ia > fa) { dh = h; dw = dh * ia; } else { dw = w; dh = dw / ia; }
+      if (zoom < 1) { if (ia > fa) { dw = w; dh = dw / ia; } else { dh = h; dw = dh * ia; } }
+      const ox = 50 + posX / 2, oy = 50 + posY / 2;
+      const il = x + w * ox / 100 - dw * ox / 100, it = y + h * oy / 100 - dh * oy / 100;
+      const icx = il + dw / 2, icy = it + dh / 2;
+      const ncx = cx + (icx - cx) * zoom, ncy = cy + (icy - cy) * zoom;
+      nW = dw * zoom; nH = dh * zoom; L = ncx - nW / 2; T = ncy - nH / 2;
+    } else if (mode === 'stretch') {
+      nW = w * zoom; nH = h * zoom; L = cx - nW / 2; T = cy - nH / 2;
+    } else {
+      if (ia > fa) { dw = w; dh = dw / ia; } else { dh = h; dw = dh * ia; }
+      const offX = (w - dw) / 2 * (posX / 100), offY = (h - dh) / 2 * (posY / 100);
+      const icx = cx + offX, icy = cy + offY;
+      const ncx = cx + (icx - cx) * zoom, ncy = cy + (icy - cy) * zoom;
+      nW = dw * zoom; nH = dh * zoom; L = ncx - nW / 2; T = ncy - nH / 2;
+    }
+    return { l: L, t: T, w: nW, h: nH };
+  }
+  let cropS = null, cropDrag = null;
+  const c01 = (v) => Math.max(0, Math.min(1, v));
+  function cropDraw() {
+    const s = cropS; if (!s) return;
+    const r = $('cropRect');
+    r.style.left = (s.x * 100) + '%'; r.style.top = (s.y * 100) + '%';
+    r.style.width = (s.w * 100) + '%'; r.style.height = (s.h * 100) + '%';
+    $('cropInfo').textContent = `${Math.max(1, Math.round(s.w * s.nw))} × ${Math.max(1, Math.round(s.h * s.nh))} px`;
+  }
+  async function openCrop(id) {
+    endEditSafe();
+    const el = findEl(id); if (!el || isGen(el) || !el.src) return;
+    let im; try { im = await getLoadedImage(el.src); } catch (_) { return; }
+    const nw = im.naturalWidth, nh = im.naturalHeight;
+    let init = { x: 0, y: 0, w: 1, h: 1 };
+    if (!(Number(el.imgRotate) % 360)) {
+      const R = imgRectCm(el, nw, nh);
+      const x0 = c01((el.xCm - R.l) / R.w), x1 = c01((el.xCm + el.wCm - R.l) / R.w);
+      const y0 = c01((el.yCm - R.t) / R.h), y1 = c01((el.yCm + el.hCm - R.t) / R.h);
+      if (x1 - x0 > 0.01 && y1 - y0 > 0.01) init = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+    }
+    cropS = { id, im, nw, nh, init, x: init.x, y: init.y, w: init.w, h: init.h };
+    $('cropImg').src = el.src;
+    $('cropModal').classList.add('show');
+    cropDraw();
+  }
+  function closeCrop() { $('cropModal').classList.remove('show'); cropS = null; cropDrag = null; $('cropImg').removeAttribute('src'); }
+  (function () {
+    const rect = $('cropRect');
+    rect.addEventListener('pointerdown', (e) => {
+      if (!cropS) return;
+      const h = e.target.closest('.crop-h');
+      cropDrag = { k: h ? h.dataset.k : 'm', sx: e.clientX, sy: e.clientY, o: { x: cropS.x, y: cropS.y, w: cropS.w, h: cropS.h }, pid: e.pointerId };
+      try { rect.setPointerCapture(e.pointerId); } catch (_) {}
+      e.preventDefault(); e.stopPropagation();
+    });
+    rect.addEventListener('pointermove', (e) => {
+      if (!cropDrag || !cropS || e.pointerId !== cropDrag.pid) return;
+      const r = $('cropWrap').getBoundingClientRect();
+      const dx = (e.clientX - cropDrag.sx) / Math.max(1, r.width), dy = (e.clientY - cropDrag.sy) / Math.max(1, r.height);
+      const o = cropDrag.o, k = cropDrag.k, minX = 24 / Math.max(1, r.width), minY = 24 / Math.max(1, r.height);
+      let x0 = o.x, y0 = o.y, x1 = o.x + o.w, y1 = o.y + o.h;
+      if (k === 'm') {
+        const nx = Math.max(0, Math.min(1 - o.w, o.x + dx)), ny = Math.max(0, Math.min(1 - o.h, o.y + dy));
+        x0 = nx; y0 = ny; x1 = nx + o.w; y1 = ny + o.h;
+      } else {
+        if (k.includes('w')) x0 = Math.max(0, Math.min(x1 - minX, o.x + dx));
+        if (k.includes('e')) x1 = Math.min(1, Math.max(x0 + minX, o.x + o.w + dx));
+        if (k.includes('n')) y0 = Math.max(0, Math.min(y1 - minY, o.y + dy));
+        if (k.includes('s')) y1 = Math.min(1, Math.max(y0 + minY, o.y + o.h + dy));
+      }
+      cropS.x = x0; cropS.y = y0; cropS.w = x1 - x0; cropS.h = y1 - y0;
+      cropDraw(); e.preventDefault();
+    });
+    const end = (e) => { if (cropDrag && e.pointerId === cropDrag.pid) cropDrag = null; };
+    rect.addEventListener('pointerup', end); rect.addEventListener('pointercancel', end);
+    $('cropCancel').addEventListener('click', () => { sfx.tap(); closeCrop(); });
+    $('cropReset').addEventListener('click', () => { if (!cropS) return; sfx.tap(); Object.assign(cropS, cropS.init); cropDraw(); });
+    $('cropApply').addEventListener('click', () => {
+      const s = cropS; if (!s) return;
+      const el = findEl(s.id); if (!el) { closeCrop(); return; }
+      const im = s.im, nw = s.nw, nh = s.nh;
+      const cx = Math.max(0, Math.min(nw - 1, Math.round(s.x * nw))), cy = Math.max(0, Math.min(nh - 1, Math.round(s.y * nh)));
+      const cw = Math.max(1, Math.min(nw - cx, Math.round(s.w * nw))), ch = Math.max(1, Math.min(nh - cy, Math.round(s.h * nh)));
+      try {
+        const R = imgRectCm(el, nw, nh), kx = R.w / nw, ky = R.h / nh;
+        const newW = Math.max(0.1, cw * kx), newH = Math.max(0.1, ch * ky);
+        // El recorte se queda en el mismo lugar de la hoja (respetando la rotación del elemento).
+        const ccx = R.l + (cx + cw / 2) * kx, ccy = R.t + (cy + ch / 2) * ky;
+        const ocx = el.xCm + el.wCm / 2, ocy = el.yCm + el.hCm / 2;
+        const ox = ccx - ocx, oy = ccy - ocy, a = (el.rot || 0) * Math.PI / 180;
+        const ncx = ocx + ox * Math.cos(a) - oy * Math.sin(a), ncy = ocy + ox * Math.sin(a) + oy * Math.cos(a);
+        const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+        c.getContext('2d').drawImage(im, cx, cy, cw, ch, 0, 0, cw, ch);
+        const mime = (el.src.match(/^data:(image\/[a-zA-Z0-9.+-]+)/) || [])[1];
+        const out = mime === 'image/jpeg' ? c.toDataURL('image/jpeg', 0.95) : c.toDataURL('image/png');
+        el.src = out;
+        el.wCm = newW; el.hCm = newH; el.xCm = ncx - newW / 2; el.yCm = ncy - newH / 2;
+        el.mode = Math.abs(kx / ky - 1) < 0.001 ? 'fit' : 'stretch';
+        el.imgZoom = 100; el.imgPosX = 0; el.imgPosY = 0;
+        selectedIds = new Set([el.id]);
+        thumbCache.clear(); saveState(); closeCrop(); renderAll(); sfx.success();
+      } catch (err) { sfx.error(); closeCrop(); }
+    });
+    $('cropImageBtn').addEventListener('click', () => { const f = getSelectedEls()[0]; if (f) { sfx.click(); openCrop(f.id); } });
+  })();
+
   window.addEventListener('resize', () => { if (psOpen) psDraw(); });
   { const b = document.createElement('button'); b.id = 'openPosterBtn';
     b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>Editor de póster';
