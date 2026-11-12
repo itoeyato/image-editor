@@ -1509,6 +1509,7 @@
     return out;
   }
   let selectedIds = new Set();
+  let symScale = false; // escalar desde el centro (ambos lados a la vez)
   let multiSelectMode = false;
   let elCounter = 1, pageCounter = 1;
   let PX_PER_CM = 10, zoomScale = 0.7;
@@ -3440,17 +3441,20 @@ function updateThumbnails() {
           const ang = (el.rot || 0) * Math.PI / 180, ca = Math.cos(ang), sa = Math.sin(ang);
           const ldx = (dxPx * ca + dyPx * sa) / PX_PER_CM, ldy = (-dxPx * sa + dyPx * ca) / PX_PER_CM;
           let w = RZ.startW, h = RZ.startH, shx = 0, shy = 0;
-          if (RZ.edge === 'e') { w = Math.max(0.5, snap(RZ.startW + ldx)); shx = (w - RZ.startW) / 2; }
-          else if (RZ.edge === 'w') { w = Math.max(0.5, snap(RZ.startW - ldx)); shx = -(w - RZ.startW) / 2; }
-          else if (RZ.edge === 's') { h = Math.max(0.5, snap(RZ.startH + ldy)); shy = (h - RZ.startH) / 2; }
-          else if (RZ.edge === 'n') { h = Math.max(0.5, snap(RZ.startH - ldy)); shy = -(h - RZ.startH) / 2; }
+          const K = symScale ? 2 : 1; // desde el centro: ambos lados se mueven a la vez
+          if (RZ.edge === 'e') { w = Math.max(0.5, snap(RZ.startW + K * ldx)); shx = symScale ? 0 : (w - RZ.startW) / 2; }
+          else if (RZ.edge === 'w') { w = Math.max(0.5, snap(RZ.startW - K * ldx)); shx = symScale ? 0 : -(w - RZ.startW) / 2; }
+          else if (RZ.edge === 's') { h = Math.max(0.5, snap(RZ.startH + K * ldy)); shy = symScale ? 0 : (h - RZ.startH) / 2; }
+          else if (RZ.edge === 'n') { h = Math.max(0.5, snap(RZ.startH - K * ldy)); shy = symScale ? 0 : -(h - RZ.startH) / 2; }
           const ncx = RZ.startX0 + RZ.startW / 2 + shx * ca - shy * sa;
           const ncy = RZ.startY0 + RZ.startH / 2 + shx * sa + shy * ca;
           el.wCm = w; el.hCm = h; el.xCm = ncx - w / 2; el.yCm = ncy - h / 2;
         } else {
-          const gr = guideResize(el, gesture.resize.startW + dxPx / PX_PER_CM, gesture.resize.startH + dyPx / PX_PER_CM);
+          const K2 = symScale ? 2 : 1;
+          const gr = guideResize(el, gesture.resize.startW + K2 * dxPx / PX_PER_CM, gesture.resize.startH + K2 * dyPx / PX_PER_CM);
           el.wCm = Math.max(0.5, gr.sw ? gr.w : snap(gr.w));
           el.hCm = Math.max(0.5, gr.sh ? gr.h : snap(gr.h));
+          if (symScale) { el.xCm = RZ.startX0 + (RZ.startW - el.wCm) / 2; el.yCm = RZ.startY0 + (RZ.startH - el.hCm) / 2; }
         }
         if (isGen(el)) sanitizeGen(el);
         const elDiv = stage.querySelector(`.el[data-id="${gesture.resize.elId}"]`);
@@ -5995,10 +5999,10 @@ ctx.restore();
   function updateQA(els) {
     if (!els.length || (editingTextId && edTA)) { qa.classList.remove('show'); qaSig = ''; return; }
     const f = els[0], multi = els.length > 1, t = f.tx, sh = f.sh;
-    const sig = JSON.stringify([f.type, els.length, t && [t.bold, t.italic, t.underline, t.align, t.fit], !!f.groupId, !!f.flipX]);
+    const sig = JSON.stringify([f.type, els.length, t && [t.bold, t.italic, t.underline, t.align, t.fit], !!f.groupId, !!f.flipX, symScale]);
     qa.style.top = ($('stage-wrapper').getBoundingClientRect().top + 6) + 'px';
     if (sig !== qaSig) {
-      qaSig = sig; let h = '';
+      qaSig = sig; let h = qaB('sym', '↔ Centro', symScale) + qaSep;
       if (f.type === 'text') h += qaB('edit', 'Editar') + qaSep + qaB('bold', '<b>N</b>', t.bold) + qaB('italic', '<i>K</i>', t.italic) + qaB('underline', '<u>S</u>', t.underline) + qaSep + qaB('sdn', 'A−') + qaB('sup', 'A+') + '<input type="color" data-qc="tx.color">' + qaB('align', { left: 'Izq', center: 'Centro', right: 'Der', justify: 'Justif.' }[t.align]) + qaB('fit', { none: 'Fijo', grow: 'Crece', shrink: 'Reduce' }[t.fit]) + qaSep;
       else if (f.type === 'shape') h += '<input type="color" data-qc="sh.fill"><input type="color" data-qc="sh.stroke">' + qaSep;
       else if (!multi) h += qaB('replace', 'Cambiar') + qaB('crop', 'Recortar') + qaSep;
@@ -6022,6 +6026,7 @@ ctx.restore();
     else if (a === 'flipX') { const v = !f.flipX; els.forEach(x => x.flipX = v); commit(); }
     else if (a === 'replace') { const i = $('replaceImageInput'); i.dataset.targetId = f.id; i.click(); }
     else if (a === 'crop') openCrop(f.id);
+    else if (a === 'sym') { symScale = !symScale; qaSig = ''; updateQA(els); }
     else if (a === 'dup') els.length > 1 ? doDuplicateAll() : doDuplicate();
     else if (a === 'array') openArray();
     else if (a === 'front') els.length > 1 ? bringToFrontAll() : bringToFront(f.id);
